@@ -1,6 +1,25 @@
 {% extends "main.html" %}
 
-{% block content %} hallo {% endblock %}
+{% block content %}
+<table class="table table-striped pretty" id="datatable">
+    <thead>
+    <tr> <th>Name</th> <th>Sex</th> <th>Location</th> <th>Part 1</th> <th>Part 2</th>
+         <th>Paypal</th> <th>Donation</th> <th>Application time</th></tr>
+    </thead>
+
+    <tbody>
+    {% for participant in participants %}
+    <tr><td><a href="show-participant.html?id={{ participant.id }}">{{ participant.fullnameLF() }}</a></td>
+        <td>{{ participant.shortsex() }}</td> <td>{{ participant.city_with_country() }}</td>
+        <td>{{ participant.part1|part }}</td> <td>{{ participant.part2|part }}</td>
+        <td>{{ participant.paypal_status.paypal_status_name }}</td>
+        <td>{{ participant.donation }}</td>
+        <td>{{ participant.application_time|ft }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
 
 
 {% block navbar %}

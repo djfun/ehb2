@@ -48,7 +48,7 @@ class Participant(Base):
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)
     paypal_token = Column(String(30), index=True)
-    last_paypal_status = Column(SmallInteger)
+    _paypal_status = Column("last_paypal_status", SmallInteger, ForeignKey("paypal_statuses.id"))
     email = Column(String(100), unique=True)
     exp_quartet = Column(String)
     exp_brigade = Column(String)
@@ -63,6 +63,7 @@ class Participant(Base):
 
     s_final_part = relationship("Part", backref=backref("participants"))
     country = relationship("Country", backref=backref("participants"))
+    paypal_status = relationship("PaypalStatus", backref=backref("participants"))
 
     def city_with_country(self):
         return "%s, %s" % (self.city, self._country)
@@ -80,6 +81,12 @@ class Participant(Base):
 
     def fullname(self):
         return "%s %s" % (self.firstname, self.lastname)
+
+    def fullnameLF(self):
+        return "%s, %s" % (self.lastname, self.firstname)
+
+    def paypalStatus(self):
+        return "xx"
 
     def __repr__(self):
         return "%s %s (%d)" % (self.firstname, self.lastname, self.id)
