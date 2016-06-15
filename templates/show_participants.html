@@ -19,6 +19,56 @@
     {% endfor %}
     </tbody>
 </table>
+
+&nbsp;<br/>
+&nbsp;<br/>
+
+<h2>Overview of applications</h2>
+<table>
+    <tr >
+        <td class="chart-cell"><canvas id="countryChart" width="200" height="200"></canvas></td>
+        <td class="chart-cell"><canvas id="partChart" width="200" height="200"></canvas></td>
+    </tr>
+    <tr >
+        <td class="chart-label-cell">by country</td>
+        <td class="chart-label-cell">by part</td>
+    </tr>
+</table>
+
+
+<h2>Total donations</h2>
+<p>Total donations: {{ total_donations }} EUR</p>
+
+
+<script src="static/libs/Chart.min.js"></script>
+<script type="text/javascript">
+    Chart.defaults.global.animation = false;
+
+    var cdata = [ {{ country_data|join(",")|safe }} ];
+
+      var cctx = document.getElementById("countryChart").getContext("2d");
+      var cchart = new Chart(cctx).Doughnut(cdata);
+
+    var pdata = [ {{ part_data|join(",")|safe }} ];
+
+
+      var pctx = document.getElementById("partChart").getContext("2d");
+      var pchart = new Chart(pctx).Doughnut(pdata);
+  </script>
+
+<script type="text/javascript" charset="utf-8">
+		  $(document).ready(function() {
+		    $("#datatable").dataTable( {
+			  "bPaginate": false,
+			  "bFilter": false,
+			  "bSort" : true,
+			  "bAutoWidth" : false
+			})
+          });
+		</script>
+
+
+
 {% endblock %}
 
 
