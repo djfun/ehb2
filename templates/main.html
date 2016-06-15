@@ -1,0 +1,80 @@
+
+{#
+blocks:
+- title
+- navbar
+- content
+#}
+
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+
+    <link rel="icon" type="image/vnd.microsoft.icon" href="static/favicon.png" /> <!-- xxx -->
+    <title>{{ title }} - European Harmony Brigade</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="static/libs/modernizr-2.5.3.min.js"></script>
+    <script src="static/libs/jquery-1.9.0.min.js"></script>
+    <script src="static/libs/jquery.dataTables.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="static/jquery.dataTables.css">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/bootstrap.css">
+    <link rel="stylesheet" href="static/app.css">
+    <script type='text/javascript' src='static/plugins.js'></script>
+    <script type='text/javascript' src='static/script.js'></script>
+    <link rel="canonical" href="http://www.europeanharmonybrigade.org/">
+</head>
+
+<body class="home page page-id-5 page-template-default home">
+<div id="red-stripe"></div>
+
+<div id="wrapper">
+    <!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+
+    <header role="banner" id="header">
+        <a id="logo" href="http://www.europeanharmonybrigade.org/"> <h1>European Harmony Brigade</h1> </a>
+
+        <h2>European Harmony Brigade</h2>
+        {% block navbar %}{% endblock %}
+    </header>
+
+
+    <div id="wrap" class="container" role="document">
+        <div id="content" class="row">
+
+            <div id="main" class="span12" role="main">
+                <div class="page-header"> <h1>{{ title }}</h1> </div>
+                {% block content %}{% endblock %}
+            </div><!-- /#main -->
+
+            <!-- @{if( selectedNav == "index" ) { Sidebar.generate }} -->
+
+        </div><!-- /#content -->
+    </div><!-- /#wrap -->
+
+
+
+    <footer id="content-info" class="container" role="contentinfo">
+        <hr/>
+        <p class="footer-text">
+            &copy; 2016 European Harmony Brigade &nbsp; | &nbsp;
+            r103 &nbsp; | &nbsp;
+            <a href="http://www.europeanharmonybrigade.org/organizers.html">Contact us</a>
+            <!--             @{controllers.Auth.maybeUsername(request).map { un => Html("&nbsp; | &nbsp; You are logged in as <i>" + un + "</i> (<a href='logout.html'>log out</a>).")}} -->
+        </p>
+    </footer>
+
+
+</div> <!-- #wrapper -->
+</body>
+</html>
+
+
+

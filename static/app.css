@@ -1,0 +1,479 @@
+
+
+/* this is needed to stop Bootstrap from distorting the Google Map */
+#map-canvas img {
+   max-width: none;
+}
+
+
+
+/* =============================================================================
+   FAQ
+   ========================================================================== */
+
+.faq {
+	margin-top: 2em;
+}
+
+.faq .q {
+	font-size: 110%;
+	line-height: 150%;
+	font-weight: bold;
+}
+
+ .faq .a {
+	font-size: 110%;
+	line-height: 150%;
+}
+
+
+/* =============================================================================
+   Participant charts
+   ========================================================================== */
+
+.chart-cell {
+  text-align: center;
+  padding: 20px;
+}
+
+.chart-label-cell {
+  text-align: center;
+}
+
+.participant-management h1 {
+  padding-top: 3em;
+  padding-bottom: 1em;
+}
+
+.hover-anchor:hover {
+  font-weight:bold; text-decoration:underline;
+}
+
+/* =============================================================================
+   Base
+   ========================================================================== */
+
+body {background:white url(img/background.png) repeat-x;}
+
+#wrapper {width:980px; margin:0 auto;}
+
+[class*="span"] {
+float: left;
+margin-left: 26px;}
+
+
+a, a:hover {color:#3e6bd0;}
+
+p, blockquote, label, td {
+	font-size:110%;
+	line-height: 150%;
+}
+
+#main li {
+	font-size: 110%;
+	line-height: 150%;
+	margin:7px 0;
+}
+
+time {font-weight:bold;}
+
+.red {color:#c71c22;}
+
+.full { width: 100%; height: auto; }
+
+.error {
+  border-style: solid;
+  border-color: red;
+  color: red;
+  padding: 5px;
+}
+
+/* =============================================================================
+   Organizers table
+   ========================================================================== */
+
+
+.organizers td {
+	padding-top: 1em;
+	padding-right: 2ex;
+	font-size: 110%;
+	line-height: 150%;
+}
+
+.organizers {
+	margin-bottom: 4em;
+}
+
+.organizers td img {
+	border:thin solid black;
+}
+
+
+
+
+/* =============================================================================
+   Header
+   ========================================================================== */
+
+#red-stripe {background:#1B3E8C; height:115px; width:100%;}  /* EHB blue */
+
+#logo  {
+    width: 210px;
+    height: 172px;
+	background:url(img/ehb-logo.png) no-repeat;
+	display:block;
+	text-indent: -999em; 
+	float:left;
+	margin:-75px 26px 0 26px;}
+	
+#header h2 {
+	float:left; 
+	font-weight:normal; 
+	font-size:240%; 
+
+	color:#FECB0A;    /* EHB Star orange */
+	margin-top:-55px;
+	margin-left: 5px;
+	}
+	
+#header {margin-bottom:60px;}
+
+nav {margin-top:5px;}
+
+nav ul li {
+	display:inline-block;
+
+	}
+
+
+.nav li a {
+	width:150px; /* 150 */
+	text-align:center;
+	padding:6px;
+	margin:5px;
+	font-size:16px;
+	border-radius:2px;
+	border:2px solid #1B3E8C; /* #c71c22; */
+	color: #1B3E8C; /*
+	color:#c71c22;*/
+	}
+	
+
+
+.nav li a:hover, .current-menu-item .nav li a {
+	background: #1B3E8C; /*#c71c22; */
+	color:#FFF;
+	}
+	
+.current-menu-item a {
+	background:#1B3E8C; /*#c71c22; */
+	color:#FFF !important;
+	cursor:default;
+	}
+	
+/*
+.nav li a:active {
+	background:#fec20b;
+	color:#c71c22;
+	}
+*/
+
+/* =============================================================================
+   Content
+   ========================================================================== */
+
+.page-header {border:none; margin:0 0 20px 0; padding:0; padding-top: 4ex;  }
+
+#content {overflow:hidden; }
+
+
+
+/* =============================================================================
+   Primary Content
+   ========================================================================== */
+
+#main {padding-right:20px; }
+
+/*
+#main h2, #main h3 {color:#c71c22;}
+*/
+
+#main h2 {
+	font-size: 150%;
+	margin-top: 3ex;
+}
+
+#main h3 {margin:25px 0 5px 0;}
+
+#timetable {text-align:center; background:#FFF;}
+
+#timetable td, #timetable th {border:3px solid #333; padding:5px;}
+
+#timetable th {font-weight:bold;font-size:120%;}
+
+#timetable .timetable-break {background:#999;}
+
+#timetable td.timetable-notbreak {background:#FFF; !important;}
+
+#timetable .time {min-width:60px;}
+
+
+#form {padding:0 20px;}
+		
+		
+textarea {
+			    width:100%;
+				min-height:80px;			
+		}
+		
+#form legend {border:none; width:auto; margin:0px; padding:0 10px; font-size:130%; font-weight:bold; background:#fffac2;}
+
+#form fieldset {
+	border:2px dotted #444;
+	border-radius:2px;
+ 	padding:10px 20px; 
+	margin:10px auto;
+	}
+	
+#form label {font-size:100%; margin-top:10px;}
+
+#form input[type=checkbox] {float:left; margin-right:10px;}
+
+#form input#Agree  {float:left; margin-top:10px;}
+
+#form input.submit {
+	width:170px;
+	text-align:center;
+	padding:5px;
+	font-size:16px;
+	border-radius:2px;
+	border:2px solid #c71c22;
+	color:#c71c22;
+	background:none;
+	}
+	
+
+
+#form input.submit:hover{
+	background:#c71c22;
+	color:#FFF;
+	}
+
+#form input.submit:active {
+	background:#fec20b;
+	color:#c71c22;
+	}
+
+	/*
+#form input:required {background:#FFF;}
+*/
+
+div.error {
+	border-style:none;
+}
+
+ul.teachtracks  {margin:0;}
+
+ul.teachtracks  li {
+	list-style:none; 
+	display:inline-block; 
+}
+
+
+.teachtracks  li a {
+	display:block;
+	text-align:center;
+	padding:5px 15px;
+	margin:5px 10px 5px 0;
+	border-radius:2px;
+	border:2px solid #c71c22;
+	color:#c71c22;
+	text-decoration:none;
+	}
+	
+
+
+.teachtracks li a:hover {
+	background:#c71c22;
+	color:#FFF;
+	}
+	
+
+.teachtracks li a:active {
+	background:#fec20b;
+	color:#c71c22;
+	}
+
+
+/** style tables in extras_confirm **/
+
+.table-borderless tbody tr td, .table-borderless tbody tr th, .table-borderless thead tr th {
+    border: none;
+}
+
+tr.topline td, tr.topline th {
+  border-top:1pt solid black !important;
+    border-collapse:collapse;
+}
+
+
+
+/* =============================================================================
+   Sidebar
+   ========================================================================== */
+
+#sidebar {
+	/*display: table-cell; */
+	margin-left: 10px;
+	padding: 2px; 
+	margin-bottom: -5000px; /* any large number will do */
+  padding-bottom: 5000px; 
+	background: #eee;}
+
+.well {background:none; border:none;}
+
+
+#sidebar h3 {text-align:center;}
+
+#sidebar ul {margin:0; padding:0;}
+
+#sidebar li {list-style:none; font-size:100%; margin:20px 0 30px 0; text-align:justify;}
+
+#sidebar .date {font-weight:bold; font-size:110%;}
+
+#sidebar h4 {text-transform: uppercase; }
+
+
+
+/* =============================================================================
+   Posts
+   ========================================================================== */
+
+.hentry header { }
+.hentry h2 a { text-decoration: none; }
+.hentry time { display: block; }
+.hentry p.byline { }
+.hentry footer { clear: both; }
+
+
+
+/* =============================================================================
+   Post Comments
+   ========================================================================== */
+
+#comments, #respond, #submit { clear: both; display: block; }
+ol.commentlist img.avatar { float: left; margin-right: 10px; }
+
+
+
+/* =============================================================================
+   Footer
+   ========================================================================== */
+
+#content-info {
+  margin-top: 30px;
+  padding: 0 26px;
+  border-top: none;
+}
+
+#content-info p small { font-size: 11px; }
+
+.footer-text {font-size:12px; margin-top:-4px;}
+
+footer img {float:left; margin-right:10px;}
+
+
+
+/* =============================================================================
+   WordPress Generated Classes
+   See: http://codex.wordpress.org/CSS#WordPress_Generated_Classes
+   ========================================================================== */
+
+.aligncenter { display: block; margin: 0 auto; }
+.alignleft { margin: 0 20px 20px 0; float: left; }
+.alignright { margin: 0 0 20px 20px; float: right; }
+
+
+
+/* =============================================================================
+   Media Queries
+   ========================================================================== */
+   
+   /* -------------------------------------------------------------- 
+  
+   Mobile Styles
+   
+-------------------------------------------------------------- */
+
+@media all and (orientation:portrait) {
+
+}
+
+@media all and (orientation:landscape) {
+
+}
+
+@media screen and (max-device-width: 480px) {
+
+  
+.floatleft {float: none; clear:both;}
+.floatright {float: none; clear:both;}
+
+img.floatleft  {padding:5px auto;}
+img.floatright  {padding:5px auto;}
+
+
+  /* html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } */
+  
+* {  float: none;
+ -webkit-text-size-adjust:none;
+}
+
+.smartphone {display:block;}
+.largescreen {display:none;}
+
+h1, h2, h3, p {clear:both;}
+
+p {font-size:100%;}
+
+body {font-size:1em;}
+
+#wrapper {width:100%; margin:0 auto;}
+
+.container {width:90%; margin:0 auto;}
+
+.row {margin:0;}
+
+
+	
+#header h2 {
+	display:none;
+	}
+	
+
+
+nav ul li {
+	display:inline-block;
+
+	}
+
+
+.nav li a {
+	width:130px;
+	font-size:12px;
+
+	}
+
+
+/* =============================================================================
+   Primary Content
+   ========================================================================== */
+
+#main {padding:0; margin:0; width:100%;  }
+
+
+.message  {
+	color: green;
+}
+
+

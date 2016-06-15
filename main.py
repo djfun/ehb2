@@ -4,12 +4,16 @@ from flask import send_from_directory
 
 from __init__ import *
 
+from show_participants import *
+
 
 @app.route("/")
 def index():
     return "hallo"
 
-
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
 
 #######################################################################################

@@ -1,5 +1,7 @@
 from flask import Flask
 import time
+from flask import render_template
+
 from flask_sqlalchemy_session import flask_scoped_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +15,17 @@ app = Flask(__name__, static_url_path='')
 app.secret_key = 'HbKGev1Z0G0h3J'
 # app.config.from_pyfile("alto-studio.cfg")
 start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+
+
+# set up Jinja
+# loader = FileSystemLoader("templates")
+# jenv = Environment(loader=loader)
+
+# def render(template_filename, **kwargs):
+#     return jenv.get_template(template_filename).render(**kwargs)
+
+
 
 
 # set up database connection
