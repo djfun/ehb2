@@ -31,18 +31,19 @@
     <fieldset>
 
         {{ m.header("section1", "<strong>Information about yourself</strong>") }}
-        {{ m.textfield("email", "Email", "Enter your email address", data, errors) }}
-        {{ m.textfield("firstname", "First Name", "Enter your first name", data, errors) }}
-        {{ m.textfield("lastname", "Last Name", "Enter your last name", data, errors) }}
-        {{ m.select("gender", "Gender", [("M", "male"), ("F", "female")], data) }}
+
+        {{ m.wtf(form.email) }}
+        {{ m.wtf(form.firstname) }}
+        {{ m.wtf(form.lastname) }}
+        {{ m.wtf(form.gender) }}
 
         <hr/>
 
         {{ m.header("section2", "<strong>Your address</strong>") }}
-        {{ m.textfield("street", "Street", "Enter your street address", data, errors) }}
-        {{ m.textfield("city", "City", "Enter the city you live in", data, errors) }}
-        {{ m.textfield("zip", "Zip / Post code", "Enter the zip/post code of your city", data, errors) }}
-        {{ m.select("country", "Country", countries, data) }}
+        {{ m.wtf(form.street) }}
+        {{ m.wtf(form.city) }}
+        {{ m.wtf(form.zip) }}
+        {{ m.wtf(form.country) }}
 
         <hr/>
 
@@ -53,7 +54,8 @@
         finance this sponsorship program, just enter the value below, and we will transfer it
         via Paypal together with your registration fee.
         """) }}
-        {{ m.textfield("donation", "Donation (optional)", "0", data, errors) }}
+        {{ m.wtf(form.donation) }}
+
 
         <hr/>
 
@@ -62,8 +64,8 @@
         to your favorite voice part. We will accept the same number of participants from each voice part, and may transfer you to
         your alternative part if this is necessary to balance the parts out.""") }}
 
-        {{ m.select("part1", "Preferred voice part", [("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")], data) }}
-        {{ m.select("part2", "Alternative voice part", [("0", "None"), ("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")], data) }}
+        {{ m.wtf(form.part1) }}
+        {{ m.wtf(form.part2) }}
 
         <hr/>
 
@@ -71,11 +73,12 @@
         quartet singers or musicians. We will assume a certain level of experience in the selection process
         to ensure that all participants will have a great time singing with each other.""") }}
 
-        {{ m.textarea("exp_quartet", "Quartetting experience", "List your Barbershop QUARTET experience(s) here. If applicable, include representative contest scores.", data) }}
-        {{ m.textarea("exp_brigade", "Brigade experience", "List any other Harmony Brigade or Extreme Quartetting events in which you have participated.", data) }}
-        {{ m.textarea("exp_chorus", "Barbershop chorus experience", "List your Barbershop CHORUS experience(s) here.", data) }}
-        {{ m.textarea("exp_musical", "Performance experience", "Describe any performance experience, musical education, and/or accomplishments.", data) }}
-        {{ m.textarea("exp_reference", "Musical reference", "Please provide the name and e-mail address of someone we can contact who is familiar with your singing ability (e.g., your chorus director or section leader, coach, judge, etc.). Feel free to list multiple names.", data) }}
+        {{ m.wtf(form.exp_quartet, fclass="ta") }}
+        {{ m.wtf(form.exp_brigade, fclass="ta") }}
+        {{ m.wtf(form.exp_chorus, fclass="ta") }}
+        {{ m.wtf(form.exp_musical, fclass="ta") }}
+        {{ m.wtf(form.exp_reference, fclass="ta") }}
+
 
         <hr/>
 
@@ -83,18 +86,18 @@
         you can optionally enter it here. We will then print your Instant Quartet QR code on your badge at EHB 2016. Note that you should enter your account name (= email address) here,
         not your user name (= real name).""") }}
 
-        {{ m.textfield("iq_username", "IQ account", "Enter your IQ account name (optional)", data, errors) }}
+        {{ m.wtf(form.iq_username) }}
 
         <hr/>
 
-        {{ m.textarea("comments", "Comments", "Room for anything else you would like to say.", data) }}
+        {{ m.wtf(form.comments, fclass="ta") }}
 
-        {{ m.header("section5", """<strong>Important:</strong> By clicking on the "Submit" button below, you apply for participation in the
+        {{ m.header("section5", """<strong>Important:</strong> By clicking on the \"Submit\" button below, you apply for participation in the
         European Harmony Brigade 2016.
         Please review your data carefully before clicking the button; you will not have a chance to change it later. When you click on
-        "Submit", we will redirect you to Paypal, where you will be asked to pay the registration fee of € 235, plus your sponsorship
+        \"Submit\", we will redirect you to Paypal, where you will be asked to pay the registration fee of € 235, plus your sponsorship
         donation if you made one. The recipient is
-        "BinG Barbershop in Germany".<br/>
+        \"BinG Barbershop in Germany\".<br/>
         &nbsp;<br/>
         <strong>Your acknowledgment:</strong> I have read all the 2016 application information. I will make sure that if I am invited
         and attend the European Harmony Brigade, I will be completely prepared. I will know all my notes, words, and the interpretation

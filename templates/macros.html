@@ -40,54 +40,30 @@
 </div>
 {%- endmacro %}
 
-{% macro textfield(name, label, placeholder, data, errors) -%}
+
+{# display WTF field #}
+{% macro wtf(field, fclass='') -%}
   {% with %}
-    {% if name in errors %}
-        {% set class = "control-group error" %}
-    {% else %}
-        {% set class = "control-group" %}
-    {% endif %}
+        {% if field.errors %}
+            {% set class = "control-group error" %}
+        {% else %}
+            {% set class = "control-group" %}
+        {% endif %}
+
+        {% if not fclass %}
+            {% set fclass="input-xlarge" %}
+        {% endif %}
 
     <div class='{{ class }}'>
-        <label class="control-label" for='{{ name }}'>{{ label }}</label>
+        {{ field.label(class="control-label") }}
         <div class="controls">
-            <input id='{{ name }}' name='{{ name }}' type="text" placeholder='{{ placeholder }}'
-                   class="input-xlarge" value='{{ data[name] }}' />
-            {% if name in errors %}
-                <span class="help-inline">Please enter a valid value.</span>
-            {% endif %}
+            {{ field(class=fclass) }}
+
+            {% for err in field.errors %}
+            <span class="help-inline">{{ err }} </span>
+            {% endfor %}
         </div>
     </div>
   {% endwith %}
 {%- endmacro %}
 
-
-{# values: [(DE, Germany), (GB, United Kingdom), ... #}
-{% macro select(name, label, values, data) -%}
-<div class="control-group">
-    <label class="control-label" for='{{ name }}'>{{ label }}</label>
-    <div class="controls">
-        <select id='{{ name }}' name='{{ name }}' class="input-xlarge">
-            {% for v in values -%}
-                {% if data[name] == v[0] -%}
-                    <option selected="selected" value='{{ v[0] }}'>{{ v[1] }}</option>
-                {%- else -%}
-                    <option value='{{ v[0] }}'>{{ v[1] }}</option>
-                {%- endif %}
-            {% endfor %}
-        </select>
-    </div>
-</div>
-
-{%- endmacro %}
-
-
-
-{% macro textarea(name, label, defaultContent, data) -%}
-    <div class="control-group">
-        <label class="control-label" for='{{ name }}'>{{ label }}</label>
-        <div class="controls">
-            <textarea id='{{ name }}' name='{{ name }}' rows="5" cols="80">{{ data[name]|default(defaultContent) }}</textarea>
-        </div>
-    </div>
-{%- endmacro %}
