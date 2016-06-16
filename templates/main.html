@@ -1,8 +1,6 @@
 
 {#
 blocks:
-- title
-- navbar
 - content
 #}
 
@@ -42,14 +40,19 @@ blocks:
         <a id="logo" href="http://www.europeanharmonybrigade.org/"> <h1>European Harmony Brigade</h1> </a>
 
         <h2>European Harmony Brigade</h2>
-        {% block navbar %}{% endblock %}
+
+        <!-- TODO - maybe autogenerate navbar again -->
+        <nav id="nav-main" role="navigation">
+            <div class="menu-primary-navigation-container"><ul id="menu-primary-navigation" class="nav"><li class="menu-home current-menu-item active"><a href="/">Home</a></li>
+            </ul></div>          </nav>
+
     </header>
 
 
     <div id="wrap" class="container" role="document">
         <div id="content" class="row">
 
-            <div id="main" class="span12" role="main">
+            <div id="main" class='{{ contentwidth|default("span8") }}' role="main">
                 <div class="page-header"> <h1>{{ title }}</h1> </div>
                 {% block content %}{% endblock %}
             </div><!-- /#main -->

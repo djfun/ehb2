@@ -19,15 +19,75 @@
 {% macro sel(name, selectedItem, values) -%}
 <select id={{ name }} name={{ name }} class="input-xlarge">
     {% for v in values %}
-    {% with -%}
-    {% if v[0] == selectedItem -%}
-    {% set s = "selected=selected" %}
-    {% else %}
-    {% set s = "" %}
-    {% endif %}
-    <option {{ s }} value={{ v[0] }}>{{ v[1] }}</option>
-    {%- endwith %}
+        {% with -%}
+            {% if v[0] == selectedItem -%}
+                {% set s = "selected=selected" %}
+            {% else %}
+                {% set s = "" %}
+            {% endif %}
+            <option {{ s }} value={{ v[0] }}>{{ v[1] }}</option>
+        {%- endwith %}
     {% endfor %}
 </select>
 {%- endmacro %}
 
+{% macro header(name, label) -%}
+<div class="control-group">
+    <label class="control-label" for='{{ name }}'></label>
+    <div class="controls">
+        <label id='{{ name }}' class="my-form-header">{{ label|safe }}</label>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro textfield(name, label, placeholder, data, errors) -%}
+  {% with %}
+    {% if name in errors %}
+        {% set class = "control-group error" %}
+    {% else %}
+        {% set class = "control-group" %}
+    {% endif %}
+
+    <div class='{{ class }}'>
+        <label class="control-label" for='{{ name }}'>{{ label }}</label>
+        <div class="controls">
+            <input id='{{ name }}' name='{{ name }}' type="text" placeholder='{{ placeholder }}'
+                   class="input-xlarge" value='{{ data[name] }}' />
+            {% if name in errors %}
+                <span class="help-inline">Please enter a valid value.</span>
+            {% endif %}
+        </div>
+    </div>
+  {% endwith %}
+{%- endmacro %}
+
+
+{# values: [(DE, Germany), (GB, United Kingdom), ... #}
+{% macro select(name, label, values, data) -%}
+<div class="control-group">
+    <label class="control-label" for='{{ name }}'>{{ label }}</label>
+    <div class="controls">
+        <select id='{{ name }}' name='{{ name }}' class="input-xlarge">
+            {% for v in values -%}
+                {% if data[name] == v[0] -%}
+                    <option selected="selected" value='{{ v[0] }}'>{{ v[1] }}</option>
+                {%- else -%}
+                    <option value='{{ v[0] }}'>{{ v[1] }}</option>
+                {%- endif %}
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+{%- endmacro %}
+
+
+
+{% macro textarea(name, label, defaultContent, data) -%}
+    <div class="control-group">
+        <label class="control-label" for='{{ name }}'>{{ label }}</label>
+        <div class="controls">
+            <textarea id='{{ name }}' name='{{ name }}' rows="5" cols="80">{{ data[name]|default(defaultContent) }}</textarea>
+        </div>
+    </div>
+{%- endmacro %}

@@ -17,6 +17,7 @@ def lp(id):
 parts = ["--", "Tn", "Ld", "Br", "Bs"]
 lparts = ["None", "Tenor", "Lead", "Baritone", "Bass"]
 countries = {country.id: country for country in session.query(Country).all()}
+country_list = [(c.code, c.name_en) for id, c in sorted(countries.items(), key=lambda x:x[0])]
 paypal_statuses = { pp.id : pp for pp in session.query(PaypalStatus).all() }
 
 PP_UNINITIALIZED = 1

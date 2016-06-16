@@ -1,0 +1,114 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+<p>On this page, you can apply to participate in EHB 2016. Please be sure you
+    have read <a href="http://www.europeanharmonybrigade.org/harmony-brigades.htm">what a Harmony Brigade is</a> and
+    <a href="http://www.europeanharmonybrigade.org/faq.htm">how we handle applications</a> before you apply.
+    In particular, note that your application is complete only when you have
+    paid the registration fee of € 235 in full via Paypal. If your application
+    is not accepted, we will reimburse this fee to you via Paypal as quickly
+    as we can.</p>
+
+<p>The information you submit will be held in confidence. We may share
+    it among the organizing team in order to review the applications, but
+    we will never give it to a third party.</p>
+
+<p><strong>EHB sponsorship program:</strong>
+    If you are a great singer and the only thing that holds you back from
+    coming to EHB 2016 is the registration fee, we may be able to reduce
+    or even waive your registration fee. Note that we can only offer this
+    for a small number of participants, due to financial constraints.
+    To apply for such support,
+    please send an email to <a href="mailto:akoller@@gmail.com">Alexander Koller</a>
+    with a brief explanation of why we should consider you for
+    sponsorship. Your email will be held in the utmost confidence.
+</p>
+
+
+<form class="form-horizontal" action="payment.html" method="post">
+    <fieldset>
+
+        {{ m.header("section1", "<strong>Information about yourself</strong>") }}
+        {{ m.textfield("email", "Email", "Enter your email address", data, errors) }}
+        {{ m.textfield("firstname", "First Name", "Enter your first name", data, errors) }}
+        {{ m.textfield("lastname", "Last Name", "Enter your last name", data, errors) }}
+        {{ m.select("gender", "Gender", [("M", "male"), ("F", "female")], data) }}
+
+        <hr/>
+
+        {{ m.header("section2", "<strong>Your address</strong>") }}
+        {{ m.textfield("street", "Street", "Enter your street address", data, errors) }}
+        {{ m.textfield("city", "City", "Enter the city you live in", data, errors) }}
+        {{ m.textfield("zip", "Zip / Post code", "Enter the zip/post code of your city", data, errors) }}
+        {{ m.select("country", "Country", countries, data) }}
+
+        <hr/>
+
+        {{ m.header("section_sponsorship", """<strong>Sponsorship</strong><br/>
+        We will be offering financial support to a small number of participants
+        who couldn't otherwise afford to come to EHB 2016 (see explanation at the
+        top of the page). If you would like to make a donation to help
+        finance this sponsorship program, just enter the value below, and we will transfer it
+        via Paypal together with your registration fee.
+        """) }}
+        {{ m.textfield("donation", "Donation (optional)", "0", data, errors) }}
+
+        <hr/>
+
+        {{ m.header("section3", """<strong>The voice part you would like to sing.</strong><br/>
+        If you like, you can enter an alternative voice part in addition
+        to your favorite voice part. We will accept the same number of participants from each voice part, and may transfer you to
+        your alternative part if this is necessary to balance the parts out.""") }}
+
+        {{ m.select("part1", "Preferred voice part", [("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")], data) }}
+        {{ m.select("part2", "Alternative voice part", [("0", "None"), ("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")], data) }}
+
+        <hr/>
+
+        {{ m.header("section4", """<strong>Tell us a bit about your musical experience.</strong><br/> A Harmony Brigade is an event for experienced
+        quartet singers or musicians. We will assume a certain level of experience in the selection process
+        to ensure that all participants will have a great time singing with each other.""") }}
+
+        {{ m.textarea("exp_quartet", "Quartetting experience", "List your Barbershop QUARTET experience(s) here. If applicable, include representative contest scores.", data) }}
+        {{ m.textarea("exp_brigade", "Brigade experience", "List any other Harmony Brigade or Extreme Quartetting events in which you have participated.", data) }}
+        {{ m.textarea("exp_chorus", "Barbershop chorus experience", "List your Barbershop CHORUS experience(s) here.", data) }}
+        {{ m.textarea("exp_musical", "Performance experience", "Describe any performance experience, musical education, and/or accomplishments.", data) }}
+        {{ m.textarea("exp_reference", "Musical reference", "Please provide the name and e-mail address of someone we can contact who is familiar with your singing ability (e.g., your chorus director or section leader, coach, judge, etc.). Feel free to list multiple names.", data) }}
+
+        <hr/>
+
+        {{ m.header("sectionIQ", """<strong>Instant Quartet integration.</strong><br/> If you have an account on <a href='http://www.instantquartet.org'>Instant Quartet</a>,
+        you can optionally enter it here. We will then print your Instant Quartet QR code on your badge at EHB 2016. Note that you should enter your account name (= email address) here,
+        not your user name (= real name).""") }}
+
+        {{ m.textfield("iq_username", "IQ account", "Enter your IQ account name (optional)", data, errors) }}
+
+        <hr/>
+
+        {{ m.textarea("comments", "Comments", "Room for anything else you would like to say.", data) }}
+
+        {{ m.header("section5", """<strong>Important:</strong> By clicking on the "Submit" button below, you apply for participation in the
+        European Harmony Brigade 2016.
+        Please review your data carefully before clicking the button; you will not have a chance to change it later. When you click on
+        "Submit", we will redirect you to Paypal, where you will be asked to pay the registration fee of € 235, plus your sponsorship
+        donation if you made one. The recipient is
+        "BinG Barbershop in Germany".<br/>
+        &nbsp;<br/>
+        <strong>Your acknowledgment:</strong> I have read all the 2016 application information. I will make sure that if I am invited
+        and attend the European Harmony Brigade, I will be completely prepared. I will know all my notes, words, and the interpretation
+        of all the songs. <strong><i>I will be the reason all the people I sing with will be glad they attended.</i></strong> All of the
+        information I've included is true.""") }}
+
+        <!-- Button -->
+        <div class="control-group">
+            <label class="control-label" for="submit"></label>
+            <div class="controls">
+                <button id="submit" name="submit" type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+{% endblock %}

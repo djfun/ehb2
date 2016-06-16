@@ -4,7 +4,8 @@ from flask import send_from_directory
 
 from __init__ import *
 from helpers import *
-from show_participants import *
+from show_participants import show_participants, show_participant, do_show_participants
+from apply import *
 
 
 @app.route("/")
