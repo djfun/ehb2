@@ -1,6 +1,12 @@
 {% extends "main.html" %}
 
 {% block content %}
+{% if message %}
+<p class="message">
+    {{ message }}
+</p>
+{% endif %}
+
 <table class="table table-striped pretty" id="datatable">
     <thead>
     <tr> <th>Name</th> <th>Sex</th> <th>Location</th> <th>Part 1</th> <th>Part 2</th>

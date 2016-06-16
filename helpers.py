@@ -8,6 +8,9 @@ from tables import *
 def ft(eval_ctx, value, format='%Y-%m-%d %H:%M'):
     return value.strftime(format)
 
+# lookup participant
+def lp(id):
+    return session.query(Participant).filter(Participant.id==id).first()
 
 
 # some useful global variables
@@ -16,6 +19,13 @@ lparts = ["None", "Tenor", "Lead", "Baritone", "Bass"]
 countries = {country.id: country for country in session.query(Country).all()}
 paypal_statuses = { pp.id : pp for pp in session.query(PaypalStatus).all() }
 
+PP_UNINITIALIZED = 1
+PP_TOKEN = 2
+PP_CALLBACK = 3
+PP_DETAILS = 4
+PP_SUCCESS = 5
+PP_CANCELLED = 6
+PP_ERROR = 7
 
 
 @app.template_filter()
@@ -32,9 +42,9 @@ def lpart(eval_ctx, value):
 @app.template_filter()
 @evalcontextfilter
 def paypal_status_color(eval_ctx, item):
-    if item._paypal_status == 5:
+    if item._paypal_status == PP_SUCCESS:
         return "lightgreen"
-    elif item._paypal_status == 6 or item._paypal_status == 7:
+    elif item._paypal_status == PP_CANCELLED or item._paypal_status == PP_ERROR:
         return "Pink"
     else:
         return "white"

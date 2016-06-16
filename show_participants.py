@@ -1,3 +1,4 @@
+import datetime
 
 from __init__ import *
 from tables import *
@@ -6,13 +7,13 @@ from helpers import *
 from flask import request
 
 
-@app.route("/show-participants.html")
-def show_participants():
+@app.route("/show-participants.html", methods=["GET",])
+def show_participants(message=None):
     participants = session.query(Participant).all()
-    paid_participants = session.query(Participant).filter(Participant._paypal_status == 5)
+    paid_participants = session.query(Participant).filter(Participant._paypal_status == PP_SUCCESS)
     total_donations = sum([p.donation for p in participants])
 
-    return render_template("show_participants.html", title="Show participants",
+    return render_template("show_participants.html", title="Show participants", message=message,
                            participants=participants, total_donations=total_donations,
                            part_data=make_part_data(paid_participants), country_data=make_country_data(paid_participants))
 
@@ -27,7 +28,29 @@ def show_participant():
     return render_template("show_participant.html", title="Participant details", data=participant, paypal_history=payment_steps,
                            paypal_statuses=ps)
 
+@app.route("/show-participants.html", methods=["POST",])
+def do_show_participants():
+    id = int(request.args.get('id'))
+    parti = lp(id)
 
+    if 'pp-change-button' in request.form:
+        reason = request.form['pp-change-reason']
+        value = int(request.form['sp-paypal-change-field'])
+
+        ph = PaypalHistory(participant_id=id, timestamp=datetime.datetime.now(), _paypal_status=value, data=reason, payment_step=1)
+        session.add(ph)
+        session.commit()
+
+        message="Changed PP status of %s (%d) to %d (%s; reason: %s)." % (parti.fullname(), id, value, paypal_statuses[value].shortname(), reason)
+    elif 'delete-button' in request.form:
+        if request.form['delete-field'] == 'Delete!':
+            Participant.query.filter_by(id=id).delete()
+            session.commit()
+            message = "Deleted user %s (%d)." % (parti.fullname(), id)
+        else:
+            message = "Wrong password, did not delete user %s (%d)." % (parti.fullname(), id)
+
+    return show_participants(message=message)
 
 
 
