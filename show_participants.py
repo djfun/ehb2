@@ -3,6 +3,8 @@ from __init__ import *
 from tables import *
 from itertools import groupby
 from helpers import *
+from flask import request
+
 
 @app.route("/show-participants.html")
 def show_participants():
@@ -14,6 +16,16 @@ def show_participants():
                            participants=participants, total_donations=total_donations,
                            part_data=make_part_data(paid_participants), country_data=make_country_data(paid_participants))
 
+@app.route("/show-participant.html")
+def show_participant():
+    id = int(request.args.get('id'))
+    participant = session.query(Participant).filter(Participant.id == id).first()
+    payment_steps = session.query(PaypalHistory).filter(PaypalHistory.participant_id == id).\
+        filter(PaypalHistory.payment_step == 1).order_by(PaypalHistory.timestamp).all()
+    ps = [(id, p.shortname()) for (id,p) in sorted(paypal_statuses.items())]
+
+    return render_template("show_participant.html", title="Participant details", data=participant, paypal_history=payment_steps,
+                           paypal_statuses=ps)
 
 
 

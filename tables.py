@@ -121,16 +121,23 @@ class PaypalHistory(Base):
     id = Column(Integer, primary_key=True)
     participant_id = Column(Integer)
     timestamp = Column(DateTime)
-    paypal_status = Column(Integer)
+    _paypal_status = Column("paypal_status", Integer, ForeignKey("paypal_statuses.id"))
     data = Column(String)
     payment_step = Column(SmallInteger, nullable=False, server_default=text("'1'"))
 
+    paypal_status = relationship("PaypalStatus", backref=backref("history_items"))
+
+
+paypal_shortnames = ["", "uninit", "token", "callback", "details", "success", "cancelled", "error"]
 
 class PaypalStatus(Base):
     __tablename__ = 'paypal_statuses'
 
     id = Column(Integer, primary_key=True)
     paypal_status_name = Column(String(20))
+
+    def shortname(self):
+        return paypal_shortnames[self.id]
 
 
 class RegistrationStatus(Base):

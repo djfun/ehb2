@@ -1,0 +1,33 @@
+
+{% macro controlgroup(for, title) -%}
+<div class="control-group">
+    <label class="control-label" for={{ for }}>{{ title }}</label>
+    <div class="controls">
+        {{ caller() }}
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro tf(id, label) -%}
+<input id={{ id }} name={{ id }} type="text" placeholder={{ label }} class="input-xlarge" />
+{%- endmacro %}
+
+{% macro sub(name, label, class) -%}
+<input id={{ name }} name={{ name }} value={{ label }} type="submit" class='{{ class }}' />
+{%- endmacro %}
+
+{% macro sel(name, selectedItem, values) -%}
+<select id={{ name }} name={{ name }} class="input-xlarge">
+    {% for v in values %}
+    {% with -%}
+    {% if v[0] == selectedItem -%}
+    {% set s = "selected=selected" %}
+    {% else %}
+    {% set s = "" %}
+    {% endif %}
+    <option {{ s }} value={{ v[0] }}>{{ v[1] }}</option>
+    {%- endwith %}
+    {% endfor %}
+</select>
+{%- endmacro %}
+
