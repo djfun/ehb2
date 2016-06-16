@@ -38,7 +38,7 @@ class ApplicationForm(Form):
     exp_musical = TextAreaField("Performance experience", default="Describe any performance experience, musical education, and/or accomplishments.", render_kw=_taf)
     exp_reference = TextAreaField("Musical reference", default="Please provide the name and e-mail address of someone we can contact who is familiar with your singing ability (e.g., your chorus director or section leader, coach, judge, etc.). Feel free to list multiple names.", render_kw=_taf)
 
-    iq_username = StringField("iq_username", render_kw={"placeholder": "Enter your IQ account name (optional)"})
+    iq_username = StringField("IQ account", render_kw={"placeholder": "Enter your IQ account name (optional)"})
     comments = TextAreaField("Comments", default="Room for anything else you would like to say.", render_kw=_taf)
 
 
