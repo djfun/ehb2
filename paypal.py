@@ -1,15 +1,15 @@
 
-from config import cp
+from config import conf
 
 
 import paypalrestsdk
 
 paypalrestsdk.configure({
-  "mode":          cp.get("paypal", "mode"), # sandbox or live
-  "client_id":     cp.get("paypal", "client_id"),
-  "client_secret": cp.get("paypal", "client_secret") })
+  "mode":          conf.get("paypal", "mode"), # sandbox or live
+  "client_id":     conf.get("paypal", "client_id"),
+  "client_secret": conf.get("paypal", "client_secret") })
 
-callback = cp.get("paypal", "callbackhost")
+callback = conf.get("paypal", "callbackhost")
 
 payment = paypalrestsdk.Payment({
   "intent": "sale",

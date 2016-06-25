@@ -5,7 +5,7 @@ from flask import render_template
 from flask_sqlalchemy_session import flask_scoped_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import config
+from config import conf
 from tables import Base
 
 
@@ -17,8 +17,8 @@ app.secret_key = 'HbKGev1Z0G0h3J'
 start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
 # set up database connection
-# ssh  koller@instantquartet.instantquartet.org -L 10000:localhost:3306 -N
-engine = create_engine(config.db_url)
+db_url = conf.get("database", "url")
+engine = create_engine(db_url)
 
 # flask-mysqlalchemy integration
 Base.metadata.bind = engine
