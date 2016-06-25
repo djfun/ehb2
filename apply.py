@@ -1,10 +1,13 @@
 import datetime
 
+from sqlalchemy.exc import IntegrityError
+# pymysql.err
+
 from __init__ import *
 from tables import *
 from itertools import groupby
 from helpers import *
-from flask import request
+from flask import request, flash
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField
 
 
@@ -12,6 +15,51 @@ from wtforms import Form, StringField, validators, SelectField, IntegerField, Te
 def apply(message=None):
     form = ApplicationForm(request.form)
     return render_template("apply.html", title="Apply!", form=form)
+
+
+@app.route("/apply.html", methods=["POST",])
+def do_apply():
+    form = ApplicationForm(request.form)
+
+    if form.validate():
+        new_prt = Participant(firstname=form.firstname.data, lastname=form.lastname.data,
+                              sex=form.gender.data, street=form.street.data,
+                              city=form.city.data, zip=form.zip.data,
+                              _country=form.country.data, part1=int(form.part1.data), part2=int(form.part2.data),
+                              email=form.email.data, exp_quartet=form.exp_quartet.data,
+                              exp_brigade=form.exp_brigade.data, exp_chorus=form.exp_chorus.data,
+                              exp_musical=form.exp_musical.data, exp_reference=form.exp_reference.data,
+                              application_time=datetime.datetime.now(), comments=form.comments.data,
+                              registration_status=1, # TODO - what is this for?
+                              donation=form.donation.data, iq_username=form.iq_username.data
+                              )
+
+        try:
+            session.add(new_prt)
+            session.commit()
+            return "added %d" % new_prt.id
+        except IntegrityError as e:
+            logger.error("Duplicate email in application: %s" % form.email.data)
+            flash("A user with the email address '%s' already exists. Please sign up with a different email address, or contact the organizers for help." % form.email.data)
+            return render_template("apply.html", title="Apply!", form=form)
+        except Exception as e:
+            logger.error("Exception in do_apply: %s" % str(e))
+            flash("A database error occurred. Please resubmit your application in a few minutes. If the problem persists, please contact the organizers.")
+            return render_template("apply.html", title="Apply!", form=form)
+
+
+
+
+        return str(form.data)
+    else:
+        return render_template("apply.html", title="Apply!", form=form)
+
+
+
+
+
+
+
 
 _taf = {"rows":"5", "cols":"80"}
 
@@ -41,12 +89,3 @@ class ApplicationForm(Form):
     iq_username = StringField("IQ account", render_kw={"placeholder": "Enter your IQ account name (optional)"})
     comments = TextAreaField("Comments", default="Room for anything else you would like to say.", render_kw=_taf)
 
-
-@app.route("/payment.html", methods=["POST",])
-def do_payment():
-    form = ApplicationForm(request.form)
-
-    if form.validate():
-        return str(form.data)
-    else:
-        return render_template("apply.html", title="Apply!", form=form)

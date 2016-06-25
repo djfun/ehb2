@@ -20,5 +20,6 @@ pip install Flask
 pip install sqlalchemy
 pip install Flask-SQLAlchemy-Session
 pip install wtforms
+pip install paypalrestsdk
 ```
 

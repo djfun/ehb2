@@ -3,6 +3,14 @@
 
 {% block content %}
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 <p>On this page, you can apply to participate in EHB 2016. Please be sure you
     have read <a href="http://www.europeanharmonybrigade.org/harmony-brigades.htm">what a Harmony Brigade is</a> and
     <a href="http://www.europeanharmonybrigade.org/faq.htm">how we handle applications</a> before you apply.
@@ -27,7 +35,7 @@
 </p>
 
 
-<form class="form-horizontal" action="payment.html" method="post">
+<form class="form-horizontal" action="apply.html" method="post">
     <fieldset>
 
         {{ m.header("section1", "<strong>Information about yourself</strong>") }}
