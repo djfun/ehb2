@@ -48,7 +48,7 @@ class Participant(Base):
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)
     paypal_token = Column(String(30), index=True)
-    _paypal_status = Column("last_paypal_status", SmallInteger, ForeignKey("paypal_statuses.id"))
+    last_paypal_status = Column("last_paypal_status", SmallInteger, ForeignKey("paypal_statuses.id"))
     email = Column(String(100), unique=True)
     exp_quartet = Column(String)
     exp_brigade = Column(String)

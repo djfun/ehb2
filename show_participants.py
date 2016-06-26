@@ -10,7 +10,7 @@ from flask import request
 @app.route("/show-participants.html", methods=["GET",])
 def show_participants(message=None):
     participants = session.query(Participant).all()
-    paid_participants = session.query(Participant).filter(Participant._paypal_status == PP_SUCCESS)
+    paid_participants = session.query(Participant).filter(Participant.last_paypal_status == PP_SUCCESS)
     total_donations = sum([p.donation for p in participants])
 
     return render_template("show_participants.html", title="Show participants", message=message,
@@ -37,7 +37,7 @@ def do_show_participants():
         reason = request.form['pp-change-reason']
         value = int(request.form['sp-paypal-change-field'])
 
-        ph = PaypalHistory(participant_id=id, timestamp=datetime.datetime.now(), _paypal_status=value, data=reason, payment_step=1)
+        ph = PaypalHistory(participant_id=id, timestamp=datetime.datetime.now(), last_paypal_status=value, data=reason, payment_step=1)
         session.add(ph)
         session.commit()
 
