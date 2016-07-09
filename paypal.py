@@ -23,6 +23,20 @@ payment_steps = {1: Participant,
                  2: Extra}
 
 
+def log(id, payment_step, status, message):
+    ph = PaypalHistory(participant_id=id, timestamp=datetime.datetime.now(), _paypal_status=status, data=message,
+                       payment_step=payment_step)
+
+    pst = payment_steps[payment_step]
+    session.add(ph)
+    session.query(pst).filter(pst.id == id).update({'last_paypal_status': status})
+    session.commit()
+
+
+def find_payment(paymentId):
+    return paypalrestsdk.Payment.find(paymentId)
+
+
 
 class Paypal:
     def __init__(self, payment_step, redirect, errorPage, successCallbackPath, cancelCallbackPath):
@@ -35,11 +49,7 @@ class Paypal:
         self.payment_step = payment_step
 
     def log(self, id, status, message):
-        ph = PaypalHistory(participant_id=id, timestamp=datetime.datetime.now(), _paypal_status=status, data=message, payment_step=self.payment_step)
-
-        session.add(ph)
-        session.query(self.pst).filter(self.pst.id == id).update({'last_paypal_status': status})
-        session.commit()
+        log(id, self.payment_step, status, message)
 
     def logj(self, id, status, json_message):
         if isinstance(json_message, str):
@@ -91,18 +101,11 @@ class Paypal:
                     return self.redirect(str(link.href))
                 else:
                     self.log(id, PP_ERROR, "Could not extract token, data: %s" % str(payment))
-                    return self.errorPage("Internal error. Please contact the organizers.")
+                    return self.errorPage(id, "Internal error. Please contact the organizers.")
         else:
-            self.log(id, PP_ERROR, payment.error)
-            return self.errorPage(payment.error)
+            self.log(id, PP_ERROR, "An error occurred while processing your payment. Please contact the organizers.")
+            return self.errorPage(id, payment.error)
 
     def find_by_token(self, token):
         return session.query(self.pst).filter(self.pst.paypal_token == token).first()
 
-
-def find_payment(paymentId):
-    return paypalrestsdk.Payment.find(paymentId)
-
-#
-# pp = Paypal(lambda x:x, lambda x:x, "/succ.html", "/cancel.html")
-# print(pp.pay(27, "EHB 2016", 235))

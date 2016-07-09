@@ -1,0 +1,26 @@
+<table width="100%">
+    <tr><td>Application time</td> <td>{{ data.application_time|ft }}</td> </tr>
+    <tr><td width="30%">Email</td> <td>{{ data.email }}</td></tr>
+    <tr><td>Name</td> <td>{{ data.firstname }} {{ data.lastname }}</td></tr>
+    <tr><td>Gender</td> <td>{{ data.gender }}</td></tr>
+
+    <tr><td colspan="3"><hr/></td></tr>
+
+    <tr><td>Address</td> <td>{{ data.street }}, {{ data.city }}, {{ data.country.name_en }} {{ data.zip }}</td></tr>
+
+    <td colspan="3"><hr/></td>
+
+    <tr><td>Parts</td> <td>{{ data.part1|lpart }}; alternative: {{ data.part2|lpart }}</td></tr>
+
+    <td colspan="3"><hr/></td>
+
+    <tr><td>Quartetting experience</td><td>{{ data.exp_quartet }}</td></tr>
+    <tr><td>Brigade experience</td><td>{{ data.exp_brigade }}</td></tr>
+    <tr><td>Chorus experience</td><td>{{ data.exp_chorus }}</td></tr>
+    <tr><td>Performance experience</td><td>{{ data.exp_musical }}</td></tr>
+    <tr><td>Musical reference</td><td>{{ data.exp_reference }}</td></tr>
+
+    <td colspan="3"><hr/></td>
+
+    <tr><td>Comments</td><td>{{ data.comments }}</td></tr>
+</table>

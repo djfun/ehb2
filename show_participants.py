@@ -1,5 +1,6 @@
 import datetime
 
+import paypal
 from __init__ import *
 from tables import *
 from itertools import groupby
@@ -37,14 +38,12 @@ def do_show_participants():
         reason = request.form['pp-change-reason']
         value = int(request.form['sp-paypal-change-field'])
 
-        ph = PaypalHistory(participant_id=id, timestamp=datetime.datetime.now(), last_paypal_status=value, data=reason, payment_step=1)
-        session.add(ph)
-        session.commit()
+        paypal.log(id, 1, value, reason)
 
         message="Changed PP status of %s (%d) to %d (%s; reason: %s)." % (parti.fullname(), id, value, paypal_statuses[value].shortname(), reason)
     elif 'delete-button' in request.form:
-        if request.form['delete-field'] == 'Delete!':
-            Participant.query.filter_by(id=id).delete()
+        if request.form['delete-field'] == 'delete!':
+            session.query(Participant).filter_by(id=id).delete()
             session.commit()
             message = "Deleted user %s (%d)." % (parti.fullname(), id)
         else:

@@ -13,7 +13,7 @@ __author__ = 'koller'
 
 # set up Flask
 app = Flask(__name__, static_url_path='')
-app.secret_key = 'HbKGev1Z0G0h3J'
+app.secret_key = conf.get("application", "secret")
 start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
 # set up database connection

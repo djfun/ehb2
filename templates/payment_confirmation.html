@@ -1,0 +1,29 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+	<p>You have successfully submitted your application to the {{ name }}.
+		We will review all applications, and will be in touch in late January or early February.
+	</p>
+
+	<p>We confirm that we have received your Paypal payment of € {{ amount }}. This includes:
+	<ul>
+		<li>Application fee for {{ shortname }}: € {{ application_fee }}</li>
+        {% if data.donation > 0 %}
+          <li>Donation for sponsoring participants who couldn't otherwise afford to come: € {{ data.donation }}. (Thank you!) </li>
+        {% endif %}
+	</ul>
+		</p>
+
+
+    <p>Please print or save this page
+	for your records. You will not receive an e-mail confirmation of your payment from us.</p>
+
+    <p><a href="http://www.europeanharmonybrigade.org/">Click here to return to the main EHB website.</a></p>
+
+	<hr/>
+
+    {% include "participant_details.html" %}
+
+{% endblock %}

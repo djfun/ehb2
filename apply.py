@@ -15,11 +15,13 @@ from config import conf
 
 pp1 = Paypal(1,
              lambda url: redirect(url, code=302),
-             lambda error: applyWithPaypalError(message=error),
+             lambda id, message: applyWithPaypalError(id, message),
              "/payment-success.html",
              "/payment-cancelled.html")
 
 application_fee = float(conf.get("paypal", "fee"))
+event_name = conf.get("application", "name")
+event_shortname = conf.get("application", "shortname")
 
 
 @app.route("/apply.html", methods=["GET",])
@@ -68,8 +70,11 @@ def do_apply():
 
 
 
-def applyWithPaypalError(message):
-    pass
+def applyWithPaypalError(id, message):
+    prt = session.query(Participant).filter(Participant.id == id).first()
+    form = application_form(prt)
+    flash(message)
+    return render_template("apply.html", title="Apply!", form=form)
 
 @app.route("/payment-cancelled.html", methods=["GET",])
 def paymentCancelled():
@@ -86,17 +91,15 @@ def paymentCancelled():
 
 @app.route("/payment-success.html", methods=["GET",])
 def paymentSuccess():
-    print(request.args)
-    print(request.form)
     token = request.args.get('token')
     prt = pp1.find_by_token(token)
 
-    payment_id = request.args.get("paymentId")
-    details = find_payment(payment_id)
+    # payment_id = request.args.get("paymentId")
+    # details = find_payment(payment_id)
+    # pp1.logj(prt.id, PP_SUCCESS, str(details))
 
-    pp1.logj(prt.id, PP_SUCCESS, str(details))
-
-    return "payment succeeded"
+    # TODO - amount
+    return render_template("payment_confirmation.html", title="Apply!", amount=9999, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
 
 
 
