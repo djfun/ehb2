@@ -68,7 +68,13 @@ blocks:
         <hr/>
         <p class="footer-text">
             &copy; 2016 European Harmony Brigade &nbsp; | &nbsp;
-            r103 &nbsp; | &nbsp;
+            {{ ""|gitrev }} &nbsp;
+            {% if current_user.is_authenticated %}
+              | &nbsp; {{ current_user.name }}
+              <a href="logout">(logout)</a>
+              &nbsp;
+            {% endif %}
+            | &nbsp;
             <a href="http://www.europeanharmonybrigade.org/organizers.html">Contact us</a>
             <!--             @{controllers.Auth.maybeUsername(request).map { un => Html("&nbsp; | &nbsp; You are logged in as <i>" + un + "</i> (<a href='logout.html'>log out</a>).")}} -->
         </p>

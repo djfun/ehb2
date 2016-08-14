@@ -1,14 +1,18 @@
 import datetime
 
+from flask_login import login_required
+
 import paypal
 from __init__ import *
 from tables import *
 from itertools import groupby
 from helpers import *
 from flask import request
+from auth import *
 
 
 @app.route("/show-participants.html", methods=["GET",])
+@login_required
 def show_participants(message=None):
     participants = session.query(Participant).all()
     paid_participants = session.query(Participant).filter(Participant.last_paypal_status == PP_SUCCESS)
@@ -19,6 +23,7 @@ def show_participants(message=None):
                            part_data=make_part_data(paid_participants), country_data=make_country_data(paid_participants))
 
 @app.route("/show-participant.html")
+@login_required
 def show_participant():
     id = int(request.args.get('id'))
     participant = session.query(Participant).filter(Participant.id == id).first()
@@ -30,6 +35,7 @@ def show_participant():
                            paypal_statuses=ps)
 
 @app.route("/show-participants.html", methods=["POST",])
+@login_required
 def do_show_participants():
     id = int(request.args.get('id'))
     parti = lp(id)

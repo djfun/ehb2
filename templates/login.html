@@ -1,0 +1,30 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<form class="form-horizontal col-md-8" action="{{ baseurl }}login" method="post">
+    {{ m.wtf(form.name) }}
+    {{ m.wtf(form.passwd) }}
+
+    {{ form.next() }}
+
+    <button id="submit" name="submit" type="submit" class="btn btn-primary">Login</button>
+
+</form>
+
+
+
+{% endblock %}
+
+
+

@@ -1,3 +1,4 @@
+import subprocess
 from flask import Flask
 import time
 from flask import render_template
@@ -32,3 +33,5 @@ logger = logging.getLogger(__name__)
 
 logger.info("Started at %s" % str(start_time))
 
+# find Git revision
+git_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])

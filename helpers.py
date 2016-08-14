@@ -1,6 +1,7 @@
 from jinja2 import evalcontextfilter, Markup
 
 from __init__ import *
+from config import conf
 from tables import *
 
 @app.template_filter()
@@ -29,6 +30,16 @@ PP_CANCELLED = 6
 PP_ERROR = 7
 
 
+# base URL from ehb.conf, with or without trailing slash
+def base_url(with_slash=False):
+    without = conf.get("server", "base_url").rstrip("/")
+
+    if with_slash:
+        return without + "/"
+    else:
+        return without
+
+
 @app.template_filter()
 @evalcontextfilter
 def part(eval_ctx, value):
@@ -54,9 +65,13 @@ def paypal_status_color(eval_ctx, item):
 @app.template_filter()
 @evalcontextfilter
 def tf(label, eval_ctx, name):
-    print(eval_ctx)
-    print(label)
-    print(name)
+    # print(eval_ctx)
+    # print(label)
+    # print(name)
     return Markup("<input id='%s' name='%s' type='text' placeholder='%s' class='input-xlarge' />" % (name, name, label))
 
+@app.template_filter()
+@evalcontextfilter
+def gitrev(eval_ctx, value):
+    return git_revision.strip().decode("UTF-8")
 

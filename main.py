@@ -7,13 +7,14 @@ from tornado.wsgi import WSGIContainer
 
 from __init__ import *
 from helpers import *
+from auth import *
 from show_participants import show_participants, show_participant, do_show_participants
 from apply import *
 
 
 @app.route("/")
 def index():
-    return "hallo"
+    return apply()
 
 @app.route('/static/<path:path>')
 def send_static(path):
