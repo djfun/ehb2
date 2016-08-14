@@ -15,7 +15,7 @@ The EHB server requires [Python 3](https://www.python.org/download/releases/3.0/
 Make sure you have the following Python packages installed (replacing the MySQL connector by the Python library for your database engine, if you use a database engine other than MySQL):
 
 ```
-pip install mysql-connector-python
+pip install pymysql
 pip install Flask
 pip install sqlalchemy
 pip install Flask-SQLAlchemy-Session
