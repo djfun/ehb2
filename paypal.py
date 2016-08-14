@@ -16,7 +16,7 @@ paypalrestsdk.configure({
   "client_id":     conf.get("paypal", "client_id"),
   "client_secret": conf.get("paypal", "client_secret") })
 
-callback = conf.get("paypal", "callbackhost")
+callback = conf.get("server", "base_url").rstrip("/")
 currency = conf.get("paypal", "currency")
 
 payment_steps = {1: Participant,
