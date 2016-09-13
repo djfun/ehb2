@@ -1,0 +1,180 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+
+<p>Welcome, {{ prt.firstname }} {{ prt.lastname }}!</p>
+
+<p>On this page, you can let us know whether you want a single room, who you would
+    like to share your room with, whether you are bringing guests, and so on.
+    When you click "Submit" below, you will pay for these extras by Paypal,
+    and they will be ready for you when you come to Berlin.</p>
+
+<form class="form-horizontal" action='extras.html' method="post">
+    <fieldset>
+        {{ m.header("section1", "<strong>Your room</strong><br/>
+
+        <p>Your registration fee covers two nights for yourself in a double room.
+        If you have a specific person you'd like to share the room with, please let us know here.
+        This can be another participant; then pick them from the list below. It can also
+            be a guest you're bringing with you; then pick \"share with a guest\" here and tell us
+            about your guest below under \"Guests\". If you state no preference, we will pair you
+            up with some other participant of the same gender.</p>
+        <p>You can also choose to book a single room instead of a double room. This will incur
+            an extra cost of 74 EUR for the two nights from June 10-12, which you will settle
+            directly with the hotel once you've arrived.</p>") }}
+
+        {{ m.wtf(form.roompartner_code) }}
+
+
+        <hr/>
+
+        {{ m.header("section2", """<strong>Arrival and departure</strong><br/>
+        <p>If you would like to arrive in Berlin before June 10 or depart after
+        June 12, we can extend your room reservation in the hotel where EHB
+        takes place. This will incur an extra cost of EUR 52 per person and night
+            in a double room, or of EUR 89 per night in a single room.
+        </p>""") }}
+
+        {{ m.wtf(form.participant_arrival) }}
+        {{ m.wtf(form.participant_departure) }}
+
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <script> $(function() { $( "#participant_arrival" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
+        <script> $(function() { $( "#participant_departure" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
+
+
+
+        <hr/>
+
+        {{ m.header("section3", """<strong>Guests</strong><br/>
+        <p>You are welcome to bring guests to Berlin, and they are welcome to stay in the same hotel
+        and share our meals. Your guests pay the same for staying in the hotel: 52 EUR per night
+        in a double room, and 89 EUR per night in a single room. Each guest pays 20 EUR to share our
+            Friday night dinner, 20 EUR to share our Saturday lunch, and 6 EUR if they'd like to
+            help themselves to the after-show midnight snacks on Saturday night.</p>
+
+        <p>If you bring up to two guests, please enter their names and departure/arrival dates
+        below. If you have more than two guests, or would like to let us know anything else
+        regarding the guests, please use the free-form text field.</p>
+
+        <p>Also, if you would like to book tickets for the <a href='http://schalotte.de/index.php?option=com_seminar&task=3&cid=567&sem_midx=2&sem_jidx=0'>Saturday night show</a>
+            with Ringmasters, you can do this here. Regular tickets are EUR 16 each; students, unemployed people and
+            people with disabilities can get discounted tickets for EUR 12 each.
+            Obviously, EHB participants don't need tickets for themselves.</p>
+        """) }}
+
+        {{ m.wtf(form.guest1_roomtype) }}
+        {{ m.wtf(form.guest1_name) }}
+        {{ m.wtf(form.guest1_arrival) }}
+        {{ m.wtf(form.guest1_departure) }}
+
+
+        <script> $(function() { $( "#guest1_arrival" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
+        <script> $(function() { $( "#guest1_departure" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
+
+        {{ m.wtf(form.guest2_roomtype) }}
+        {{ m.wtf(form.guest2_name) }}
+        {{ m.wtf(form.guest2_arrival) }}
+        {{ m.wtf(form.guest2_departure) }}
+
+        <script> $(function() { $( "#guest2_arrival" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
+        <script> $(function() { $( "#guest2_departure" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
+
+        {{ m.wtf(form.num_dinner_friday) }}
+        {{ m.wtf(form.num_lunch_saturday) }}
+        {{ m.wtf(form.num_after_concert) }}
+        {{ m.wtf(form.num_show_tickets_regular) }}
+        {{ m.wtf(form.num_show_tickets_discount) }}
+
+        {{ m.wtf(form.guest, fclass="ta") }}
+
+
+
+
+        <hr/>
+
+        {{ m.header("section_sat_dinner", """<strong>Dinner on Saturday night</strong><br/>
+        <p>
+            On Saturday afternoon, all EHB participants will move to the <a href='https://www.google.de/maps/place/Cafe+Theater+Schalotte/@52.5166209,13.3009495,17z/data=!3m1!4b1!4m5!3m4!1s0x47a85126a9c55ab5:0x3bb659d7e7b9882f!8m2!3d52.5166177!4d13.3031435?hl=de'>Schalotte theater</a>,
+            the concert venue for the Saturday night show, for an on-stage rehearsal. There will be about an
+            hour between this rehearsal and the final warm-up to the show, which you can use to
+            grab some dinner. You can either go and find some sandwiches or fast food on your own;
+            or you can join us at one of four restaurants within walking distance at which we've
+            made reservations. All four are offering set menus to us, including a starter,
+            main course, and a soft drink, for EUR 15 per person. If you (and perhaps your
+            guests) would like to have dinner in one of these restaurants, please pick a restaurant
+            and specify the number of people below.
+        </p>
+        """) }}
+
+        {{ m.wtf(form.sat_dinner_restaurant) }}
+        {{ m.wtf(form.sat_dinner_numpeople) }}
+
+
+
+
+        <hr/>
+
+        {{ m.header("section3", """<strong>T-Shirt</strong><br/>
+        <p>As in 2015, we are again offering commemorative polo shirts for EHB 2016.
+            These will be a different color than last year, so it's worth getting one
+            even if you were here last year. Women's shirts differ from men's in
+            that they are fitted, i.e. follow your body's curves a bit more. You can
+            find the <a href='https://docs.google.com/spreadsheets/d/17kBgA9BmEgWWcOTA6GOlG0eSOVsOQ2d4LXq94wmRi5Q/edit#gid=0'>exact measurements here</a>.</p>
+        </p>""") }}
+
+        {{ m.wtf(form.tshirt_sex) }}
+        {{ m.wtf(form.tshirt_size) }}
+
+        <hr/>
+
+
+        {{ m.header("section_phone", """<strong>Emergency phone number</strong><br/>
+        <p>It can happen that we need to reach you at short notice, especially while everyone
+            is getting settled in on Friday. In such a situation, it would be helpful for
+            us to have your mobile phone number.</p>
+
+        <p>Below, you can optionally give us your phone number (in international format, e.g. '+49 151 ...' for a
+            German phone). We will use your data solely within the
+            context of organizing EHB 2016, will not pass it on to anyone, and will delete it from our
+            system on June 13.
+        </p>""") }}
+
+        {{ m.wtf(form.phone) }}
+
+        <hr/>
+
+
+        {{ m.header("Section4", """<strong>Comments</strong><br/>
+        <p>Tell us anything else we need to know here.</p>""") }}
+
+        {{ m.wtf(form.other, fclass="ta") }}
+
+
+
+
+        <!-- Button -->
+        <div class="control-group">
+            <label class="control-label" for="submit"></label>
+            <div class="controls">
+                <button id="submit" name="submit" type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+
+
+        {{ form.code() }}
+    </fieldset>
+</form>
+
+{% endblock %}

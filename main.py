@@ -10,7 +10,7 @@ from helpers import *
 from auth import *
 from show_participants import show_participants, show_participant, do_show_participants
 from apply import *
-
+from extras import *
 
 @app.route("/")
 def index():
