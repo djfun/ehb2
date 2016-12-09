@@ -52,7 +52,7 @@ def do_apply():
             session.commit()
 
             pp1.log(new_prt.id, PP_UNINITIALIZED, "")
-            return pp1.pay(new_prt.id, "EHB 2016 Application Fee: %s %s" % (new_prt.firstname, new_prt.lastname), application_fee + new_prt.donation)
+            return pp1.pay(new_prt.id, "%s Application Fee: %s %s" % (event_shortname, new_prt.firstname, new_prt.lastname), application_fee + new_prt.donation)
 
 
         except IntegrityError as e:

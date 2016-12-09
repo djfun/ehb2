@@ -14,6 +14,10 @@ from extras import *
 
 @app.route("/")
 def index():
+    return "The application site is not yet available - please check back later!"
+
+@app.route("/secret")
+def secret():
     return apply()
 
 @app.route('/static/<path:path>')
