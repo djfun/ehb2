@@ -94,12 +94,18 @@ def paymentSuccess():
     token = request.args.get('token')
     prt = pp1.find_by_token(token)
 
+    if prt:
+        pp1.log(prt.id, PP_SUCCESS, "(success)")
+        amount = application_fee + prt.donation
+        return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
+
+    else:
+        return "Could not resolve token to participant: %s. Please contact the organizers." % token
+
     # payment_id = request.args.get("paymentId")
     # details = find_payment(payment_id)
     # pp1.logj(prt.id, PP_SUCCESS, str(details))
 
-    # TODO - amount
-    return render_template("payment_confirmation.html", title="Apply!", amount=9999, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
 
 
 
