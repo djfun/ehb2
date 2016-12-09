@@ -23,11 +23,16 @@ application_fee = float(conf.get("paypal", "fee"))
 event_name = conf.get("application", "name")
 event_shortname = conf.get("application", "shortname")
 
+conf_data = {"name": event_name,
+              "shortname": event_shortname,
+              "s_application_fee": str(application_fee)
+              }
+
 
 @app.route("/apply.html", methods=["GET",])
 def apply(message=None):
     form = ApplicationForm(request.form)
-    return render_template("apply.html", title="Apply!", form=form)
+    return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 
 @app.route("/apply.html", methods=["POST",])
@@ -59,14 +64,14 @@ def do_apply():
             # TODO - if participant exists AND HAS PAID, reject application for same email
             logger.error("Duplicate email in application: %s" % form.email.data)
             flash("A user with the email address '%s' already exists. Please sign up with a different email address, or contact the organizers for help." % form.email.data)
-            return render_template("apply.html", title="Apply!", form=form)
+            return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
         except Exception as e:
             logger.error("Exception in do_apply: %s" % str(e))
             flash("A database error occurred. Please resubmit your application in a few minutes. If the problem persists, please contact the organizers.")
-            return render_template("apply.html", title="Apply!", form=form)
+            return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
     else:
-        return render_template("apply.html", title="Apply!", form=form)
+        return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 
 
@@ -74,7 +79,7 @@ def applyWithPaypalError(id, message):
     prt = session.query(Participant).filter(Participant.id == id).first()
     form = application_form(prt)
     flash(message)
-    return render_template("apply.html", title="Apply!", form=form)
+    return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 @app.route("/payment-cancelled.html", methods=["GET",])
 def paymentCancelled():
@@ -87,7 +92,7 @@ def paymentCancelled():
 
     form = application_form(prt)
     flash("You have cancelled payment. Your application has not been processed. Please resubmit this form and complete payment to apply for EHB.")
-    return render_template("apply.html", title="Apply!", form=form)
+    return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 @app.route("/payment-success.html", methods=["GET",])
 def paymentSuccess():

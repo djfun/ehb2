@@ -11,11 +11,11 @@
     {% endif %}
 {% endwith %}
 
-<p>On this page, you can apply to participate in EHB 2016. Please be sure you
+<p>On this page, you can apply to participate in {{ conf_data["shortname"] }}. Please be sure you
     have read <a href="http://www.europeanharmonybrigade.org/harmony-brigades.htm">what a Harmony Brigade is</a> and
     <a href="http://www.europeanharmonybrigade.org/faq.htm">how we handle applications</a> before you apply.
     In particular, note that your application is complete only when you have
-    paid the registration fee of € 235 in full via Paypal. If your application
+    paid the registration fee of € {{ conf_data["s_application_fee"] }} in full via Paypal. If your application
     is not accepted, we will reimburse this fee to you via Paypal as quickly
     as we can.</p>
 
@@ -25,11 +25,11 @@
 
 <p><strong>EHB sponsorship program:</strong>
     If you are a great singer and the only thing that holds you back from
-    coming to EHB 2016 is the registration fee, we may be able to reduce
+    coming to {{ conf_data["shortname"] }} is the registration fee, we may be able to reduce
     or even waive your registration fee. Note that we can only offer this
     for a small number of participants, due to financial constraints.
     To apply for such support,
-    please send an email to <a href="mailto:akoller@@gmail.com">Alexander Koller</a>
+    please  <a href="http://www.europeanharmonybrigade.org/organizers.htm">contact an organizer</a>
     with a brief explanation of why we should consider you for
     sponsorship. Your email will be held in the utmost confidence.
 </p>
@@ -57,7 +57,7 @@
 
         {{ m.header("section_sponsorship", """<strong>Sponsorship</strong><br/>
         We will be offering financial support to a small number of participants
-        who couldn't otherwise afford to come to EHB 2016 (see explanation at the
+        who couldn't otherwise afford to come to " + conf_data["shortname"] + " (see explanation at the
         top of the page). If you would like to make a donation to help
         finance this sponsorship program, just enter the value below, and we will transfer it
         via Paypal together with your registration fee.
@@ -91,7 +91,7 @@
         <hr/>
 
         {{ m.header("sectionIQ", """<strong>Instant Quartet integration.</strong><br/> If you have an account on <a href='http://www.instantquartet.org'>Instant Quartet</a>,
-        you can optionally enter it here. We will then print your Instant Quartet QR code on your badge at EHB 2016. Note that you should enter your account name (= email address) here,
+        you can optionally enter it here. We will then print your Instant Quartet QR code on your badge at " + conf_data["shortname"] + ". Note that you should enter your account name (= email address) here,
         not your user name (= real name).""") }}
 
         {{ m.wtf(form.iq_username) }}
@@ -101,13 +101,13 @@
         {{ m.wtf(form.comments, fclass="ta") }}
 
         {{ m.header("section5", """<strong>Important:</strong> By clicking on the \"Submit\" button below, you apply for participation in the
-        European Harmony Brigade 2016.
+        " + conf_data["name"] + ".
         Please review your data carefully before clicking the button; you will not have a chance to change it later. When you click on
-        \"Submit\", we will redirect you to Paypal, where you will be asked to pay the registration fee of € 235, plus your sponsorship
+        \"Submit\", we will redirect you to Paypal, where you will be asked to pay the registration fee of € " + conf_data["s_application_fee"] + ", plus your sponsorship
         donation if you made one. The recipient is
         \"BinG Barbershop in Germany\".<br/>
         &nbsp;<br/>
-        <strong>Your acknowledgment:</strong> I have read all the 2016 application information. I will make sure that if I am invited
+        <strong>Your acknowledgment:</strong> I have read all the application information for " + conf_data["shortname"] + ". I will make sure that if I am invited
         and attend the European Harmony Brigade, I will be completely prepared. I will know all my notes, words, and the interpretation
         of all the songs. <strong><i>I will be the reason all the people I sing with will be glad they attended.</i></strong> All of the
         information I've included is true.""") }}
