@@ -67,7 +67,7 @@ blocks:
     <footer id="content-info" class="container" role="contentinfo">
         <hr/>
         <p class="footer-text">
-            &copy; 2016 European Harmony Brigade &nbsp; | &nbsp;
+            &copy; {{ ""|ehbrev }} &nbsp; | &nbsp;
             {{ ""|gitrev }} &nbsp;
             {% if current_user.is_authenticated %}
               | &nbsp; {{ current_user.name }}

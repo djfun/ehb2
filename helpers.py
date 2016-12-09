@@ -75,3 +75,9 @@ def tf(label, eval_ctx, name):
 def gitrev(eval_ctx, value):
     return git_revision.strip().decode("UTF-8")
 
+
+@app.template_filter()
+@evalcontextfilter
+def ehbrev(eval_ctx, value):
+    return conf.get("application", "name")
+
