@@ -128,7 +128,7 @@ class PaypalHistory(Base):
     paypal_status = relationship("PaypalStatus", backref=backref("history_items"))
 
 
-paypal_shortnames = ["", "uninit", "token", "callback", "approved", "paid", "cancelled", "error"]
+paypal_shortnames = ["", "uninit", "token", "callback", "approved", "paid", "cancelled", "error", "oops"]
 
 class PaypalStatus(Base):
     __tablename__ = 'paypal_statuses'
@@ -193,3 +193,12 @@ class Extra(Base):
     phone = Column(String(100))
 
     participant = relationship("Participant", backref=backref("extras"))
+
+
+class OopsCode(Base):
+    __tablename__ = "oops_code"
+
+    id = Column(Integer, ForeignKey('participant.id'), primary_key=True)
+    code = Column(String(16))
+
+    participant = relationship("Participant", backref=backref("oops_code"))

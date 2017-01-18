@@ -13,6 +13,10 @@ def ft(eval_ctx, value, format='%Y-%m-%d %H:%M'):
 def lp(id):
     return session.query(Participant).filter(Participant.id==id).first()
 
+# lookup partcipant by oops code
+def lookup_oops(oops_code):
+    oops = session.query(OopsCode).filter(OopsCode.code==oops_code).first()
+    return oops.participant
 
 # some useful global variables
 parts = ["--", "Tn", "Ld", "Br", "Bs"]
@@ -29,6 +33,7 @@ PP_APPROVED = 4
 PP_SUCCESS = 5
 PP_CANCELLED = 6
 PP_ERROR = 7
+PP_OOPS = 8
 
 
 # base URL from ehb.conf, with or without trailing slash

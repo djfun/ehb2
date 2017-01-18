@@ -121,29 +121,6 @@ def paymentSuccess():
         flash("Something went wrong with your Paypal payment. Please contact the organizers.")
         return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
 
-    #
-    #
-    # token = request.args.get('token')
-    # prt = pp1.find_by_token(token)
-    #
-    # paymentId = request.args.get("paymentId")
-    # payerId = request.args.get("PayerID")
-    #
-    # # payment = Pay
-    #
-    # if prt:
-    #     pp1.log(prt.id, PP_APPROVED, "(success)")
-    #     amount = application_fee + prt.donation
-    #     return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
-    #
-    # else:
-    #     return "Could not resolve token to participant: %s. Please contact the organizers." % token
-    #
-    # # payment_id = request.args.get("paymentId")
-    # # details = find_payment(payment_id)
-    # # pp1.logj(prt.id, PP_SUCCESS, str(details))
-
-
 
 
 _taf = {"rows":"5", "cols":"80"}
@@ -195,3 +172,44 @@ def application_form(prt):
     ret.iq_username.data = prt.iq_username
     ret.comments.data = prt.comments
     return ret
+
+
+
+
+################################################
+#
+# for fixing the billing disaster of EHB 2017
+#
+################################################
+
+
+@app.route("/execute-payment.html", methods=["GET",])
+def executePaymentOops():
+    oops_code = request.args.get("code")
+    prt = lookup_oops(oops_code)
+
+    if prt.last_paypal_status == PP_OOPS:
+        items = [PaymentItem("Application fee", application_fee)]
+
+        if prt.donation > 0:
+            items.append(PaymentItem("Donation", prt.donation))
+
+        total_amount = application_fee + prt.donation
+
+        return render_template("oops.html", prt=prt, payment_items=items, total_amount=total_amount)
+    else:
+        return render_template("no_oops.html", prt=prt)
+
+@app.route("/execute-payment.html", methods=["POST",])
+def doExecutePaymentOops():
+    amount = float(request.form["amount"])
+    id = int(request.form["id"])
+    prt = lp(id)
+
+    return pp1.pay(prt.id, "%s Application Fee: %s %s" % (event_shortname, prt.firstname, prt.lastname), amount)
+
+
+class PaymentItem:
+    def __init__(self, name, amount):
+        self.name = name
+        self.amount = amount

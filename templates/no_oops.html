@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<div class="page-header"> <h1>Executing your payment</h1> </div>
+
+
+<p>Hello, {{ prt.firstname }} {{ prt.lastname }}!</p>
+
+{% if prt.paypal_status.shortname() == "paid" %}
+<p>You have already executed your payment, so you're done.
+    Thank you!</p>
+{% else %}
+<p>You are not affected by the payment bug. If you are unsure about your
+    payment status (which is "{{ prt.paypal_status.shortname() }}"),
+    please get in touch with the organizers.
+</p>
+{% endif %}
+
+
+
+{% endblock %}
