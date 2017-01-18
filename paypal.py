@@ -5,10 +5,11 @@ import re
 
 # https://github.com/paypal/PayPal-Python-SDK
 import paypalrestsdk
+from paypalrestsdk.payments import Payment
 
 from config import conf
 from __init__ import *
-from helpers import PP_TOKEN, PP_ERROR
+from helpers import PP_TOKEN, PP_ERROR, PP_APPROVED, PP_SUCCESS
 from tables import PaypalHistory, Participant, Extra
 
 paypalrestsdk.configure({
@@ -91,7 +92,13 @@ class Paypal:
             "description": description }]})
 
         if payment.create():
+          # At this point, we have created the payment, but the participant
+          # hasn't yet had a chance to approve it.
+
           for link in payment.links:
+            # One of the links should have a method of "REDIRECT". This is a Paypal URL
+            # at which the participant can approve the payment. Find it and redirect the
+            # participant there.
             if link.method == "REDIRECT":
                 m = self.re.search(str(link.href))
 
@@ -109,3 +116,59 @@ class Paypal:
     def find_by_token(self, token):
         return session.query(self.pst).filter(self.pst.paypal_token == token).first()
 
+
+
+
+    def execute_payment(self, args):
+        # The URL is of the form: http://localhost:5001/payment-success.html?paymentId=PAY-7US79692XR919631JLB7SUGY&token=EC-8KP41677BL107680E&PayerID=UB6Z4EQPBR8H6
+        # args are the arguments of this request
+
+        token = args.get('token')
+        paymentId = args.get("paymentId")
+        payerId = args.get("PayerID")
+
+        arg_str = "args: token=%s, paymentId=%s, payerId=%s" % (token, paymentId, payerId)
+
+        prt = self.find_by_token(token)
+        if not prt:
+            raise ParticipantNotFoundException(token)
+
+        if prt.last_paypal_status == PP_SUCCESS:
+            # user already paid
+            self.log(prt.id, PP_SUCCESS, "(duplicate payment attempt)")
+            raise DuplicatePaymentException(prt)
+
+        payment = Payment.find(paymentId)
+        if not payment:
+            self.log(prt.id, PP_ERROR, "Payment not found: " + paymentId)
+            raise PaymentNotFoundException(paymentId, prt)
+
+        # log payment as approved (but not yet executed)
+        self.logj(prt.id, PP_APPROVED, str(payment))
+
+        result = payment.execute({"payer_id": payerId})
+        if not result:
+            self.log(prt.id, PP_ERROR, "Payment failed (execute returned false)")
+            raise PaymentFailedException(prt, payment)
+
+        self.logj(prt.id, PP_SUCCESS, str(payment))
+        return payment, prt
+
+
+class DuplicatePaymentException(Exception):
+    def __init__(self, prt):
+        self.prt = prt
+
+class ParticipantNotFoundException(Exception):
+    def __init__(self, token):
+        self.token = token
+
+class PaymentNotFoundException(Exception):
+    def __init__(self, paymentId, prt):
+        self.paymentId = paymentId
+        self.prt = prt
+
+class PaymentFailedException(Exception):
+    def __init__(self, prt, payment):
+        self.prt = prt
+        self.payment = payment

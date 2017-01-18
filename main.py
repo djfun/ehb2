@@ -14,7 +14,10 @@ from extras import *
 
 @app.route("/")
 def index():
-    return "The application site is not yet available - please check back later!"
+    if conf.getboolean("application", "active"):
+        return apply()
+    else:
+        return "The application site is not available right now - please check back later!"
 
 @app.route("/secret")
 def secret():

@@ -5,7 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import redirect
 
 from __init__ import *
-from paypal import Paypal, find_payment
+from paypal import Paypal, find_payment, ParticipantNotFoundException, PaymentFailedException, PaymentNotFoundException, \
+    DuplicatePaymentException
 from tables import *
 from itertools import groupby
 from helpers import *
@@ -29,7 +30,7 @@ conf_data = {"name": event_name,
               }
 
 
-@app.route("/apply.html", methods=["GET",])
+#@app.route("/apply.html", methods=["GET",])
 def apply(message=None):
     form = ApplicationForm(request.form)
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
@@ -96,20 +97,51 @@ def paymentCancelled():
 
 @app.route("/payment-success.html", methods=["GET",])
 def paymentSuccess():
-    token = request.args.get('token')
-    prt = pp1.find_by_token(token)
+    # Paypal redirects the user to this URL once the user has approved the payment.
+    # Now we still need to execute the payment.
 
-    if prt:
-        pp1.log(prt.id, PP_SUCCESS, "(success)")
+    try:
+        payment, prt = pp1.execute_payment(request.args)
+
+        # amount = payment["transactions"][0]["amount"]["total"]  # get total amount from the Paypal return message
         amount = application_fee + prt.donation
         return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
 
-    else:
-        return "Could not resolve token to participant: %s. Please contact the organizers." % token
+    except ParticipantNotFoundException as e:
+        # print("pnfe " + e.token)
+        return "Unable to resolve the Paypal token '%s' to a participant. Please try resubmitting your application, or contact the organizers." % e.token
+    except PaymentNotFoundException as e:
+        # print("pm nfe " + e.paymentId)
+        flash("Unable to resolve the Paypal payment ID '%s' to a payment. Please try resubmitting your application, or contact the organizers." % e.paymentId)
+        return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
+    except DuplicatePaymentException as e:
+        amount = application_fee + e.prt.donation
+        return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=e.prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
+    except PaymentFailedException as e:
+        flash("Something went wrong with your Paypal payment. Please contact the organizers.")
+        return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
 
-    # payment_id = request.args.get("paymentId")
-    # details = find_payment(payment_id)
-    # pp1.logj(prt.id, PP_SUCCESS, str(details))
+    #
+    #
+    # token = request.args.get('token')
+    # prt = pp1.find_by_token(token)
+    #
+    # paymentId = request.args.get("paymentId")
+    # payerId = request.args.get("PayerID")
+    #
+    # # payment = Pay
+    #
+    # if prt:
+    #     pp1.log(prt.id, PP_APPROVED, "(success)")
+    #     amount = application_fee + prt.donation
+    #     return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
+    #
+    # else:
+    #     return "Could not resolve token to participant: %s. Please contact the organizers." % token
+    #
+    # # payment_id = request.args.get("paymentId")
+    # # details = find_payment(payment_id)
+    # # pp1.logj(prt.id, PP_SUCCESS, str(details))
 
 
 

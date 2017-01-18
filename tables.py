@@ -128,7 +128,7 @@ class PaypalHistory(Base):
     paypal_status = relationship("PaypalStatus", backref=backref("history_items"))
 
 
-paypal_shortnames = ["", "uninit", "token", "callback", "details", "paid", "cancelled", "error"]
+paypal_shortnames = ["", "uninit", "token", "callback", "approved", "paid", "cancelled", "error"]
 
 class PaypalStatus(Base):
     __tablename__ = 'paypal_statuses'
