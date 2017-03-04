@@ -10,8 +10,8 @@ conf.optionxform = lambda option: option
 conf.read("ehb.conf")
 
 # start and end date of this event
-start_date = datetime.strptime(conf["application"]["start_date"], "%Y-%m-%d")
-end_date = datetime.strptime(conf["application"]["end_date"], "%Y-%m-%d")
+start_date = datetime.strptime(conf["application"]["start_date"], "%Y-%m-%d").date()
+end_date = datetime.strptime(conf["application"]["end_date"], "%Y-%m-%d").date()
 number_of_days = (end_date-start_date).days  # number of days = number of nights
 
 

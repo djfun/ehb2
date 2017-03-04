@@ -38,7 +38,8 @@
             up with some other participant of the same gender.</p>
         ")  }}
 
-        {{ m.wtf(form.roompartner_code) }}
+        {{ m.wtf(form.participant_roomtype) }}
+        {{ m.wtf(form.participant_roompartner) }}
 
 
         <hr/>
@@ -61,21 +62,16 @@
 
         <hr/>
 
-        {{ m.header("section3", """<strong>Guests</strong><br/>
-        <p>You are welcome to bring guests to Berlin, and they are welcome to stay in the same hotel
-        and share our meals. Your guests pay the same as you for staying in the hotel: " ~ conf.roomcost_double ~ " EUR per night
-        in a double room, and " ~ conf.roomcost_single ~ " EUR per night in a single room. Each guest pays " ~ conf.cost_fri_dinner ~ " EUR to share our
-            Friday night dinner, " ~ conf.cost_sat_lunch ~ " EUR to share our Saturday lunch, and " ~ conf.cost_after_concert ~ " EUR if they'd like to
-            help themselves to the after-show midnight snacks on Saturday night.</p>
+        {{ m.header("section3", """<strong>Hotel Rooms for Guests</strong><br/>
+        <p>You are welcome to bring guests to Berlin, and they are welcome to stay in the same hotel with us.
+            Your guests pay the same as you for staying in the hotel: " ~ conf.roomcost_double ~ " EUR per night
+        in a double room, and " ~ conf.roomcost_single ~ " EUR per night in a single room.</p>
 
         <p>If you bring up to two guests, please enter their names and departure/arrival dates
         below. If you have more than two guests, or would like to let us know anything else
-        regarding the guests, please use the free-form text field.</p>
+        regarding the guests, please use the free-form text field below.</p>
 
-        <p>Also, if you would like to book tickets for the <a href='http://schalotte.de/index.php?option=com_seminar&task=3&cid=567&sem_midx=2&sem_jidx=0'>Saturday night show</a>
-            with Trocadero, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
-            people with disabilities can get discounted tickets for EUR " ~ conf.cost_ticket_discounted ~ " each.
-            Obviously, EHB participants don't need tickets for themselves.</p>
+
         """) }}
 
         {{ m.wtf(form.guest1_roomtype) }}
@@ -95,6 +91,21 @@
         <script> $(function() { $( "#guest2_arrival" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
         <script> $(function() { $( "#guest2_departure" ).datepicker({ dateFormat: "dd/mm/yy" }); }); </script>
 
+
+
+        <hr/>
+
+        {{ m.header("section_guest_extras", """<strong>Extras for Guests</strong><br/>
+        <p>Your guests can also share our meals at the hotel. Each guest pays " ~ conf.cost_fri_dinner ~ " EUR to share our
+            Friday night dinner, " ~ conf.cost_sat_lunch ~ " EUR to share our Saturday lunch, and " ~ conf.cost_after_concert ~ " EUR if they'd like to
+            help themselves to the after-show midnight snacks on Saturday night.</p>
+
+         <p>Also, if you would like to book tickets for the <a href='http://schalotte.de/index.php?option=com_seminar&task=3&cid=567&sem_midx=2&sem_jidx=0'>Saturday night show</a>
+            with Trocadero, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
+            people with disabilities can get discounted tickets for EUR " ~ conf.cost_ticket_discounted ~ " each.
+            Obviously, EHB participants don't need tickets for themselves.</p>
+        """) }}
+
         {{ m.wtf(form.num_dinner_friday) }}
         {{ m.wtf(form.num_lunch_saturday) }}
         {{ m.wtf(form.num_after_concert) }}
@@ -102,8 +113,6 @@
         {{ m.wtf(form.num_show_tickets_discount) }}
 
         {{ m.wtf(form.guest, fclass="ta") }}
-
-
 
 
         <hr/>

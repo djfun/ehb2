@@ -37,7 +37,8 @@ def apply(message=None):
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 def make_code(id):
-    return hashlib.sha224(str(id).encode()).hexdigest()[:16]
+    s = "%s #%d" % (event_shortname, id) # generate different hashes for each new EHB instance
+    return hashlib.sha224(s.encode()).hexdigest()[:16]
 
 @app.route("/apply.html", methods=["POST",])
 def do_apply():
