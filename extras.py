@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import redirect
@@ -13,7 +14,7 @@ from helpers import *
 from flask import request, flash
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField
 from wtforms.validators import ValidationError
-from config import conf
+from config import conf, end_date, start_date
 
 # todo - fill this in
 pp2 = Paypal(2,
@@ -25,14 +26,80 @@ pp2 = Paypal(2,
 event_name = conf.get("application", "name")
 event_shortname = conf.get("application", "shortname")
 
+# todo
+def is_guest_of(guest_id, participant_id):
+    return True
+
+class RoomConstraint:
+    def __init__(self, name, fn, parameter):
+        self.name = name
+        self.fn = fn
+        self.parameter = parameter
+
+    # person_in_room: person we're checking the constraint for
+    # participant_id: participant to whom this person belongs
+    # other_people_in_room: the other people in the room (excluding the person_in_room themselves)
+    def test(self, person_in_room, participant_id, other_people_in_room):
+        if self.parameter:
+            return self.fn(self.value, participant_id, self.parameter)
+        else:
+            return self.fn(self.value, participant_id)
+
+room_constraints = {}
+room_constraints["ANYONE"] = RoomConstraint("ANYONE", lambda person, participant, others: True, None)
+room_constraints["WITH_PARTICIPANT"] = RoomConstraint("WITH_PARTICIPANT", lambda person, participant, others, para: all(map(lambda x: x==para, others)), None) # all others must be desired partner
+room_constraints["WITH_GUEST"] = RoomConstraint("WITH_GUEST", lambda person, participant, others: all(map(lambda x: is_guest_of(x, person), others)), None)
+room_constraints["WITH_ME"] = RoomConstraint("WITH_ME", lambda person, participant, others: all(map(lambda x: x == participant)), None)
+
+
+class Roomtype:
+    def __init__(self, id, for_participants, for_guests, people_in_room, constraint):
+        self.id = id
+        self.for_participants = for_participants
+        self.for_guests = for_guests
+        self.people_in_room = people_in_room
+        self.constraint = constraint
+
+    def __str__(self):
+        return "{rt %s, part:%s, guests:%s, people:%d, cstr:%s}" % (self.id, self.for_participants, self.for_guests, self.people_in_room, self.constraint)
+
+    def __repr__(self):
+        return self.__str__()
+
+
+def mybool(s):
+    return s.lower() == "true" or s.lower() == "yes"
+
+def parse_constraint(s):
+    return room_constraints[s]
+
+# parse room types
+roomtype_id = 0
+roomtypes = []
+for key in conf["extras: roomtypes"].keys():
+    values = re.split("\s*,\s*", conf["extras: roomtypes"][key])
+    rt = Roomtype(roomtype_id, mybool(values[1]), mybool(values[2]), int(values[0]), parse_constraint(values[3]))
+    roomtypes.append(rt)
+    roomtype_id += 1
+
+print(roomtypes)
+
+
+NO_GUEST = 0 # roomtype for "no guest"; this is used when validating the form
+# SHARE_WITH_GUEST = 4
+# SHARE_WITH_ME = 5
+
+# sorted_roomtype_items = sorted(roomtypes.items(), key=lambda x: x[0])
+# sorted_roomtypes = [x[1] for x in sorted_roomtype_items]
+# sel_guest_roomtypes = [(str(rt.id), rt.form_description) for rt in sorted_roomtypes if rt.for_guests]
+
+sel_guest_roomtypes = [("A", "B")]
+## todo - fix these
+
 
 # Choices for before-show dinner
-# TODO - read from config
-dinner_choices = [("None", "Would like to find my own dinner"),
-                  ("Kibar", "Kibar (Turkish-Italian)"),
-                  ("Sole d'Oro", "Sole d'Oro (Italian)"),
-                  ("Do Long", "Do Long (Vietnamese)"),
-                  ("Taverna Elena", "Taverna Elena (Greek)")]
+restaurant_map = conf["extras: restaurants"]
+dinner_choices = [(key, restaurant_map[key]) for key in restaurant_map.keys()] ## todo - sel_**
 
 # Choices for t-shirts
 # TODO - read from config
@@ -61,37 +128,30 @@ t_shirt_sizes = {"0": TShirt("0", 0),
 sel_t_shirt_sizes = [(size, t_shirt_sizes[size].form_description()) for size in ["0", "S", "M", "L", "XL", "XXL", "XXXL"]]
 
 
-class Roomtype:
-    def __init__(self, id, for_participants, for_guests, form_description, receipt_description, price_per_night):
-        self.id = id
-        self.for_participants = for_participants
-        self.for_guests = for_guests
-        self.form_description = form_description
-        self.receipt_description = receipt_description
-        self.price_per_night = price_per_night
+# class Roomtype:
+#     def __init__(self, id, for_participants, for_guests, form_description, receipt_description, price_per_night):
+#         self.id = id
+#         self.for_participants = for_participants
+#         self.for_guests = for_guests
+#         self.form_description = form_description
+#         self.receipt_description = receipt_description
+#         self.price_per_night = price_per_night
 
+#
+# roomtypes = {0: Roomtype(0, False, True, "No guest", "none", 0),
+#              1: Roomtype(1, True, True, "Double room, and would share with anyone", "Double (share with anyone)", 52),
+#              2: Roomtype(2, True, True, "Single room", "Single", 89),
+#              3: Roomtype(3, True, False, "Double room, share with specific participant", "Double (share with participant)", 52),
+#              4: Roomtype(4, True, False, "Double room, share with my guest", "Double (share with guest)", 52),
+#              5: Roomtype(5, False, True, "Double room, share with me", "Double (share with host)", 52),
+#              6: Roomtype(6, False, True, "Double room, share with other guest", "Double (share with other guest)", 52),
+#              }
 
-roomtypes = {0: Roomtype(0, False, True, "No guest", "none", 0),
-             1: Roomtype(1, True, True, "Double room, and would share with anyone", "Double (share with anyone)", 52),
-             2: Roomtype(2, True, True, "Single room", "Single", 89),
-             3: Roomtype(3, True, False, "Double room, share with specific participant", "Double (share with participant)", 52),
-             4: Roomtype(4, True, False, "Double room, share with my guest", "Double (share with guest)", 52),
-             5: Roomtype(5, False, True, "Double room, share with me", "Double (share with host)", 52),
-             6: Roomtype(6, False, True, "Double room, share with other guest", "Double (share with other guest)", 52),
-             }
-
-NO_GUEST = 0 # roomtype for "no guest"; this is used when validating the form
-SHARE_WITH_GUEST = 4
-SHARE_WITH_ME = 5
-
-sorted_roomtype_items = sorted(roomtypes.items(), key=lambda x: x[0])
-sorted_roomtypes = [x[1] for x in sorted_roomtype_items]
-sel_guest_roomtypes = [(str(rt.id), rt.form_description) for rt in sorted_roomtypes if rt.for_guests]
 
 @app.route("/extras.html", methods=["GET",])
 def extras(message=None):
     code = request.args.get('code')
-    prt = participant_by_code(code)
+    prt = lc(code)
 
     form = ExtrasForm(request.form)
     form.code.data = code
@@ -102,7 +162,7 @@ def extras(message=None):
 @app.route("/extras.html", methods=["POST",])
 def do_extras():
     form = ExtrasForm(request.form)
-    prt = participant_by_code(form.code.data)
+    prt = lc(form.code.data)
 
     if form.validate():
         print(form.data)
@@ -112,20 +172,8 @@ def do_extras():
         return render_template("extras.html", title="Extras", form=form, prt=prt)
 
 
-
-def participant_by_code(code):
-    e = session.query(ExtrasCode).filter(ExtrasCode.code == code).first()
-
-    if e:
-        return e.participant
-    else:
-        return None
-
-
-
-# TODO - config
-default_arrival_date = datetime.date(2016, 6, 10)
-default_departure_date = datetime.date(2016, 6, 12)
+default_arrival_date = start_date
+default_departure_date = end_date
 
 
 _taf = {"rows":"5", "cols":"80"}
