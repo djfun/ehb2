@@ -3,6 +3,9 @@ __author__ = 'koller'
 import configparser
 
 
-conf = configparser.ConfigParser({ }) # "password":""
+conf = configparser.RawConfigParser()
+conf.optionxform = lambda option: option
+# conf = configparser.ConfigParser({ }) # "password":""
 conf.read("ehb.conf")
+
 

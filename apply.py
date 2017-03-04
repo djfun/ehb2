@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 
 from sqlalchemy.exc import IntegrityError
 # pymysql.err
@@ -35,6 +36,8 @@ def apply(message=None):
     form = ApplicationForm(request.form)
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
+def make_code(id):
+    return hashlib.sha224(str(id).encode()).hexdigest()[:16]
 
 @app.route("/apply.html", methods=["POST",])
 def do_apply():
@@ -55,6 +58,9 @@ def do_apply():
 
         try:
             session.add(new_prt)
+            session.commit()
+
+            new_prt.code = make_code(new_prt.id)
             session.commit()
 
             pp1.log(new_prt.id, PP_UNINITIALIZED, "")

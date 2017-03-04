@@ -60,6 +60,7 @@ class Participant(Base):
     registration_status = Column(SmallInteger)
     donation = Column(Integer)
     iq_username = Column(String(100))
+    code = Column(String(16))
 
     s_final_part = relationship("Part", backref=backref("participants"))
     country = relationship("Country", backref=backref("participants"))
@@ -92,13 +93,13 @@ class Participant(Base):
         return "%s %s (%d)" % (self.firstname, self.lastname, self.id)
 
 
-class ExtrasCode(Base):
-    __tablename__ = "extras_code"
-
-    id = Column(Integer, ForeignKey('participant.id'), primary_key=True)
-    code = Column(String(16))
-
-    participant = relationship("Participant", backref=backref("code"))
+# class ExtrasCode(Base):
+#     __tablename__ = "extras_code"
+#
+#     id = Column(Integer, ForeignKey('participant.id'), primary_key=True)
+#     code = Column(String(16))
+#
+#     participant = relationship("Participant", backref=backref("code"))
 
 
 class Part(Base):

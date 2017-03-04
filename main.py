@@ -14,7 +14,7 @@ from extras import *
 
 @app.route("/")
 def index():
-    if conf.getboolean("application", "active"):
+    if conf.getboolean("application", "accept_applications"):
         return apply()
     else:
         return "The application site is not available right now - please check back later!"

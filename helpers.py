@@ -9,14 +9,22 @@ from tables import *
 def ft(eval_ctx, value, format='%Y-%m-%d %H:%M'):
     return value.strftime(format)
 
-# lookup participant
+# lookup participant by ID
 def lp(id):
     return session.query(Participant).filter(Participant.id==id).first()
 
-# lookup partcipant by oops code
+
+# lookup participant by code
+def lc(code):
+    return session.query(Participant).filter(Participant.code==code).first()
+
+
+
+# lookup partcipant by oops code - DEPRECATED
 def lookup_oops(oops_code):
     oops = session.query(OopsCode).filter(OopsCode.code==oops_code).first()
     return oops.participant
+
 
 # some useful global variables
 parts = ["--", "Tn", "Ld", "Br", "Bs"]
