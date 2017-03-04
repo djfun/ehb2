@@ -1,8 +1,12 @@
+{% set contentwidth="span12" %}
 {% extends "main.html" %}
 {% import "macros.html" as m %}
 
 {% block content %}
 
-	<p>Show extras for {{ prt.firstname }} {{ prt.lastname }}.</p>
+	<h1>{{ conf.shortname }} Extras for {{ prt.firstname }} {{ prt.lastname }}</h1>
 
+    <p>You have booked the following extras:</p>
+
+    {% include "extras_table.html" %}
 {% endblock %}

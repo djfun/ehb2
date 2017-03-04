@@ -1,6 +1,7 @@
 from collections import OrderedDict
-
+from __init__ import *
 from config import conf, number_of_days
+from tables import Participant
 
 NO_ROOMPARTNER = "-1"
 NO_GUEST = "no_guest" # roomtype for "no guest"; this is used when validating the form
@@ -110,6 +111,27 @@ class Roomtype:
             self.detailed_description = "%s (+ %d EUR)" % (self.description, extra_cost_for_single)
         else:
             self.detailed_description = self.description
+
+    def cost_on_ehb_days(self):
+        if self.people_in_room == 1:
+            return roomcost_single-roomcost_double
+        else:
+            return 0
+
+    def cost_on_other_days(self):
+        if self.people_in_room == 1:
+            return roomcost_single
+        elif self.people_in_room == 2:
+            return roomcost_double
+        else:
+            return 0
+
+    def description_with_roompartner(self, partner_id):
+        if self.id == "double_participant":
+            partner = session.query(Participant).filter(Participant.id==partner_id).first()
+            return "Double room, shared with %s" % partner.fullname()
+        else:
+            return self.description
 
     def __str__(self):
         return "{rt %s, '%s', part:%s, guests:%s, people:%d, cstr:%s}" % (self.id, self.description, self.for_participants, self.for_guests, self.people_in_room, self.constraint)

@@ -5,7 +5,7 @@ from wtforms.validators import ValidationError
 from config import conf, end_date, start_date, number_of_days
 from extras_roomtypes import NO_GUEST, roomtypes, NO_ROOMPARTNER
 from __init__ import *
-from tables import Participant
+from tables import Participant, Extra
 
 default_arrival_date = start_date
 default_departure_date = end_date
@@ -13,6 +13,7 @@ default_departure_date = end_date
 
 
 NO_RESTAURANT = "none"
+NO_TSHIRT = "0"
 
 
 def dict_to_sel(dict):
@@ -42,7 +43,7 @@ sel_t_shirt_sexes = dict_to_sel(conf["extras: t-shirt sexes"])
 
 t_shirt_sizes = conf["extras: t-shirt sizes"]
 t_shirt_costs = {key: int(t_shirt_sizes[key]) for key in t_shirt_sizes}
-sel_t_shirt_sizes = [(size, "No t-shirt" if size == "0" else "%s (EUR %d)" % (size, t_shirt_costs[size])) for size in t_shirt_sizes] # iterate over original ordered_dict to preserve order
+sel_t_shirt_sizes = [(size, "No t-shirt" if size == NO_TSHIRT else "%s (EUR %d)" % (size, t_shirt_costs[size])) for size in t_shirt_sizes] # iterate over original ordered_dict to preserve order
 
 
 
@@ -167,4 +168,42 @@ class ExtrasForm(Form):
     phone = StringField("Your number (optional)")
 
     other = TextAreaField("Comments", default="Tell us anything else we need to know here.", render_kw=_taf)
+
+
+def make_extras_from_form(prt, form):
+    return Extra(id=prt.id,
+                 roomtype = form.participant_roomtype.data,
+                 roompartner = int(form.participant_roompartner.data),
+
+                 arrival_date = form.participant_arrival.data,
+                 departure_date = form.participant_departure.data,
+
+                 guest1_roomtype = form.guest1_roomtype.data,
+                 guest1_name = form.guest1_name.data,
+                 guest1_arrival = form.guest1_arrival.data,
+                 guest1_departure = form.guest1_departure.data,
+
+                 guest2_roomtype = form.guest2_roomtype.data,
+                 guest2_name = form.guest2_name.data,
+                 guest2_arrival = form.guest2_arrival.data,
+                 guest2_departure = form.guest2_departure.data,
+
+                 num_dinner_friday = form.num_dinner_friday.data,
+                 num_lunch_saturday = form.num_lunch_saturday.data,
+                 num_after_concert = form.num_after_concert.data,
+
+                 num_show_tickets_regular = form.num_show_tickets_regular.data,
+                 num_show_tickets_discount = form.num_show_tickets_discount.data,
+
+                 guest = form.guest.data,
+
+                 sat_night_restaurant = form.sat_dinner_restaurant.data,
+                 sat_night_numpeople = form.sat_dinner_numpeople.data,
+
+                 t_shirt_sex = form.tshirt_sex.data,
+                 t_shirt_size = form.tshirt_size.data,
+
+                 phone = form.phone.data,
+                 other = form.other.data
+                 )
 

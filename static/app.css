@@ -64,7 +64,7 @@ margin-left: 26px;}
 
 a, a:hover {color:#3e6bd0;}
 
-p, blockquote, label, td {
+p, blockquote, label, td, th {
 	font-size:110%;
 	line-height: 150%;
 }
