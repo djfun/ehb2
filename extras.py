@@ -127,7 +127,10 @@ def extras(message=None):
         previous_extras = find_extras(prt.id)
 
         if previous_extras:
-            # todo - also check if they paid yet
+            # todo 1. if they have already paid, show "everything is okay" page
+            # todo 2. if they have not paid, show extras table + payment link
+            # That is, extras.html needs to exist in four flavors: confirmation; everything okay; payment missing; for organizers (with Paypal status modification button)
+
             return render_template("show_extras.html", prt=prt, extras=previous_extras)
 
         else:
@@ -136,8 +139,7 @@ def extras(message=None):
             return render_template("extras.html", title="Extras", form=form, prt=prt, conf=conf_for_template)
 
     else:
-        # todo - make this pretty
-        return "unknown code"
+        return render_template("message.html", message="Unknown code. Please check that you clicked on the link in your email correctly (no characters missing from the link, etc.). If this problem persists, please contact the organizers.")
 
 
 @app.route("/extras.html", methods=["POST",])
@@ -150,6 +152,9 @@ def do_extras():
             extras = make_extras_from_form(prt, form)
             pay_now, pay_to_hotel, items = extras_cost(extras)
 
+            # todo 1. send to confirmation page (show table + paypal link)
+            # todo 2. paypal success link simply sends to GET /extras.html, which should then show "everything is okay" page
+
             # todo - accept payment
 
             return render_template("show_extras.html", prt=prt, extras=extras, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items, conf=conf_for_template)
@@ -158,5 +163,4 @@ def do_extras():
             return render_template("extras.html", title="Extras", form=form, prt=prt, conf=conf_for_template)
 
     else:
-        # todo - make this pretty
-        return "unknown code"
+        return render_template("message.html", message="Unknown code. Please check that you clicked on the link in your email correctly (no characters missing from the link, etc.). If this problem persists, please contact the organizers.")
