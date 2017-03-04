@@ -24,15 +24,19 @@
     <fieldset>
         {{ m.header("section1", "<strong>Your room</strong><br/>
 
-        <p>Your registration fee covers two nights for yourself in a double room.
-        If you have a specific person you'd like to share the room with, please let us know here.
-        This can be another participant; then pick them from the list below. It can also
+        <p>Your registration fee covers the two nights from " + conf.s_startdate + " to " + conf.s_enddate + " for yourself in a double room.
+           You can choose to book a single room instead of a double room. This will incur
+            an extra cost of " + ("" ~ ((conf.roomcost_single-conf.roomcost_double)*conf.num_days)) + " EUR for
+            these two nights. You will settle all extra costs for hotel rooms directly
+            with the hotel when you check in.</p>
+
+        <p>If you do choose a double room and you have a preference on who you'd
+            like to share it with, please let us know here.
+            This can be another participant; then pick them from the list below. It can also
             be a guest you're bringing with you; then pick \"share with a guest\" here and tell us
             about your guest below under \"Guests\". If you state no preference, we will pair you
             up with some other participant of the same gender.</p>
-        <p>You can also choose to book a single room instead of a double room. This will incur
-            an extra cost of 74 EUR for the two nights from June 10-12, which you will settle
-            directly with the hotel once you've arrived.</p>") }}
+        ")  }}
 
         {{ m.wtf(form.roompartner_code) }}
 
@@ -40,10 +44,10 @@
         <hr/>
 
         {{ m.header("section2", """<strong>Arrival and departure</strong><br/>
-        <p>If you would like to arrive in Berlin before June 10 or depart after
-        June 12, we can extend your room reservation in the hotel where EHB
-        takes place. This will incur an extra cost of EUR 52 per person and night
-            in a double room, or of EUR 89 per night in a single room.
+        <p>If you would like to arrive in Berlin before " + conf.s_startdate + " or depart after " + conf.s_enddate +
+        ", we can extend your room reservation in the hotel where EHB
+        takes place. This will incur an extra cost of EUR " ~ conf.roomcost_double ~ " per person and night
+            in a double room, or of EUR " ~ conf.roomcost_single ~ " per night in a single room.
         </p>""") }}
 
         {{ m.wtf(form.participant_arrival) }}
@@ -59,9 +63,9 @@
 
         {{ m.header("section3", """<strong>Guests</strong><br/>
         <p>You are welcome to bring guests to Berlin, and they are welcome to stay in the same hotel
-        and share our meals. Your guests pay the same for staying in the hotel: 52 EUR per night
-        in a double room, and 89 EUR per night in a single room. Each guest pays 20 EUR to share our
-            Friday night dinner, 20 EUR to share our Saturday lunch, and 6 EUR if they'd like to
+        and share our meals. Your guests pay the same as you for staying in the hotel: " ~ conf.roomcost_double ~ " EUR per night
+        in a double room, and " ~ conf.roomcost_single ~ " EUR per night in a single room. Each guest pays " ~ conf.cost_fri_dinner ~ " EUR to share our
+            Friday night dinner, " ~ conf.cost_sat_lunch ~ " EUR to share our Saturday lunch, and " ~ conf.cost_after_concert ~ " EUR if they'd like to
             help themselves to the after-show midnight snacks on Saturday night.</p>
 
         <p>If you bring up to two guests, please enter their names and departure/arrival dates
@@ -69,8 +73,8 @@
         regarding the guests, please use the free-form text field.</p>
 
         <p>Also, if you would like to book tickets for the <a href='http://schalotte.de/index.php?option=com_seminar&task=3&cid=567&sem_midx=2&sem_jidx=0'>Saturday night show</a>
-            with Ringmasters, you can do this here. Regular tickets are EUR 16 each; students, unemployed people and
-            people with disabilities can get discounted tickets for EUR 12 each.
+            with Trocadero, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
+            people with disabilities can get discounted tickets for EUR " ~ conf.cost_ticket_discounted ~ " each.
             Obviously, EHB participants don't need tickets for themselves.</p>
         """) }}
 
@@ -112,7 +116,7 @@
             grab some dinner. You can either go and find some sandwiches or fast food on your own;
             or you can join us at one of four restaurants within walking distance at which we've
             made reservations. All four are offering set menus to us, including a starter,
-            main course, and a soft drink, for EUR 15 per person. If you (and perhaps your
+            main course, and a soft drink, for EUR " ~ conf.cost_sat_dinner ~ " per person. If you (and perhaps your
             guests) would like to have dinner in one of these restaurants, please pick a restaurant
             and specify the number of people below.
         </p>
@@ -127,9 +131,9 @@
         <hr/>
 
         {{ m.header("section3", """<strong>T-Shirt</strong><br/>
-        <p>As in 2015, we are again offering commemorative polo shirts for EHB 2016.
-            These will be a different color than last year, so it's worth getting one
-            even if you were here last year. Women's shirts differ from men's in
+        <p>As in earlier years, we are again offering commemorative polo shirts for " ~ conf.shortname ~ ".
+            These will be a different color than in earlier years, so it's worth getting one
+            even if you were attended a previous EHB. Women's shirts differ from men's in
             that they are fitted, i.e. follow your body's curves a bit more. You can
             find the <a href='https://docs.google.com/spreadsheets/d/17kBgA9BmEgWWcOTA6GOlG0eSOVsOQ2d4LXq94wmRi5Q/edit#gid=0'>exact measurements here</a>.</p>
         </p>""") }}
@@ -147,8 +151,8 @@
 
         <p>Below, you can optionally give us your phone number (in international format, e.g. '+49 151 ...' for a
             German phone). We will use your data solely within the
-            context of organizing EHB 2016, will not pass it on to anyone, and will delete it from our
-            system on June 13.
+            context of organizing " ~ conf.shortname ~ ", will not pass it on to anyone, and will delete it from our
+            system afterwards.
         </p>""") }}
 
         {{ m.wtf(form.phone) }}

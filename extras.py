@@ -14,7 +14,7 @@ from helpers import *
 from flask import request, flash
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField
 from wtforms.validators import ValidationError
-from config import conf, end_date, start_date
+from config import conf, end_date, start_date, number_of_days
 
 # todo - fill this in
 pp2 = Paypal(2,
@@ -70,6 +70,9 @@ class Roomtype:
 def mybool(s):
     return s.lower() == "true" or s.lower() == "yes"
 
+def dict_to_sel(dict):
+    return [(key, dict[key]) for key in dict.keys()]
+
 def parse_constraint(s):
     return room_constraints[s]
 
@@ -98,65 +101,76 @@ sel_guest_roomtypes = [("A", "B")]
 
 
 # Choices for before-show dinner
-restaurant_map = conf["extras: restaurants"]
-dinner_choices = [(key, restaurant_map[key]) for key in restaurant_map.keys()] ## todo - sel_**
+sel_restaurants = dict_to_sel(conf["extras: restaurants"])
 
 # Choices for t-shirts
-# TODO - read from config
-# TODO - replace sex keys by M and F
-sel_t_shirt_sexes = [("1", "Men's"), ("2", "Women's")]
-
-class TShirt:
-    def __init__(self, size, cost):
-        self.size = size
-        self.cost = cost
-
-    def form_description(self):
-        if self.size == "0":
-            return "No t-shirt"
-        else:
-            return "%s (EUR %d)" % (self.size, self.cost)
-
-t_shirt_sizes = {"0": TShirt("0", 0),
-            "S": TShirt("S", 30),
-            "M": TShirt("M", 30),
-            "L": TShirt("L", 30),
-            "XL": TShirt("XL", 30),
-            "XXL": TShirt("XXL", 35),
-            "XXXL": TShirt("XXXL", 35)}
-
-sel_t_shirt_sizes = [(size, t_shirt_sizes[size].form_description()) for size in ["0", "S", "M", "L", "XL", "XXL", "XXXL"]]
+sel_t_shirt_sexes = dict_to_sel(conf["extras: t-shirt sexes"])
 
 
-# class Roomtype:
-#     def __init__(self, id, for_participants, for_guests, form_description, receipt_description, price_per_night):
-#         self.id = id
-#         self.for_participants = for_participants
-#         self.for_guests = for_guests
-#         self.form_description = form_description
-#         self.receipt_description = receipt_description
-#         self.price_per_night = price_per_night
+t_shirt_sizes = conf["extras: t-shirt sizes"]
+t_shirt_costs = {key: int(t_shirt_sizes[key]) for key in t_shirt_sizes}
+sel_t_shirt_sizes = [(size, "No t-shirt" if size == "0" else "%s (EUR %d)" % (size, t_shirt_costs[size])) for size in t_shirt_sizes] # iterate over original ordered_dict to preserve order
+
 
 #
-# roomtypes = {0: Roomtype(0, False, True, "No guest", "none", 0),
-#              1: Roomtype(1, True, True, "Double room, and would share with anyone", "Double (share with anyone)", 52),
-#              2: Roomtype(2, True, True, "Single room", "Single", 89),
-#              3: Roomtype(3, True, False, "Double room, share with specific participant", "Double (share with participant)", 52),
-#              4: Roomtype(4, True, False, "Double room, share with my guest", "Double (share with guest)", 52),
-#              5: Roomtype(5, False, True, "Double room, share with me", "Double (share with host)", 52),
-#              6: Roomtype(6, False, True, "Double room, share with other guest", "Double (share with other guest)", 52),
-#              }
+# class TShirt:
+#     def __init__(self, size, cost):
+#         self.size = size
+#         self.cost = cost
+#
+#     def form_description(self):
+#         if self.size == "0":
+#             return "No t-shirt"
+#         else:
+#             return "%s (EUR %d)" % (self.size, self.cost)
+#
+# t_shirt_sizes = {"0": TShirt("0", 0),
+#             "S": TShirt("S", 30),
+#             "M": TShirt("M", 30),
+#             "L": TShirt("L", 30),
+#             "XL": TShirt("XL", 30),
+#             "XXL": TShirt("XXL", 35),
+#             "XXXL": TShirt("XXXL", 35)}
+#
+# sel_t_shirt_sizes = [(size, t_shirt_sizes[size].form_description()) for size in ["0", "S", "M", "L", "XL", "XXL", "XXXL"]]
 
+
+
+roomcost_single = int(conf["extras: room costs"]["1"])
+roomcost_double = int(conf["extras: room costs"]["2"])
+cost_fri_dinner = int(conf["extras"]["cost_fri_dinner"])
+cost_sat_lunch = int(conf["extras"]["cost_sat_lunch"])
+cost_after_concert = int(conf["extras"]["cost_after_concert"])
+cost_sat_dinner = int(conf["extras"]["cost_sat_dinner"])
+cost_ticket_regular = int(conf["extras"]["cost_ticket_regular"])
+cost_ticket_discounted = int(conf["extras"]["cost_ticket_discounted"])
+
+
+# variables to be made available to the website template
+conf_for_template = {"roomcost_single": roomcost_single,
+                     "roomcost_double": roomcost_double,
+                     "cost_fri_dinner": cost_fri_dinner,
+                     "cost_sat_lunch": cost_sat_lunch,
+                     "cost_after_concert": cost_after_concert,
+                     "cost_sat_dinner": cost_sat_dinner,
+                     "cost_ticket_regular": cost_ticket_regular,
+                     "cost_ticket_discounted": cost_ticket_discounted,
+                     "shortname": conf["application"]["shortname"],
+                     "s_startdate": start_date.strftime("%B %d"),
+                     "s_enddate": end_date.strftime("%B %d"),
+                     "num_days": number_of_days}
 
 @app.route("/extras.html", methods=["GET",])
 def extras(message=None):
+    # todo - check if that person has already submitted and paid for extras
+
     code = request.args.get('code')
     prt = lc(code)
 
     form = ExtrasForm(request.form)
     form.code.data = code
 
-    return render_template("extras.html", title="Extras", form=form, prt=prt)
+    return render_template("extras.html", title="Extras", form=form, prt=prt, conf=conf_for_template)
 
 
 @app.route("/extras.html", methods=["POST",])
@@ -266,7 +280,7 @@ class ExtrasForm(Form):
 
     guest = TextAreaField("Further guest info", default="Room for any other comments regarding your guests.", render_kw=_taf)
 
-    sat_dinner_restaurant = SelectField("Restaurant", choices=dinner_choices, validators=[restaurant_consistency_check("sat_dinner_numpeople")])
+    sat_dinner_restaurant = SelectField("Restaurant", choices=sel_restaurants, validators=[restaurant_consistency_check("sat_dinner_numpeople")])
     sat_dinner_numpeople = IntegerField("Number of people", validators=[validators.NumberRange(min=0)], default=0)
 
     tshirt_sex = SelectField("Style", choices=sel_t_shirt_sexes)
