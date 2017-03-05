@@ -18,6 +18,11 @@ def lp(id):
 def lc(code):
     return session.query(Participant).filter(Participant.code==code).first()
 
+# show message on the message.html template
+def show_message(message):
+    return render_template("message.html", message=message)
+
+
 
 
 # lookup partcipant by oops code - DEPRECATED

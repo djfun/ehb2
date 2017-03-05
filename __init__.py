@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from config import conf
 from tables import Base
+from sqlalchemy.orm.session import Session
 
 
 __author__ = 'koller'
@@ -24,7 +25,7 @@ engine = create_engine(db_url)
 # flask-mysqlalchemy integration
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
-session = flask_scoped_session(DBSession, app)
+session = flask_scoped_session(DBSession, app) # type: Session
 
 # set up logging
 import logging

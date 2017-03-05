@@ -207,3 +207,42 @@ def make_extras_from_form(prt, form):
                  other = form.other.data
                  )
 
+
+def make_form_from_extras(extras:Extra):
+    ret = ExtrasForm() # type: ExtrasForm
+
+    ret.participant_roomtype.data = extras.roomtype
+    ret.participant_roompartner.data = extras.roompartner
+
+    ret.participant_arrival.data = extras.arrival_date
+    ret.participant_departure.data = extras.departure_date
+
+    ret.guest1_roomtype.data = extras.guest1_roomtype
+    ret.guest1_name.data = extras.guest1_name
+    ret.guest1_arrival.data = extras.guest1_arrival
+    ret.guest1_departure.data = extras.guest1_departure
+
+    ret.guest2_roomtype.data = extras.guest2_roomtype
+    ret.guest2_name.data = extras.guest2_name
+    ret.guest2_arrival.data = extras.guest2_arrival
+    ret.guest2_departure.data = extras.guest2_departure
+
+    ret.num_dinner_friday.data = extras.num_dinner_friday
+    ret.num_lunch_saturday.data = extras.num_lunch_saturday
+    ret.num_after_concert.data = extras.num_after_concert
+
+    ret.num_show_tickets_regular.data = extras.num_show_tickets_regular
+    ret.num_show_tickets_discount.data = extras.num_show_tickets_discount
+
+    ret.guest.data = extras.guest
+
+    ret.sat_dinner_restaurant.data = extras.sat_night_restaurant
+    ret.sat_dinner_numpeople.data = extras.sat_night_numpeople
+
+    ret.tshirt_sex.data = extras.t_shirt_sex
+    ret.tshirt_size.data = extras.t_shirt_size
+
+    ret.phone.data = extras.phone
+    ret.other.data = extras.other
+
+    return ret

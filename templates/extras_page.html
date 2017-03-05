@@ -1,0 +1,36 @@
+{% set contentwidth="span12" %}
+{% set title=conf.shortname ~ " Extras for " ~ prt.fullname() %}
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+	{% if message %}
+    <hr/> <p class="error"> {{ message }} </p>
+    {% endif %}
+
+    {% if all_paid %}
+    <p>We confirm that you have paid the total amount for the extras you have booked
+        and that are paid directly to the EHB (column "Pay Now" below). Please remember
+        that you will still need to pay the amount in the "Pay to Hotel" column. You
+        will settle it directly with the hotel when you check in.
+    </p>
+    {% else %}
+    <p>
+        You have selected the following extra items, but <strong>you have not yet paid for them</strong>.
+        Your extras booking is not valid until you have paid the amount in the "Pay Now"
+        column in full. Please click on the "Pay with Paypal" at the bottom to do this.
+    </p>
+    {% endif %}
+
+    {% include "extras_table.html" %}
+
+    {% if not all_paid %}
+    <form class="form-horizontal" action='extras_payment.html' method="post">
+        <input type="hidden" name="code" value="{{ prt.code }}" />
+        <input type="hidden" name="pay_now" value="{{ pay_now }}" />
+
+        <button id="submit" name="submit" type="submit" class="btn btn-primary">Pay via Paypal</button>
+    </form>
+    {% endif %}
+{% endblock %}

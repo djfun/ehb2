@@ -192,8 +192,43 @@ class Extra(Base):
     sat_night_restaurant = Column(String(100))
     sat_night_numpeople = Column(SmallInteger)
     phone = Column(String(100))
+    paypal_token = Column(String(30))
 
     participant = relationship("Participant", backref=backref("extras"))
+
+class OverwrittenExtra(Base):
+    __tablename__ = 'overwritten_extras'
+
+    uid = Column(Integer, primary_key=True)
+    id = Column(Integer, ForeignKey('participant.id'), nullable=False)
+    roomtype = Column(String(100), nullable=False)
+    roompartner = Column(Integer)
+    arrival_date = Column(Date, nullable=False)
+    departure_date = Column(Date, nullable=False)
+    num_show_tickets_regular = Column(SmallInteger, nullable=False)
+    num_show_tickets_discount = Column(SmallInteger, nullable=False)
+    t_shirt_sex = Column(String(1), nullable=False)
+    t_shirt_size = Column(String(5))
+    other = Column(String(1000), nullable=False, server_default=text("''"))
+    guest = Column(String(1000), nullable=False, server_default=text("''"))
+    num_after_concert = Column(SmallInteger, nullable=False)
+    num_lunch_saturday = Column(SmallInteger, nullable=False)
+    num_dinner_friday = Column(SmallInteger, nullable=False)
+    guest1_name = Column(String(200))
+    guest1_arrival = Column(Date)
+    guest1_departure = Column(Date)
+    guest1_roomtype = Column(String(100))
+    guest2_name = Column(String(200))
+    guest2_arrival = Column(Date)
+    guest2_departure = Column(Date)
+    guest2_roomtype = Column(String(100))
+    last_paypal_status = Column(SmallInteger)
+    sat_night_restaurant = Column(String(100))
+    sat_night_numpeople = Column(SmallInteger)
+    phone = Column(String(100))
+    paypal_token = Column(String(30))
+
+    participant = relationship("Participant", backref=backref("overwritten_extras"))
 
 
 class OopsCode(Base):
