@@ -4,10 +4,6 @@ from __init__ import *
 from config import conf
 from tables import *
 
-@app.template_filter()
-@evalcontextfilter
-def ft(eval_ctx, value, format='%Y-%m-%d %H:%M'):
-    return value.strftime(format)
 
 # lookup participant by ID
 def lp(id):
@@ -81,6 +77,15 @@ def paypal_status_color(eval_ctx, item):
         return "white"
 
 
+# show string for last_paypal_status (works for Extras, need to confirm for Participants)
+@app.template_filter()
+@evalcontextfilter
+def ppstatus(eval_ctx, item):
+    if item.last_paypal_status:
+        return paypal_statuses[item.last_paypal_status].shortname()
+    else:
+        return "(none)"
+
 @app.template_filter()
 @evalcontextfilter
 def tf(label, eval_ctx, name):
@@ -100,3 +105,15 @@ def gitrev(eval_ctx, value):
 def ehbrev(eval_ctx, value):
     return conf.get("application", "name")
 
+# format time
+@app.template_filter()
+@evalcontextfilter
+def ft(eval_ctx, value, format='%Y-%m-%d %H:%M'):
+    return value.strftime(format)
+
+
+# format date
+@app.template_filter()
+@evalcontextfilter
+def fd(eval_ctx, value, format='%Y-%m-%d'):
+    return value.strftime(format)

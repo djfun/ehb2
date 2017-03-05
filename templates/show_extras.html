@@ -1,12 +1,83 @@
+{% set title="Extras" %}
 {% set contentwidth="span12" %}
 {% extends "main.html" %}
 {% import "macros.html" as m %}
 
 {% block content %}
 
-	<h1>{{ conf.shortname }} Extras for {{ prt.firstname }} {{ prt.lastname }}</h1>
 
-    <p>You have booked the following extras:</p>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
-    {% include "extras_table.html" %}
+<p>
+    <strong>Reports:</strong>
+    <a href="show-meals.html">Meals</a> /
+    <a href="show-tickets.html">Tickets</a> /
+    <a href="show-shirts.html">Shirts</a> /
+    <a href="show-checkin.html">Check-In</a>
+</p>
+
+
+<table class="table table-striped pretty" id="datatable">
+    <thead>
+    <tr> <th>Name</th> <th>Arrival</th> <th>Departure</th> <th>Pay Now</th> <th>Pay Hotel</th> <th>Status</th></tr>
+    </thead>
+
+    <tbody>
+    {% for prt, extras, pay_now, pay_hotel in prt_with_data %}
+    <tr>
+        <td><a href="show-extra.html?id={{ prt.id }}">{{ prt.fullnameLF() }}</a></td>
+        <td>{{ extras.arrival_date|fd }}</td>
+        <td>{{ extras.departure_date|fd }}</td>
+        <td>EUR {{ pay_now }}</td>
+        <td>EUR {{ pay_hotel }}</td>
+        <td>{{ extras | ppstatus }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<h2>Missing Participants</h2>
+
+
+<table class="table table-striped pretty" id="datatable_missing">
+    <thead>
+    <tr> <th>Name</th> </tr>
+    </thead>
+
+    <tbody>
+    {% for prt in missing_prts %}
+    <tr><td>{{ prt.fullnameLF() }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<script type="text/javascript" charset="utf-8">
+		  $(document).ready(function() {
+		    $("#datatable").dataTable( {
+			  "bPaginate": false,
+			  "bFilter": false,
+			  "bSort" : true,
+			  "bAutoWidth" : false
+			})
+          });
+
+          $(document).ready(function() {
+		    $("#datatable_missing").dataTable( {
+			  "bPaginate": false,
+			  "bFilter": false,
+			  "bSort" : true,
+			  "bAutoWidth" : false
+			})
+          });
+</script>
+
+
 {% endblock %}

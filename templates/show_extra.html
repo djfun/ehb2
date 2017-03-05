@@ -1,0 +1,57 @@
+{% set title="Extras for " ~ prt.fullname() %}
+{% set contentwidth="span12" %}
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+<p><strong>Booking for:</strong> {{ prt.fullname() }} ({{ prt.email }})</p>
+
+{% include "extras_table.html" %}
+
+
+<div class="participant-management">
+    <h1>Payment History</h1>
+    <table width="100%">
+        <tr><th align="left" width="20%">Time</th> <th align="left" width="20%">Paypal Status</th> <th align="left" width="60%">Details</th></tr>
+        {% for item in paypal_history %}
+        <tr>
+            <td bgcolor={{ item|paypal_status_color }}>
+                {{ item.timestamp|ft }}
+            </td>
+
+            <td bgcolor={{ item|paypal_status_color }}>
+                {{ item.payment_step }}: {{ item.paypal_status.shortname() }}
+            </td>
+
+            {% if item.paypal_status.paypal_status_name == "paypal_error" %}
+            <td bgcolor={{ item|paypal_status_color }}>{{ item.data|replace("\n", "<br/>\n")|safe }}</td>
+            {% else %}
+            <td bgcolor={{ item|paypal_status_color }}>
+                <div title="timestamp: {{ item.timestamp|ft }}
+status: {{ item.paypal_status.paypal_status_name }}
+{{ item.data }}"
+                     class="hover-anchor">(hover here)</div>
+            </td>
+            {% endif %}
+        </tr>
+
+        {% endfor %}
+    </table>
+
+
+
+
+
+    <h1>Participant Management</h1>
+    <p>Please do not use these functions unless you know what you're doing.<br/></p>
+    <form class="form-horizontal" action="change-extras.html?id={{ prt.id }}" method="post">
+        {% call m.controlgroup("paypal-change-field", "Change PP status") %}
+          {{ m.sel("sp-paypal-change-field", "1", paypal_statuses) }}
+          {{ m.tf("pp-change-reason", "reason?") }}
+          {{ m.sub("pp-change-button", "Submit", "btn btn-primary") }}
+        {% endcall %}
+    </form>
+</div>
+
+{% endblock %}

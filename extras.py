@@ -1,5 +1,7 @@
 from datetime import date
 
+from flask_login import login_required
+
 from __init__ import *
 from extras_form import ExtrasForm, make_extras_from_form, NO_TSHIRT, t_shirt_costs, make_form_from_extras
 from extras_roomtypes import Roomtype
@@ -265,4 +267,79 @@ def paymentSuccessExtras():
     except PaymentFailedException as e:
         prt = lp(e.prt.id)
         return show_page_for_extras(prt, e.prt, message = "Something went wrong with your Paypal payment. Please contact the organizers.")
+
+
+
+##############################################################
+#
+# Admin access
+#
+##############################################################
+
+@app.route("/show-extras.html", methods=["GET",])
+@login_required
+def show_extras(message=None):
+    if message:
+        flash(message)
+
+    all_participants = session.query(Participant).all()
+
+    missing_participants = []
+    prt_with_data = []
+
+    for prt in all_participants:
+        extras = find_extras(prt.id)
+
+        if extras:
+            pay_now, pay_to_hotel, items = extras_cost(extras)
+            prt_with_data.append((prt, extras, pay_now, pay_to_hotel))
+        else:
+            missing_participants.append(prt)
+
+    return render_template("show_extras.html", prt_with_data=prt_with_data, missing_prts=missing_participants)
+
+
+@app.route("/show-extra.html", methods=["GET",])
+@login_required
+def show_extra():
+    id = int(request.args.get('id'))
+    prt = lp(id)
+    extras = find_extras(id)
+
+    if not prt:
+        return show_message("Cannot resolve ID %d to a participant." % id)
+
+    if not extras:
+        return show_message("Participant %s has not booked any extras yet." % prt.fullname())
+
+    pay_now, pay_to_hotel, items = extras_cost(extras)
+
+    payment_steps = session.query(PaypalHistory).filter(PaypalHistory.participant_id == id).\
+        filter(PaypalHistory.payment_step == 2).order_by(PaypalHistory.timestamp).all()
+    ps = [(id, p.shortname()) for (id,p) in sorted(paypal_statuses.items())]
+
+    return render_template("show_extra.html", prt=prt,
+                           items=items, pay_now=pay_now, pay_to_hotel=pay_to_hotel,
+                           paypal_history=payment_steps, paypal_statuses=ps)
+
+@app.route("/change-extras.html", methods=["POST",])
+@login_required
+def change_extras():
+    id = int(request.args.get('id'))
+    prt = lp(id)
+    extras = find_extras(id)
+
+    if not prt or not extras:
+        return show_message("Could not process extras change for id '%s'" % request.args.get('id'))
+
+    if 'pp-change-button' in request.form:
+        reason = request.form['pp-change-reason']
+        value = int(request.form['sp-paypal-change-field'])
+
+        pp2.log(id, value, reason)
+
+        message="Changed PP status of %s (%d) to %d (%s; reason: %s)." % (prt.fullname(), prt.id, value, paypal_statuses[value].shortname(), reason)
+        return show_extras(message)
+
+    return show_message("Undefined command")
 
