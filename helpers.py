@@ -55,6 +55,16 @@ def base_url(with_slash=False):
         return without
 
 
+class TableToShow:
+    def __init__(self, header, content, title=None, summaryRow=None):
+        self.header = header
+        self.content = content
+        self.title = title
+        self.summaryRow = summaryRow
+
+
+
+
 @app.template_filter()
 @evalcontextfilter
 def part(eval_ctx, value):

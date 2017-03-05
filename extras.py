@@ -1,9 +1,11 @@
+from collections import Counter
 from datetime import date
 
 from flask_login import login_required
 
 from __init__ import *
-from extras_form import ExtrasForm, make_extras_from_form, NO_TSHIRT, t_shirt_costs, make_form_from_extras
+from extras_form import ExtrasForm, make_extras_from_form, NO_TSHIRT, t_shirt_costs, make_form_from_extras, \
+    NO_RESTAURANT, restaurant_names
 from extras_roomtypes import Roomtype
 from extras_roomtypes import roomtypes, NO_ROOMPARTNER, NO_GUEST
 
@@ -60,6 +62,21 @@ def fd(d:date):
     return d.strftime("%d/%m/%Y")
 
 
+def meal_costs(extras:Extra):
+    return extras.num_dinner_friday*cost_fri_dinner + extras.num_lunch_saturday*cost_sat_lunch + extras.num_after_concert*cost_after_concert
+
+def ticket_costs(extras:Extra):
+    return extras.num_show_tickets_regular*cost_ticket_regular + extras.num_show_tickets_discount*cost_ticket_discounted
+
+def s_tshirt_size(extras):
+    return "%s, size %s" % (conf["extras: t-shirt sexes"][extras.t_shirt_sex], extras.t_shirt_size)
+
+def restaurant_name(extras):
+    if extras.sat_night_restaurant == NO_RESTAURANT:
+        return "(none)"
+    else:
+        return restaurant_names[extras.sat_night_restaurant]
+
 # returns (pay_now, pay_to_hotel, items), where items is a list of entries (item description, pay_to_hotel, pay_to_ehb)
 def extras_cost(extras:Extra):
     prt_roomtype = roomtypes[extras.roomtype] # type: Roomtype
@@ -99,19 +116,19 @@ def extras_cost(extras:Extra):
     if extras.num_show_tickets_discount:
         items.append(("%d discounted ticket(s) for the Saturday night show" % extras.num_show_tickets_discount, 0, extras.num_show_tickets_discount*cost_ticket_discounted))
 
-    extra_costs_guests = extras.num_dinner_friday*cost_fri_dinner + extras.num_lunch_saturday*cost_sat_lunch + extras.num_after_concert*cost_after_concert + extras.num_show_tickets_regular*cost_ticket_regular + extras.num_show_tickets_discount*cost_ticket_discounted
+    extra_costs_guests = meal_costs(extras) + ticket_costs(extras)
 
     # Sat night dinner
     cost_sat_night = 0
     if extras.sat_night_numpeople:
-        items.append(("Dinner for %d people at %s before the Saturday night show" % (extras.sat_night_numpeople, conf["extras: restaurants"][extras.sat_night_restaurant]), 0, extras.sat_night_numpeople*cost_sat_dinner))
+        items.append(("Dinner for %d people at %s before the Saturday night show" % (extras.sat_night_numpeople, restaurant_name(extras)), 0, extras.sat_night_numpeople*cost_sat_dinner))
         cost_sat_night = extras.sat_night_numpeople*cost_sat_dinner
 
     # t-shirt
     cost_tshirt = 0
     if extras.t_shirt_size != NO_TSHIRT:
         cost_tshirt = t_shirt_costs[extras.t_shirt_size]
-        items.append(("%s t-shirt (%s, size %s)" % (event_shortname, conf["extras: t-shirt sexes"][extras.t_shirt_sex], extras.t_shirt_size), 0, cost_tshirt))
+        items.append(("%s t-shirt (%s)" % (event_shortname, s_tshirt_size(extras)), 0, cost_tshirt))
 
     pay_now = extra_costs_guests + cost_sat_night + cost_tshirt
     pay_to_hotel = extra_room_cost_ehbdays + room_cost_other_days + guest1_roomcost + guest2_roomcost
@@ -217,7 +234,6 @@ def is_extras_paid(extras:Extra):
 def show_page_for_extras(prt:Participant, extras:Extra, message=None):
     all_paid = extras.last_paypal_status == PP_SUCCESS
     pay_now, pay_to_hotel, items = extras_cost(extras)
-    print("prt " + str(prt))
     return render_template("extras_page.html", prt=prt, extras=extras, message=message, all_paid=all_paid, conf=conf_for_template, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items)
 
 @app.route("/extras_payment.html", methods=["POST",])
@@ -343,3 +359,126 @@ def change_extras():
 
     return show_message("Undefined command")
 
+
+
+
+##############################################################
+#
+# Tables
+#
+##############################################################
+
+@app.route("/show-meals.html")
+@login_required
+def show_meals():
+    header = ["Nr", "Participant", "Dinner Fri", "Lunch Sat", "Midnight snack", "Cost (EUR)"]
+    content = []
+
+    for prt in session.query(Participant).all():
+        extras = find_extras(prt.id) # type: Extra
+
+        if extras:
+            costs = meal_costs(extras)
+            if costs > 0:
+                content.append([prt.fullnameLF(), extras.num_dinner_friday, extras.num_lunch_saturday, extras.num_after_concert, costs])
+
+    summaryRow = sortIdSummarize(content)
+    return render_template("show_table.html", tables=[TableToShow(header, content, title="Prepaid Extra Meals - %s" % event_shortname, summaryRow=summaryRow)])
+
+@app.route("/show-tickets.html")
+@login_required
+def show_tickets():
+    header = ["Nr", "Gast", "Regulär", "Ermäßigt", "Preis (EUR)"]
+    content = []
+
+    for prt in session.query(Participant).all():
+        extras = find_extras(prt.id) # type: Extra
+
+        if extras:
+            costs = ticket_costs(extras)
+            if costs > 0:
+                content.append([prt.fullnameLF(), extras.num_show_tickets_regular, extras.num_show_tickets_discount, costs])
+
+    summaryRow = sortIdSummarize(content)
+    return render_template("show_table.html", tables=[TableToShow(header, content, title="Bezahlte Tickets - %s" % event_shortname, summaryRow=summaryRow)])
+
+@app.route("/show-shirts.html")
+@login_required
+def show_tshirts():
+    # Table with individual t-shirts
+    header = ["Nr", "Name", "Size", "Cost (EUR)"]
+    content = []
+    all_sizes = [] # list of all t-shirt sizes for all participants, with duplicates
+
+    for prt in session.query(Participant).all():
+        extras = find_extras(prt.id) # type: Extra
+
+        if extras:
+            if extras.t_shirt_size != NO_TSHIRT:
+                content.append([prt.fullnameLF(), s_tshirt_size(extras), t_shirt_costs[extras.t_shirt_size]])
+                all_sizes.append(s_tshirt_size(extras))
+
+    summaryRow = sortIdSummarize(content, columns=set([2]))
+    table = TableToShow(header, content, title="T-Shirts - %s" % event_shortname, summaryRow=summaryRow)
+
+    # Table with t-shirt quantities
+    size_counter = Counter(all_sizes)
+    keys = list(size_counter.keys())
+    keys.sort()
+
+    qt_header = ["Size", "Quantity"]
+    qt_content = [[key, size_counter[key]] for key in keys]
+    qt_table = TableToShow(qt_header, qt_content, title="Order Summary", summaryRow=["Total", len(all_sizes)])
+
+    # render template
+    return render_template("show_table.html", tables=[table, qt_table])
+
+
+@app.route("/show-checkin.html")
+@login_required
+def show_checkin():
+    header = ["Nr", "Name", "T-Shirt", "Sat Dinner", "Tickets", "Meals", "Checked In"]
+    content = []
+
+    for prt in session.query(Participant).all():
+        extras = find_extras(prt.id) # type: Extra
+
+        if extras:
+            content.append([
+                prt.fullnameLF(),
+                "--" if extras.t_shirt_size == NO_TSHIRT else s_tshirt_size(extras),
+                "--" if extras.sat_night_numpeople == 0 else "%s (x %d)" % (restaurant_name(extras), extras.sat_night_numpeople),
+                "--" if ticket_costs(extras) == 0 else "%d / %d" % (extras.num_show_tickets_regular, extras.num_show_tickets_discount),
+                "--" if meal_costs(extras) == 0 else "%d / %d / %d" % (extras.num_dinner_friday, extras.num_lunch_saturday, extras.num_after_concert),
+                ""
+            ])
+        else:
+            content.append([prt.fullnameLF(), "--", "--", "--", "--", ""])
+
+    sortIdSummarize(content, columns=set())
+    return render_template("show_table.html", tables=[TableToShow(header, content, title="Check-In - %s" % event_shortname)])
+
+
+
+def sortIdSummarize(content, columns=None):
+    if len(content) > 0:
+        content.sort(key=lambda x:x[0])          # sort by names
+
+        summary_values = [0] * (len(content[0])-1) # make accumulators
+        if columns == None:
+            columns = set(range(1,len(content[0]))) # if no columns specified, summarize over all except the first one
+        nr = 1
+
+        for row in content:
+            for i in range(1,len(row)):
+                if i in columns:
+                    summary_values[i-1] += row[i]
+            row.insert(0, str(nr))
+            nr += 1
+
+        summary_values.insert(0, "Total")
+        summary_values.insert(0, "")
+
+        return summary_values
+    else:
+        return None

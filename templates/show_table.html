@@ -1,0 +1,46 @@
+
+{# set title variable from outside if you want a page title #}
+
+{% set contentwidth="span12" %}
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{% for table in tables %}
+    {% if table.title %}
+        <h2>{{ table.title }}</h2>
+    {% else %}
+        <span style="margin-top: 1cm">&nbsp;</span>
+    {% endif %}
+
+
+    <table class="table" style="margin-bottom:1cm">
+      <thead><tr>
+          {% for hr in table.header %}
+            <th>{{ hr }}</th>
+          {% endfor %}
+      </tr></thead>
+
+      <tbody>
+        {% for row in table.content %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+
+        {% if table.summaryRow %}
+        <tr>
+            {% for cell in table.summaryRow %}
+                <td><strong>{{ cell }}</strong></td>
+            {% endfor %}
+        </tr>
+        {% endif %}
+      </tbody>
+  </table>
+{% endfor %}
+
+
+{% endblock %}

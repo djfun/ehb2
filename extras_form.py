@@ -1,3 +1,5 @@
+import re
+
 from wtforms.fields.core import DateField
 from wtforms.fields.simple import HiddenField
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField
@@ -35,7 +37,17 @@ sel_all_participants.insert(0, (NO_ROOMPARTNER, "-- no selection --"))
 
 
 # Choices for before-show dinner
-sel_restaurants = dict_to_sel(conf["extras: restaurants"])
+restaurant_names = {}
+sel_restaurants = []
+
+for key in conf["extras: restaurants"]:
+    parts = re.split("\s*,\s*", conf["extras: restaurants"][key])
+    restaurant_names[key] = parts[0]
+
+    if len(parts) > 1: # restaurant has a not, put it in parentheses
+        sel_restaurants.append((key, "%s (%s)" % (parts[0], parts[1])))
+    else:
+        sel_restaurants.append((key, parts[0]))
 
 
 # Choices for t-shirts
