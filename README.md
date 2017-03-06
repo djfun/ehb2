@@ -1,6 +1,6 @@
 # EHB Website Server
 
-This is the source code for the application page for the European Harmony Brigade (EHB). It was developed by Alexander Koller for EHB 2015 and 2016, and rewritten from scratch after EHB 2016. It provides the following functionality for the EHB registration process:
+This is the source code for the application page for the European Harmony Brigade (EHB). It was developed by Alexander Koller for EHB 2015 and 2016, and rewritten from scratch in Python for EHB 2017. It provides the following functionality for the EHB registration process:
 
 * Participants can submit an application, and later book extras, and pay for both via Paypal.
 * Organizers can display and edit the applications.
