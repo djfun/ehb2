@@ -1,0 +1,25 @@
+{% set title="Admin start page" %}
+{% set contentwidth="span12" %}
+{% extends "main.html" %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<h2>Participant Management</h2>
+
+<p><a href="show-participants.html">Show and manage applications</a></p>
+
+
+<h2>Extras Management</h2>
+
+<p><a href="show-extras.html">Show and manage extras bookings</a></p>
+<p>Room Planner stuff</p>
+
+{% endblock %}

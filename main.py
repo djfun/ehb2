@@ -27,6 +27,11 @@ def secret():
 def send_static(path):
     return send_from_directory('static', path)
 
+@app.route('/admin.html')
+@login_required
+def adminpage():
+    return render_template("admin.html")
+
 
 #######################################################################################
 ## main

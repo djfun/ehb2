@@ -1,0 +1,73 @@
+{# peopleString: string #}
+{# rooms: list(list(string)) #}
+
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+    <title>EHB Room Planner</title>
+
+    <script type="text/javascript"  src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/static/dragula.min.css">
+    <link rel="stylesheet" href="/static/roomplanner.css">
+
+    <script src="/static/opentip-jquery.min.js"></script>
+    <link href="/static/opentip.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+<h1>EHB Room Planner</h1>
+
+<button class="btn btn-primary" id="b_save">Save to database</button>
+<button class="btn btn-primary" id="b_undo">Reload from database</button>
+<a class="btn btn-primary" href="/room-assignments.csv">Download CSV</a>
+
+<span id="message">&nbsp;</span>
+
+<table class="root">
+    {% for row in rooms %}
+      <tr class="wrapper">
+          {% for col in row %}
+          <td id="{{ col }}" class="container" />
+          {% endfor %}
+      </tr>
+    {% endfor %}
+</table>
+
+
+<script>
+    var people = { {{ peopleString|safe }} };
+</script>
+
+
+<script type="text/javascript" src="assets/javascripts/dragula.min.js"></script>
+<script type="text/javascript" src="assets/javascripts/room_planner_script.js"></script>
+
+<script type="text/javascript">
+  $("#b_save").on('click', make_submit_button_handler("#b_save"));
+
+  $("#b_undo").on('click', function(e) {
+    window.location.href = '/room-planner.html';
+  });
+
+  $("#b_undo").on('click', function(e) {
+    window.location.href = '/room-planner.html';
+  });
+</script>
+
+
+</body> </html>

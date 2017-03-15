@@ -230,6 +230,13 @@ class OverwrittenExtra(Base):
 
     participant = relationship("Participant", backref=backref("overwritten_extras"))
 
+class RoomAssignment(Base):
+    __tablename__ = 'room_assignments'
+
+    name = Column(String(100), primary_key=True)
+    id = Column(Integer)
+    room = Column(String(10))
+
 
 class OopsCode(Base):
     __tablename__ = "oops_code"
