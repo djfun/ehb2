@@ -11,6 +11,7 @@ from auth import *
 from show_participants import show_participants, show_participant, do_show_participants
 from apply import *
 from extras import *
+from extras_roomplanner import *
 
 @app.route("/")
 def index():

@@ -4,6 +4,12 @@
 
 {% block content %}
 
+{# friendly messages #}
+{% if message %}
+    <p class="message"> {{ message }}</p>
+{% endif %}
+
+{# error messages #}
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         {% for message in messages %}
@@ -20,6 +26,7 @@
 <h2>Extras Management</h2>
 
 <p><a href="show-extras.html">Show and manage extras bookings</a></p>
-<p>Room Planner stuff</p>
+<p><a href="/initialize-room-assignments.html">Initialize room assignments</a></p>
+<p><a href="room-planner.html">Room planner</a></p>
 
 {% endblock %}

@@ -233,8 +233,10 @@ class OverwrittenExtra(Base):
 class RoomAssignment(Base):
     __tablename__ = 'room_assignments'
 
-    name = Column(String(100), primary_key=True)
+    uid = Column(Integer, primary_key=True)
+    name = Column(String(100))
     id = Column(Integer)
+    guest_position = Column(SmallInteger)
     room = Column(String(10))
 
 

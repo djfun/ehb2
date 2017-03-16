@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from __init__ import *
 from config import conf, number_of_days
-from tables import Participant
+from tables import Participant, Extra
 
 NO_ROOMPARTNER = "-1"
 NO_GUEST = "no_guest" # roomtype for "no guest"; this is used when validating the form
@@ -162,7 +162,7 @@ class Roomtype:
 
 # room types for participants
 
-class DoubleAnyoneRomtype(Roomtype):
+class DoubleAnyoneRoomtype(Roomtype):
     def __init__(self):
         Roomtype.__init__(self, "double_anyone", "Double room, would share with anyone", 2, True, False, "ANYONE")
 
@@ -172,6 +172,10 @@ class DoubleAnyoneRomtype(Roomtype):
             return "If you are willing to share with any other participant, please choose '-- no selection --' under 'Share room with' below."
 
         return None
+
+    @staticmethod
+    def tooltip(extras:Extra, prt_dict):
+        return "share with anyone"
 
 class SingleRoomtype(Roomtype):
     def __init__(self):
@@ -184,6 +188,11 @@ class SingleRoomtype(Roomtype):
 
         return None
 
+    @staticmethod
+    def tooltip(extras:Extra, prt_dict):
+        return None
+
+
 class DoubleParticipantRoomtype(Roomtype):
     def __init__(self):
         Roomtype.__init__(self, "double_participant", "Double room, share with specific participant", 2, True, False, "WITH_PARTICIPANT")
@@ -194,6 +203,12 @@ class DoubleParticipantRoomtype(Roomtype):
             return "If you would like to share your room with a specific participant, please choose that participant under 'Share room with' below."
 
         return None
+
+    @staticmethod
+    def tooltip(extras:Extra, prt_dict):
+        partner = prt_dict[extras.roompartner] # type: Participant
+        return "share with " + partner.fullname()
+
 
 class DoubleWithGuestRoomtype(Roomtype):
     def __init__(self):
@@ -210,6 +225,11 @@ class DoubleWithGuestRoomtype(Roomtype):
 
         return None
 
+    @staticmethod
+    def tooltip(extras: Extra, prt_dict):
+        return "share with guest"
+
+
 # room types for guests
 
 class NoGuestRoomtype(Roomtype):
@@ -220,6 +240,11 @@ class NoGuestRoomtype(Roomtype):
     def form_constraint(prt_roomtype, other_guest_roomtype):
         return None
 
+    @staticmethod
+    def tooltip(extras: Extra, prt_dict):
+        return None
+
+
 class DoubleAnyoneGuestRoomtype(Roomtype):
     def __init__(self):
         Roomtype.__init__(self, "double_anyone_guest", "Double room, would share with anyone", 0, False, True, "ANYONE")
@@ -228,6 +253,11 @@ class DoubleAnyoneGuestRoomtype(Roomtype):
     def form_constraint(prt_roomtype, other_guest_roomtype):
         return None
 
+    @staticmethod
+    def tooltip(extras: Extra, prt_dict):
+        prt = prt_dict[extras.id] # type: Participant
+        return "(guest of %s) share with anyone" % prt.fullname()
+
 class SingleGuestRoomtype(Roomtype):
     def __init__(self):
         Roomtype.__init__(self, "single_guest", "Single room", 1, False, True, "ANYONE")
@@ -235,6 +265,11 @@ class SingleGuestRoomtype(Roomtype):
     @staticmethod
     def form_constraint(prt_roomtype, other_guest_roomtype):
         return None
+
+    @staticmethod
+    def tooltip(extras: Extra, prt_dict):
+        prt = prt_dict[extras.id] # type: Participant
+        return "(guest of %s) single" % prt.fullname()
 
 class DoubleWithMeRoomtype(Roomtype):
     def __init__(self):
@@ -250,6 +285,12 @@ class DoubleWithMeRoomtype(Roomtype):
 
         return None
 
+    @staticmethod
+    def tooltip(extras: Extra, prt_dict):
+        prt = prt_dict[extras.id] # type: Participant
+        return "(guest of %s) share with participant" % prt.fullname()
+
+
 class DoubleWithOtherGuestRoomtype(Roomtype):
     def __init__(self):
         Roomtype.__init__(self, "double_with_other_guest", "Double room, share with other guest", 2, False, True, "WITH_GUEST")
@@ -261,8 +302,14 @@ class DoubleWithOtherGuestRoomtype(Roomtype):
 
         return None
 
+    @staticmethod
+    def tooltip(extras: Extra, prt_dict):
+        prt = prt_dict[extras.id] # type: Participant
+        return "(guest of %s) share with other guest" % prt.fullname()
+
+
 
 roomtypes = OrderedDict()
 
-for rt in [DoubleAnyoneRomtype(), SingleRoomtype(), DoubleParticipantRoomtype(), DoubleWithGuestRoomtype(), NoGuestRoomtype(), DoubleAnyoneGuestRoomtype(), SingleGuestRoomtype(), DoubleWithMeRoomtype(), DoubleWithOtherGuestRoomtype()]:
+for rt in [DoubleAnyoneRoomtype(), SingleRoomtype(), DoubleParticipantRoomtype(), DoubleWithGuestRoomtype(), NoGuestRoomtype(), DoubleAnyoneGuestRoomtype(), SingleGuestRoomtype(), DoubleWithMeRoomtype(), DoubleWithOtherGuestRoomtype()]:
     roomtypes[rt.id] = rt

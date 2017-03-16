@@ -473,7 +473,7 @@ nav ul li {
 
 
 .message  {
-	color: green;
+	color: green !important;
 }
 
 
