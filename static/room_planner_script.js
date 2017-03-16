@@ -5,7 +5,6 @@
 function make_submit_button_handler(forButton) {
     return function (e) {
         var all_containers = jQuery.makeArray($('.container'));
-        var pos = 0;
         var dict = {};
         var button = $(forButton);
 
@@ -25,9 +24,7 @@ function make_submit_button_handler(forButton) {
 
           for( var j = 0; j < container.children.length; j++ ) {
             var element = container.children[j];
-            dict["pos_"+pos] = element.id;
-            dict["assignment_" + element.id] = container.id;
-            pos++;
+            dict[element.id] = container.id; // "assignment_" +
           }
         }
 

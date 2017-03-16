@@ -34,13 +34,13 @@ def room_planner():
 @app.route("/room-planner.html", methods=["POST",])
 @login_required
 def save_room_planner():
-    data = request.get_json() # Python dictionary of assignment_* and pos_* to values
+    data = request.get_json() # type: dict
 
     for ra in session.query(RoomAssignment).all(): # type: RoomAssignment
         if ra.guest_position:
-            key = "assignment_" + make_guest_key(ra)
+            key = make_guest_key(ra)
         else:
-            key = "assignment_%d" % ra.id
+            key = str(ra.id)
 
         ra.room = data[key]
 
