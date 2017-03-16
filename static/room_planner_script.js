@@ -137,33 +137,6 @@ function set_message(text, htmlClass) {
         return false;
     }
 
-//
-//                if( person.guest_of ) {
-//                    // person is guest
-//                    console.log("guest " + person.name + ": partner " + person.partner + ", guestof " + person.guest_of + ", other " + other_person.id);
-//
-//                    if( ! (person.partner == 3 && person.guest_of == other_person.id) ) { // ok <= guest "person" wants to share with participant, and "partner" is that participant
-//                        if( ! (person.partner == 4 && other_person.guest_of )) {  // ok <= guest "person" wants to share with other guest, and "partner" is a guest
-//                            return true;
-//                        }
-//                    }
-//                } else {
-//                    // person is participant
-//                    if( person.gender != other_person.gender ) {
-//                        if( ! (person.partner == other_person.id) ) {  // ok <= "person" wanted "other" as partner, and "other" is participant
-//                            if( ! (person.partner == -2 && other_person.guest_of == person.id) ) {  // ok <= "person" wanted guest as partner, and "other" is guest of "person"
-//                                return true;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//	    }
-//
-//	    return false;
-//    }
-
-
     // returns true if the other_person is a partner that person specifically requested
     function is_desired_partner(person, other_person) {
         if( person.guest_of ) {
@@ -205,38 +178,6 @@ function set_message(text, htmlClass) {
             return false;
         }
     }
-
-
-//
-//            if( person.guest_of ) {
-//              // person is a guest
-//
-//
-//
-//            } else {
-//              // person is a participant
-//              if( person.partner == -2 ) {
-//                  // wants to share with guest
-//                  for(var i = 0; i < container.children.length; i++) {
-//                    var other_person = person_for_element(container.children[i]);
-//
-//                    if( person.id == other_person.guest_of ) {
-//                      return true;
-//                    }
-//                  }
-//
-//                  return false;
-//              } else {
-//                  for(var i = 0; i < container.children.length; i++) {
-//                      if( person.partner == container.children[i].id ) {
-//                          return true;
-//                      }
-//                  }
-//                  return false;
-//              }
-//            }
-//        }
-//    }
 
     function prepend_gender(person, str) {
         if(person.gender == "M") {
@@ -292,8 +233,27 @@ function set_message(text, htmlClass) {
     drake.on("drop", function(el, target, source, sibling) {
         check_containers([target, source], people);
         set_message("Unsaved changes!", "message-old");
-//        $("#message").text("Unsaved changes!");
-//        $("#message").removeClass().addClass("message-old");
+
+        // check whether move made everyone in target container happy
+        var target_all_happy = true;
+        for( var i = 0; i < target.children.length; i++ ) {
+            var el = target.children[i];
+            var status = el.getAttribute("class");
+
+            console.log(status);
+            if( status != "w-happy" ) {
+                target_all_happy = false;
+            }
+        }
+
+        // play sound depending on that
+        if( target_all_happy ) {
+            var audio = new Audio('/static/success.mp3');
+            audio.play();
+        } else {
+            var audio = new Audio('/static/plonk.mp3');
+            audio.play();
+        }
     });
 
     function f (id) {

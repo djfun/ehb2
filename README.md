@@ -24,3 +24,14 @@ pip install paypalrestsdk
 pip install XlsxWriter
 ```
 
+
+## Credits
+
+This code uses
+[Thunk](http://www.freesound.org/people/Reitanna/sounds/323725/) by
+Reitanna and
+[Powerup/Success](http://www.freesound.org/people/GabrielAraujo/sounds/242501/)
+by GabrielAraujo from [Freesound](http://www.freesound.org), both
+distributed under a Creative Commons licence.
+
+
