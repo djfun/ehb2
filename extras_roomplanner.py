@@ -1,10 +1,18 @@
+import io
+from collections import defaultdict
+
+import itertools
+import xlsxwriter
 from flask import Response
 from flask import flash
+from flask import make_response
 from flask import request
+from flask import send_file
 from flask_login import login_required
 
 from __init__ import *
 from config import start_date, end_date
+from extras import extras_cost
 from extras_roomtypes import roomtypes, NO_GUEST
 from extras_roomtypes import Roomtype
 
@@ -21,6 +29,7 @@ def mkrm(row, col):
 ROOM_ROWS = 30
 ROOM_COLS = 5
 all_rooms = [[mkrm(row, col) for col in range(1,ROOM_COLS+1)] for row in range(1,ROOM_ROWS+1)]
+flattened_all_rooms = itertools.chain.from_iterable(all_rooms)
 
 @app.route("/room-planner.html", methods=["GET",])
 @login_required
@@ -47,6 +56,85 @@ def save_room_planner():
     session.commit()
     return "success"
 
+
+
+# german_df = "%d.%m.%Y"
+
+@app.route("/room-assignments.xlsx")
+@login_required
+def send_room_assignemnts_xslx():
+    # get data from database
+    prt_dict = id_to_participant_dict()
+    r_room_assignments = session.query(RoomAssignment).all()
+    room_to_ra = defaultdict(list)
+    for ra in r_room_assignments:
+        room_to_ra[ra.room].append(ra)
+
+    # prepare Excel file
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    bold = workbook.add_format({'bold': True})
+    df = workbook.add_format({'num_format': 'dd/mm/yy'})
+    money = workbook.add_format({'num_format': '€ 0'})
+    worksheet = workbook.add_worksheet()
+
+    # header row
+    worksheet.write(0, 0, "Nr", bold)
+    worksheet.write(0, 1, "Name", bold)
+    worksheet.write(0, 2, "Status", bold)
+    worksheet.write(0, 3, "Anreise", bold)
+    worksheet.write(0, 4, "Abreise", bold)
+    worksheet.write(0, 5, "Zahlt", bold)
+
+    # column widths
+    worksheet.set_column('A:A', 5)
+    worksheet.set_column('B:B', 25)
+    worksheet.set_column('C:C', 30)
+
+    # fill with data
+    row = 2
+    nr = 1
+
+    for room in flattened_all_rooms:
+        for ra in room_to_ra[room]:
+            prt = prt_dict[ra.id] # type: Participant
+            worksheet.write(row, 0, nr)
+            worksheet.write(row, 1, ra.name)
+
+            if not ra.guest_position:
+                # participant
+                worksheet.write(row, 2, "T")
+                ee = prt.extras
+                if ee:
+                    e = ee[0] # type: Extra
+                    pay_now, pay_to_hotel, items = extras_cost(e)
+                    worksheet.write(row, 3, e.arrival_date, df)
+                    worksheet.write(row, 4, e.departure_date, df)
+                    worksheet.write(row, 5, pay_to_hotel, money)
+                else:
+                    # no extras
+                    worksheet.write(row, 3, start_date, df)
+                    worksheet.write(row, 4, end_date, df)
+                    worksheet.write(row, 5, 0, money)
+
+            else:
+                # guest
+                e = prt.extras[0] # type: Extra
+                arrival, departure = (e.guest1_arrival, e.guest1_departure) if ra.guest_position == 1 else (e.guest2_arrival, e.guest2_departure)
+                worksheet.write(row, 2, "Gast von %s" % prt.fullname())
+                worksheet.write(row, 3, arrival, df)
+                worksheet.write(row, 4, departure, df)
+
+            nr += 1
+            row += 1
+
+        row += 1 # empty row after each room
+
+    workbook.close()
+
+    output.seek(0)
+
+    return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
 
