@@ -251,7 +251,7 @@ function set_message(text, htmlClass) {
             var audio = new Audio('/static/success.mp3');
             audio.play();
         } else {
-            var audio = new Audio('/static/plonk.mp3');
+            var audio = new Audio('/static/postit.mp3');
             audio.play();
         }
     });
