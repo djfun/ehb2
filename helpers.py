@@ -15,9 +15,13 @@ def lc(code):
     return session.query(Participant).filter(Participant.code==code).first()
 
 
+# returns mapping from participant ids to participants
 def id_to_participant_dict():
     all_prts = session.query(Participant).all()
     return {prt.id : prt for prt in all_prts}
+
+
+# returns mapping from
 
 
 # show message on the message.html template

@@ -1,8 +1,11 @@
+from flask import Response
 from flask import flash
+from flask import request
 from flask_login import login_required
 
 from __init__ import *
-from extras_roomtypes import roomtypes
+from config import start_date, end_date
+from extras_roomtypes import roomtypes, NO_GUEST
 from extras_roomtypes import Roomtype
 
 from helpers import *
@@ -23,6 +26,29 @@ all_rooms = [[mkrm(row, col) for col in range(1,ROOM_COLS+1)] for row in range(1
 @login_required
 def room_planner():
     return render_template("roomplanner.html", peopleString=make_people_string(), rooms=all_rooms)
+
+# Write room planner entries to database.
+# The current room assignments are sent as part of the POST request; see make_submit_button_handler in room_planner_script.js.
+# The method returns the string "success" if successful to indicate to the Ajax
+# callback that everything worked well.
+@app.route("/room-planner.html", methods=["POST",])
+@login_required
+def save_room_planner():
+    data = request.get_json() # Python dictionary of assignment_* and pos_* to values
+
+    for ra in session.query(RoomAssignment).all(): # type: RoomAssignment
+        if ra.guest_position:
+            key = "assignment_" + make_guest_key(ra)
+        else:
+            key = "assignment_%d" % ra.id
+
+        ra.room = data[key]
+
+    session.commit()
+    return "success"
+
+
+
 
 @app.route("/initialize-room-assignments.html")
 @login_required
@@ -51,12 +77,14 @@ def initialize_room_assignments():
 
     for extras in session.query(Extra).all(): # type: Extra
         if not extras.guest1_name in name_to_ra:
-            entries.append(RoomAssignment(name=extras.guest1_name, id=extras.id, guest_position=1, room=mkrm(row, col)))
-            row, col = inc_rowcol(row, col)
+            if extras.guest1_roomtype != NO_GUEST:
+                entries.append(RoomAssignment(name=extras.guest1_name, id=extras.id, guest_position=1, room=mkrm(row, col)))
+                row, col = inc_rowcol(row, col)
 
         if not extras.guest2_name in name_to_ra:
-            entries.append(RoomAssignment(name=extras.guest2_name, id=extras.id, guest_position=2, room=mkrm(row, col)))
-            row, col = inc_rowcol(row, col)
+            if extras.guest2_roomtype != NO_GUEST:
+                entries.append(RoomAssignment(name=extras.guest2_name, id=extras.id, guest_position=2, room=mkrm(row, col)))
+                row, col = inc_rowcol(row, col)
 
     # do all these people fit into the room planner?
     if len(entries) > (ROOM_ROWS-last_occupied_row) * ROOM_COLS:
@@ -81,46 +109,68 @@ def inc_rowcol(row, col):
 
     return (row, col)
 
+# date format for roomplanner cards
+rp_df = "%d/%m"
 
+def make_guest_key(ra:RoomAssignment):
+    return "%d_g%d" % (ra.id, ra.guest_position)
 
-# returns string with comma-separated entries like this:
-# "19": {"id": "19", "name": "Simone Knoop", "arrival": "09/06", "departure": "12/06","roomsize": 2, "tooltip":"shared with Marquis, Mira", "extras_submitted":true, "room":"4_1", "partner": "35", "gender": "F"}
-# with one entry per person who needs a room
 def make_people_string():
+    """
+    Returns a string of comma-separated entries, one per person who should be displayed in the room planner.
+    See below for the formats for participants and guests.
+    :return:
+    """
+
     prt_dict = id_to_participant_dict()
     entries = []
+
+    df_startdate = start_date.strftime(rp_df)
+    df_enddate   = end_date.strftime(rp_df)
 
     for ra in session.query(RoomAssignment).all(): # type: RoomAssignment
         prt = prt_dict[ra.id] # type: Participant
 
         if not ra.guest_position:
-            # room assignment for a participant
-            ee = prt.extras # type: Extra
+            # Room assignment for a participant. This produces a string of the following form:
+            # "19": {"id": "19", "name": "Simone Knoop", "arrival": "09/06", "departure": "12/06","roomsize": 2, "tooltip":"shared with Marquis, Mira", "extras_submitted":true, "room":"4_1", "partner": "35", "gender": "F"}
 
+            ee = prt.extras
             if ee:
-                e = ee[0]
-                print("aaa %s" % type(e.arrival_date))
-
                 # prt submitted extras
-                arrival = e.arrival_date.strftime("%d/%m")
-                departure = e.departure_date.strftime("%d/%m")
+                e = ee[0] # type: Extra
+                arrival = e.arrival_date.strftime(rp_df)
+                departure = e.departure_date.strftime(rp_df)
                 rt = roomtypes[e.roomtype] # type: Roomtype
-                tooltip = rt.tooltip(e, prt_dict) # todo - avoid "None" in js
-                roompartner_code = e.roompartner if e.roompartner >= 0 else -2
+                tooltip = rt.tooltip(e, prt_dict)
+                roompartner_code = rt.roompartner_code(e) # type: str
 
-                entries.append('"%d": {"id": "%d", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": true, "room": "%s", "partner": "%d", "gender": "%s"}' % \
-                               (prt.id, prt.id, prt.fullname(), arrival, departure, rt.people_in_room, tooltip, ra.room, roompartner_code, prt.sex))
+                entries.append('"%d": {"id": "%d", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": true, "room": "%s", "partner": "%s", "gender": "%s"}' % \
+                               (prt.id,     prt.id,    prt.fullname(),     arrival,         departure,    rt.people_in_room,     tooltip,                               ra.room,    roompartner_code,   prt.sex))
 
             else:
                 entries.append(
                     '"%d": {"id": "%d", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": false, "room": "%s", "partner": "", "gender": "%s"}' % \
-                    (prt.id, prt.id,         prt.fullname(),    arrival,         departure,            2,   "** no extras submitted **",                    ra.room,                         prt.sex))
+                    (prt.id, prt.id,         prt.fullname(),    df_startdate,      df_enddate,            2,   "** no extras submitted **",                    ra.room,                         prt.sex))
 
-                ## xx default arrival departure
 
         else:
-            # room assignment for a guest
-            pass
+            # Room assignment for a guest. This produces a string of the following form:
+            # "124_g1": {"id": "124_g1", "name": "x", "arrival": "16/06", "departure": "18/06", "roomsize": 2, "tooltip": "(guest of Alexander Koller) share with participant", "extras_submitted": true, "room": "18_1", "partner": "3", "guest_of": "124"}
+
+            ee = prt.extras[0] # type: Extra
+            arrival, departure, rt_id = (ee.guest1_arrival, ee.guest1_departure, ee.guest1_roomtype) if ra.guest_position == 1 else (ee.guest2_arrival, ee.guest2_departure, ee.guest2_roomtype)
+            df_arrival, df_departure = [date.strftime(rp_df) for date in (arrival, departure)]
+            rt = roomtypes[rt_id] # type: Roomtype
+
+            tooltip = rt.tooltip(e, prt_dict)
+            roompartner_code = rt.roompartner_code(e) # type: str
+            guest_id = make_guest_key(ra)
+
+            entries.append(
+                '"%s": {"id": "%s", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": true, "room": "%s", "partner": "%s", "guest_of": "%d"}' % \
+                (guest_id, guest_id, ra.name, df_arrival, df_departure, rt.people_in_room, tooltip, ra.room, roompartner_code, prt.id))
+
 
     return ",\n".join(entries)
 

@@ -35,7 +35,9 @@ function make_submit_button_handler(forButton) {
         $.ajax({
             'url': '/room-planner.html',
             'type': 'POST',
-            'data': dict,
+            'contentType':'application/json',
+            'data': JSON.stringify(dict),
+//            'error': function(data) { console.log("error "); console.log(data); },
             'success': function(data) {
                 if(data == "success") {
                     set_message("Database updated.", "message");
@@ -275,8 +277,10 @@ function set_message(text, htmlClass) {
 
         el.setAttribute("id", id);
 
-        el.setAttribute("data-ot", person.tooltip);
-        el.setAttribute("data-ot-delay", "1");
+        if( person.tooltip ) {
+            el.setAttribute("data-ot", person.tooltip);
+            el.setAttribute("data-ot-delay", "1");
+        }
 
         f(people[id].room).appendChild(el);
     }

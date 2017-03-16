@@ -30,13 +30,21 @@
 </head>
 
 <body>
-<h1>EHB Room Planner</h1>
+<h1 class="rp">EHB Room Planner</h1>
 
-<button class="btn btn-primary" id="b_save">Save to database</button>
+<p class="rp"><strong>Legend:</strong> <span class="w-too-many">too many</span> / <span class="w-not-enough">not enough</span> /
+    <span class="w-wrong-partner">wrong partner</span> / <span class="w-mixed-gender">mixed gender</span> /
+    <span class="w-happy">all good</span> / <span class="w-not-submitted">no extras</span> / <span class="w-guest">guest</span> /
+    <span class="cw-inconsistent-dates">inconsistent dates</span>
+</p>
+
+<span class="rp" >
+<button class="btn btn-primary" style="margin-left: 0px;" id="b_save">Save to database</button>
 <button class="btn btn-primary" id="b_undo">Reload from database</button>
-<a class="btn btn-primary" href="/room-assignments.csv">Download CSV</a>
+<a class="btn btn-primary" href="/room-assignments.xslx">Download Excel</a>
 
 <span id="message">&nbsp;</span>
+</span>
 
 <table class="root">
     {% for row in rooms %}

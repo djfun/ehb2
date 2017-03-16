@@ -1,5 +1,5 @@
 from collections import Counter
-from datetime import date
+from datetime import date, datetime
 
 from flask_login import login_required
 
@@ -215,7 +215,7 @@ def insert_or_overwrite(extras:Extra):
                               guest1_name=extras.guest1_name, guest1_arrival=extras.guest1_arrival, guest1_departure=extras.guest1_departure,
                               guest2_name=extras.guest2_name, guest2_arrival=extras.guest2_arrival, guest2_departure=extras.guest2_departure,
                               last_paypal_status=extras.last_paypal_status, sat_night_restaurant=extras.sat_night_restaurant, sat_night_numpeople=extras.sat_night_numpeople,
-                              phone=extras.phone, paypal_token=extras.paypal_token)
+                              phone=extras.phone, paypal_token=extras.paypal_token, timestamp=datetime.now())
 
         session.add(oe)
         session.delete(previous_extras)

@@ -227,6 +227,7 @@ class OverwrittenExtra(Base):
     sat_night_numpeople = Column(SmallInteger)
     phone = Column(String(100))
     paypal_token = Column(String(30))
+    timestamp = Column(DateTime)
 
     participant = relationship("Participant", backref=backref("overwritten_extras"))
 
