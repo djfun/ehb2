@@ -42,7 +42,8 @@
 
 
 {# display WTF field #}
-{% macro wtf(field, fclass='') -%}
+{# use hide="hidden" to hide the entire control group #}
+{% macro wtf(field, fclass='', hide='') -%}
   {% with %}
         {% if field.errors %}
             {% set class = "control-group error" %}
@@ -54,7 +55,7 @@
             {% set fclass="input-xlarge" %}
         {% endif %}
 
-    <div class='{{ class }}'>
+    <div class='{{ class }} {{ hide }}'>
         {{ field.label(class="control-label") }}
         <div class="controls">
             {{ field(class=fclass) }}
