@@ -2,7 +2,7 @@
 from sqlalchemy import Column, DateTime, Float, Integer, SmallInteger, String, Table, text, ForeignKey, Unicode, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
-
+from sqlalchemy.sql.sqltypes import Text, UnicodeText
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -240,6 +240,19 @@ class RoomAssignment(Base):
     guest_position = Column(SmallInteger)
     room = Column(String(10))
 
+
+class Email(Base):
+    __tablename__ = 'emails'
+
+    id = Column(Integer, primary_key=True)
+    timestamp = Column(DateTime)
+    recipient = Column(Integer, ForeignKey('participant.id'))
+    subject = Column(String(200))
+    body = Column(UnicodeText)
+    replyto = Column(String(200))
+    sent_from = Column(String(500))
+
+    participant = relationship("Participant", backref=backref("emails"))
 
 class OopsCode(Base):
     __tablename__ = "oops_code"

@@ -1,3 +1,5 @@
+import flask
+import jinja2
 from jinja2 import evalcontextfilter, Markup
 
 from __init__ import *
@@ -19,9 +21,6 @@ def lc(code):
 def id_to_participant_dict():
     all_prts = session.query(Participant).all()
     return {prt.id : prt for prt in all_prts}
-
-
-# returns mapping from
 
 
 # show message on the message.html template
@@ -71,8 +70,6 @@ class TableToShow:
         self.content = content
         self.title = title
         self.summaryRow = summaryRow
-
-
 
 
 @app.template_filter()
@@ -137,3 +134,11 @@ def ft(eval_ctx, value, format='%Y-%m-%d %H:%M'):
 @evalcontextfilter
 def fd(eval_ctx, value, format='%Y-%m-%d'):
     return value.strftime(format)
+
+
+# convert all newlines (\n) to HTML <br/>
+@app.template_filter()
+@evalcontextfilter
+def nlbr(eval_ctx, value, format='%Y-%m-%d'):
+    return value.replace("\n", "<br/>\n")
+

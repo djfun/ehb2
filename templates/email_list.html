@@ -1,0 +1,35 @@
+{% set contentwidth="span12" %}
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{# emails_with_participants: list of pairs (table.Email, table.Participant for the recipient) #}
+{# message: message to be printed at the start #}
+{# title: page title, if you want one #}
+
+<p><a href="admin.html">Back to Admin Page</a></p>
+
+{% if message %}
+<p>{{ message }}</p>
+<hr/>
+{% endif %}
+
+
+{% for email, prt in emails_with_participants %}
+<p>
+    <strong>To:</strong> {{ prt.fullname() }} &lt;{{ prt.email }}&gt; <br/>
+    <strong>Subject:</strong> {{ email.subject }} <br/>
+    <strong>Sent:</strong> {{ email.timestamp|ft }} <br/>
+    {% if email.replyto %}
+      <strong>Reply-To:</strong> {{ email.replyto }} <br/>
+    {% endif %}
+
+    <pre>{{ email.body }}</pre>
+</p>
+
+<hr/>
+{% endfor %}
+
+<p><a href="admin.html">Back to Admin Page</a></p>
+{% endblock %}

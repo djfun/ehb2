@@ -12,6 +12,7 @@ from show_participants import show_participants, show_participant, do_show_parti
 from apply import *
 from extras import *
 from extras_roomplanner import *
+from admin import *
 
 @app.route("/")
 def index():
@@ -28,10 +29,6 @@ def secret():
 def send_static(path):
     return send_from_directory('static', path)
 
-@app.route('/admin.html')
-@login_required
-def adminpage():
-    return render_template("admin.html")
 
 
 #######################################################################################

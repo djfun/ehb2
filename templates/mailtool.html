@@ -1,0 +1,35 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<form class="form-horizontal" action="mailtool.html" method="post">
+    <fieldset>
+        {{ m.wtf(form.recipient) }}
+        {{ m.wtf(form.subject) }}
+        {{ m.wtf(form.replyto) }}
+        {{ m.wtf(form.dryrun) }}
+
+        {{ m.wtf(form.body, fclass="ta") }}
+
+        <!-- Button -->
+        <div class="control-group">
+            <label class="control-label" for="submit"></label>
+            <div class="controls">
+                <button id="submit" name="submit" type="submit" class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+
+
+{% endblock %}
