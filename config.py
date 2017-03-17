@@ -1,3 +1,5 @@
+import codecs
+
 __author__ = 'koller'
 
 import configparser
@@ -6,8 +8,7 @@ from datetime import datetime
 
 conf = configparser.RawConfigParser()
 conf.optionxform = lambda option: option
-# conf = configparser.ConfigParser({ }) # "password":""
-conf.read("ehb.conf")
+conf.read_file(codecs.open("ehb.conf", "r", "utf8"))
 
 # start and end date of this event
 start_date = datetime.strptime(conf["application"]["start_date"], "%Y-%m-%d").date()
