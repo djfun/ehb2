@@ -14,4 +14,5 @@ start_date = datetime.strptime(conf["application"]["start_date"], "%Y-%m-%d").da
 end_date = datetime.strptime(conf["application"]["end_date"], "%Y-%m-%d").date()
 number_of_days = (end_date-start_date).days  # number of days = number of nights
 
+currency_symbol = conf.get("application", "currency_symbol")
 

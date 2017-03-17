@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 # pymysql.err
 from werkzeug.utils import redirect
 
+import ehbmail
 from __init__ import *
 from paypal import Paypal, find_payment, ParticipantNotFoundException, PaymentFailedException, PaymentNotFoundException, \
     DuplicatePaymentException
@@ -13,7 +14,7 @@ from itertools import groupby
 from helpers import *
 from flask import request, flash
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField
-from config import conf
+from config import conf, currency_symbol
 
 pp1 = Paypal(1,
              lambda url: redirect(url, code=302),
@@ -102,6 +103,7 @@ def paymentCancelled():
     flash("You have cancelled payment. Your application has not been processed. Please resubmit this form and complete payment to apply for EHB.")
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
+
 @app.route("/payment-success.html", methods=["GET",])
 def paymentSuccess():
     # Paypal redirects the user to this URL once the user has approved the payment.
@@ -112,6 +114,11 @@ def paymentSuccess():
 
         # amount = payment["transactions"][0]["amount"]["total"]  # get total amount from the Paypal return message
         amount = application_fee + prt.donation
+
+        # send confirmation email
+        body = render_template("application_confirmation.txt", amount=amount, data=prt, eventname=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee), currency_symbol=currency_symbol)
+        ehbmail.send([prt.id], "Application confirmed", [body], "Application page")
+
         return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
 
     except ParticipantNotFoundException as e:

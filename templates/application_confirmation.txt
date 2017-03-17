@@ -1,0 +1,19 @@
+Dear {{ prt.fullname() }},
+
+thank you for applying to {{ eventname }}!
+
+We will review all applications, and will be in touch by early February.
+
+We confirm that we have received your Paypal payment of {{ currency_symbol }} {{ amount }}. This includes:
+
+- Application fee for {{ shortname }}: {{ currency_symbol }} {{ application_fee }}
+{% if data.donation > 0 %}
+
+- Donation for sponsoring participants who couldn't otherwise afford to come:
+  {{ currency_symbol }} {{ data.donation }}. (Thank you!)
+{% endif %}
+
+Best regards,
+{{ shortname }} Organizers.
+
+
