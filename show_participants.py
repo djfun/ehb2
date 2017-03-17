@@ -47,9 +47,27 @@ def do_show_participants():
         paypal.log(id, 1, value, reason)
 
         message="Changed PP status of %s (%d) to %d (%s; reason: %s)." % (parti.fullname(), id, value, paypal_statuses[value].shortname(), reason)
+
     elif 'delete-button' in request.form:
         if request.form['delete-field'] == 'delete!':
+            prt = session.query(Participant).filter(Participant.id==id).first() # type: Participant
+            deleted_prt = DeletedParticipant(id=prt.id, firstname=prt.firstname, lastname=prt.lastname,
+                                             sex=prt.sex, street=prt.street,
+                                             city=prt.city, zip=prt.zip,
+                                             _country=prt._country, part1=prt.part1, part2=prt.part2,
+                                             email=prt.email, exp_quartet=prt.exp_quartet,
+                                             exp_brigade=prt.exp_brigade, exp_chorus=prt.exp_chorus,
+                                             exp_musical=prt.exp_musical, exp_reference=prt.exp_reference,
+                                             application_time=prt.application_time, comments=prt.comments,
+                                             registration_status=prt.registration_status,
+                                             donation=prt.donation, iq_username=prt.iq_username,
+                                             final_part=prt.final_part, paypal_token=prt.paypal_token,
+                                             last_paypal_status=prt.last_paypal_status,
+                                             code=prt.code,
+                                             deletion_time=datetime.datetime.now())
+
             session.query(Participant).filter_by(id=id).delete()
+            session.add(deleted_prt)
             session.commit()
             message = "Deleted user %s (%d)." % (parti.fullname(), id)
         else:

@@ -93,13 +93,36 @@ class Participant(Base):
         return "%s %s (%d)" % (self.firstname, self.lastname, self.id)
 
 
-# class ExtrasCode(Base):
-#     __tablename__ = "extras_code"
-#
-#     id = Column(Integer, ForeignKey('participant.id'), primary_key=True)
-#     code = Column(String(16))
-#
-#     participant = relationship("Participant", backref=backref("code"))
+
+class DeletedParticipant(Base):
+    __tablename__ = 'deleted_participants'
+
+    id = Column(Integer, primary_key=True)
+    firstname = Column(String(100))
+    lastname = Column(String(100))
+    sex = Column(String(10))
+    street = Column(String(100))
+    city = Column(String(100))
+    zip = Column(String(20))
+    _country = Column("country", String(2), ForeignKey('countries.code'))
+    final_part = Column(SmallInteger, ForeignKey('parts.id'))
+    part1 = Column(SmallInteger)
+    part2 = Column(SmallInteger)
+    paypal_token = Column(String(30), index=True)
+    last_paypal_status = Column("last_paypal_status", SmallInteger, ForeignKey("paypal_statuses.id"))
+    email = Column(String(100), unique=True)
+    exp_quartet = Column(String)
+    exp_brigade = Column(String)
+    exp_chorus = Column(String)
+    exp_musical = Column(String)
+    exp_reference = Column(String)
+    application_time = Column(DateTime)
+    comments = Column(String)
+    registration_status = Column(SmallInteger)
+    donation = Column(Integer)
+    iq_username = Column(String(100))
+    code = Column(String(16))
+    deletion_time = Column(DateTime)
 
 
 class Part(Base):
