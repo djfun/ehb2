@@ -1,4 +1,5 @@
 from datetime import datetime
+from smtplib import SMTPAuthenticationError
 
 import config
 import smtplib
@@ -44,7 +45,13 @@ def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, cha
     if not dryrun:
         server = smtplib.SMTP(server)
         server.starttls()
-        server.login(sender, password)
+
+        try:
+            server.login(sender, password)
+        except SMTPAuthenticationError:
+            # if authentication fails, log failure and continue silently with dry-run
+            log_email(0, subject, "ERROR: SMTP authentication failed in email sending", replyto, sent_from)
+            dryrun = True
 
     for recipient, body in zip(recipients, bodies):
         prt = lp(recipient)  # type: Participant
