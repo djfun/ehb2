@@ -116,10 +116,11 @@ def paymentSuccess():
         amount = application_fee + prt.donation
 
         # send confirmation email
-        body = render_template("application_confirmation.txt", amount=amount, data=prt, eventname=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee), currency_symbol=currency_symbol)
+        body = render_template("application_confirmation.txt", amount=int(amount), prt=prt, eventname=event_name, shortname=event_shortname, application_fee=int(application_fee), currency_symbol=currency_symbol)
+        print(body)
         ehbmail.send([prt.id], "Application confirmed", [body], "Application page")
 
-        return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
+        return render_template("payment_confirmation.html", title="Apply!", amount=int(amount), data=prt, name=event_name, shortname=event_shortname, application_fee=int(application_fee))
 
     except ParticipantNotFoundException as e:
         # print("pnfe " + e.token)
