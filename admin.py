@@ -32,12 +32,19 @@ def do_mailtool():
     if form.validate():
         submit_button_label = request.form['submit']
 
-        if submit_button_label == "revise":
+        if not form.recipients.data:
+            # no recipients selected
             prts = session.query(Participant).all()
             return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
 
-        dryrun = (submit_button_label != "send")
+        if submit_button_label == "revise":
+            # "revise" button clicked on confirm page
+            prts = session.query(Participant).all()
+            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
 
+        # dryrun = True: "Send" button clicked on confirm page
+        # dryrun = False: "Preview" button clicked on first Mailtool page
+        dryrun = (submit_button_label != "send")
 
         recipients = [int(rec) for rec in form.recipients.data.split(",")]
         bodies = []
@@ -59,7 +66,7 @@ def do_mailtool():
         emails = ehbmail.send(recipients, form.subject.data, bodies, "Mail Tool (%s)" % current_user.id, replyto=form.replyto.data, dryrun=dryrun)
 
         if dryrun:
-            return render_template("confirm_emails.html", title="Mail Tool", emails_with_participants=zip(emails, participants), form=form)
+            return render_template("confirm_emails.html", title="Mail Tool", emails_with_participants=zip(emails, participants), form=form, num_emails=len(emails))
 
         else:
             return render_template("admin.html", message="%d email(s) were sent." % (len(emails)))

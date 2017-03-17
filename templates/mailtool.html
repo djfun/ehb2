@@ -16,6 +16,11 @@
     <h2>Recipients</h2>
     <p>Please select the recipients from the table below using the checkboxes.</p>
 
+    <p style="margin-top: 3ex">
+        <a href="#" id="select-all">Select all</a> / <a href="#" id="deselect-all">Deselect all</a>
+    </p>
+
+    <div>
     <table class="table table-striped pretty" id="datatable">
         <thead>
             <tr> <th></th>
@@ -37,6 +42,7 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
 
     {{ form.recipients() }}
 
@@ -63,21 +69,30 @@
     $(document).ready(function() {
         // make datatable with checkboxes and multiple selections
         var table = $('#datatable').DataTable( {
-            columnDefs: [ {
+            columnDefs: [
+                {
                     orderable: false,
                     className: 'select-checkbox',
                     targets:   0
                 },
+
                 {
                     targets: 1,
                     visible: false,
                     searchable: false
                 }
             ],
+
             select: {
                 style:    'multi',
                 selector: 'td:first-child'
             },
+
+            buttons: [
+                'selectAll',
+                'selectNone'
+            ],
+
             order: [[ 2, 'asc' ]]
         } );
 
@@ -91,31 +106,35 @@
                     this.select();
                 }
             });
-
-/*
-            var row_indices = table.rows().eq(0).filter( function (rowIdx) {
-                return ids.has(table.cell( rowIdx, 1 ).data());
-            } );
-
-
-
-
-            console.log(indexes);
-            */
         }
 
         // recompute value of "recipients" form field whenever selection changes
-        var recomputeRecipients = function ( e, dt, type, indexes ) {
-            var ids = $.map(table.rows('.selected').data(), function (item) {
+        function recomputeRecipients() {
+            var selected_rows = table.rows('.selected');
+
+            var ids = $.map(selected_rows.data(), function (item) {
                 return item[1]
             });
 
             $('#recipients').val(ids.join());
+        }
+
+        var _recomputeRecipients = function ( e, dt, type, indexes ) {
+            recomputeRecipients();
         };
 
         table
-            .on( 'select', recomputeRecipients)
-            .on( 'deselect', recomputeRecipients);
+            .on( 'select', _recomputeRecipients)
+            .on( 'deselect', _recomputeRecipients);
+
+        // (de)select all links
+        $( "#select-all" ).click(function() {
+            table.rows().select();
+        });
+
+        $( "#deselect-all" ).click(function() {
+            table.rows().deselect();
+        });
 
     } );
 </script>
