@@ -39,7 +39,7 @@ def lookup_oops(oops_code):
 # some useful global variables
 parts = ["--", "Tn", "Ld", "Br", "Bs"]
 lparts = ["None", "Tenor", "Lead", "Baritone", "Bass"]
-countries = {country.id: country for country in session.query(Country).all()}
+countries = {country.code: country for country in session.query(Country)}
 country_list = [(c.code, c.name_en) for id, c in sorted(countries.items(), key=lambda x:x[0])]
 paypal_statuses = { pp.id : pp for pp in session.query(PaypalStatus).all() }
 

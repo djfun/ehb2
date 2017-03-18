@@ -43,7 +43,7 @@ class Participant(Base):
     street = Column(String(100))
     city = Column(String(100))
     zip = Column(String(20))
-    _country = Column("country", String(2), ForeignKey('countries.code'))
+    country = Column("country", String(2), ForeignKey('countries.code'))
     final_part = Column(SmallInteger, ForeignKey('parts.id'))
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)
@@ -63,11 +63,11 @@ class Participant(Base):
     code = Column(String(16))
 
     s_final_part = relationship("Part", backref=backref("participants"))
-    country = relationship("Country", backref=backref("participants"))
+    ccountry = relationship("Country", backref=backref("participants"))
     paypal_status = relationship("PaypalStatus", backref=backref("participants"))
 
     def city_with_country(self):
-        return "%s, %s" % (self.city, self._country)
+        return "%s, %s" % (self.city, self.country)
 
     def makeMapLabel(self):
         line1 = "%s %s (%s / %s)" % (self.firstname, self.lastname, self.shortsex(), self.shortpart())
@@ -104,7 +104,7 @@ class DeletedParticipant(Base):
     street = Column(String(100))
     city = Column(String(100))
     zip = Column(String(20))
-    _country = Column("country", String(2), ForeignKey('countries.code'))
+    country = Column("country", String(2), ForeignKey('countries.code'))
     final_part = Column(SmallInteger, ForeignKey('parts.id'))
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)

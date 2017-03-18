@@ -5,6 +5,7 @@ import xlsxwriter
 from flask import request
 from flask import send_file
 from flask.templating import render_template_string
+from sqlalchemy import inspect
 from wtforms import Form, validators
 from wtforms.fields.core import IntegerField, SelectField, StringField, BooleanField
 from wtforms.fields.simple import TextAreaField, HiddenField
@@ -122,7 +123,13 @@ def participants_spreadsheet():
     money = workbook.add_format({'num_format': '€ 0'})
     worksheet = workbook.add_worksheet()
 
-    fields = ["id", "firstname", "lastname", "sex", "street", "city", "zip", "_country", "final_part", "part1", "part2", \
+    mapper = inspect(Participant)
+    print(Participant.__table__.columns)
+
+    for column in Participant.__table__.columns:
+        print(column.key)
+
+    fields = ["id", "firstname", "lastname", "sex", "street", "city", "zip", "country", "final_part", "part1", "part2", \
               "paypal_token", "last_paypal_status", "email", "exp_quartet", "exp_brigade", "exp_chorus", "exp_musical", "exp_reference", "application_time", "comments", "donation", "iq_username", "code"]
     date_fields = set(["application_time"])
     money_fields = set(["donation"])

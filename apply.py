@@ -49,7 +49,7 @@ def do_apply():
         new_prt = Participant(firstname=form.firstname.data, lastname=form.lastname.data,
                               sex=form.gender.data, street=form.street.data,
                               city=form.city.data, zip=form.zip.data,
-                              _country=form.country.data, part1=int(form.part1.data), part2=int(form.part2.data),
+                              country=form.country.data, part1=int(form.part1.data), part2=int(form.part2.data),
                               email=form.email.data, exp_quartet=form.exp_quartet.data,
                               exp_brigade=form.exp_brigade.data, exp_chorus=form.exp_chorus.data,
                               exp_musical=form.exp_musical.data, exp_reference=form.exp_reference.data,
@@ -175,7 +175,7 @@ def application_form(prt):
     ret.street.data = prt.street
     ret.city.data = prt.city
     ret.zip.data = prt.zip
-    ret.country.data = prt._country
+    ret.country.data = prt.country
     ret.donation.data = prt.donation
     ret.part1.data = prt.part1
     ret.part2.data = prt.part2

@@ -54,7 +54,7 @@ def do_show_participants():
             deleted_prt = DeletedParticipant(id=prt.id, firstname=prt.firstname, lastname=prt.lastname,
                                              sex=prt.sex, street=prt.street,
                                              city=prt.city, zip=prt.zip,
-                                             _country=prt._country, part1=prt.part1, part2=prt.part2,
+                                             country=prt.country, part1=prt.part1, part2=prt.part2,
                                              email=prt.email, exp_quartet=prt.exp_quartet,
                                              exp_brigade=prt.exp_brigade, exp_chorus=prt.exp_chorus,
                                              exp_musical=prt.exp_musical, exp_reference=prt.exp_reference,
@@ -97,7 +97,7 @@ def make_part_data(all_participants):
 
 
 def make_country_data(all_participants):
-    p_by_country = participants_by(all_participants, lambda p: p.country.id)
+    p_by_country = participants_by(all_participants, lambda p: p.country)
     return ["{ value: %d, color:'#%s', highlight:'#%s', label:'%s'}" %
             (len(list(people)), country_colors[i], country_highlight_colors[i], countries[country].name_en)
             for (i, (country,people)) in enumerate(p_by_country)]
