@@ -112,9 +112,8 @@ def offline_participants():
     return render_template("offline-participants.html")
 
 
-@app.route("/participants.xlsx")
-@login_required
-def participants_spreadsheet():
+
+def send_table_spreadsheet(table, date_fields, money_fields):
     # prepare Excel file
     output = io.BytesIO()
     workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -123,23 +122,15 @@ def participants_spreadsheet():
     money = workbook.add_format({'num_format': '€ 0'})
     worksheet = workbook.add_worksheet()
 
-    mapper = inspect(Participant)
-    print(Participant.__table__.columns)
-
-    for column in Participant.__table__.columns:
-        print(column.key)
-
-    fields = ["id", "firstname", "lastname", "sex", "street", "city", "zip", "country", "final_part", "part1", "part2", \
-              "paypal_token", "last_paypal_status", "email", "exp_quartet", "exp_brigade", "exp_chorus", "exp_musical", "exp_reference", "application_time", "comments", "donation", "iq_username", "code"]
-    date_fields = set(["application_time"])
-    money_fields = set(["donation"])
-
+    fields = [column.key for column in table.__table__.columns]
+    date_fields = set(date_fields)
+    money_fields = set(money_fields)
 
     for i, f in enumerate(fields):
         worksheet.write(0, i, f, bold)
 
     for i, prt in enumerate(session.query(Participant)):
-        row = i+1
+        row = i + 1
 
         for col, f in enumerate(fields):
             if f in date_fields:
@@ -152,3 +143,10 @@ def participants_spreadsheet():
     workbook.close()
     output.seek(0)
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+@app.route("/participants.xlsx")
+@login_required
+def participants_spreadsheet():
+    return send_table_spreadsheet(Participant, ["application_time"], ["donation"])
+
