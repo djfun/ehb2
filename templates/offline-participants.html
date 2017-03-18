@@ -1,0 +1,35 @@
+{% set title="Offline Participants" %}
+{% extends "main.html" %}
+
+{% block content %}
+
+<h2>Download Participant List</h2>
+
+<p>Click <a href="participants.xlsx">here</a> to download an Excel spreadsheet with
+the current list of all participants.</p>
+
+
+<h2>Upload Participant List</h2>
+
+<p>You can edit the Excel spreadsheet offline and then upload the edited version here.
+    This will modify the participants database. Please take care of the following points
+    if you do this:
+    <ul>
+        <li>Be VERY VERY CAREFUL about not messing up the spreadsheet. Any values in the
+            database will be overwritten without further sanity checks by the spreadsheet
+            you upload. There is no backup. So it is absolutely possible to destroy
+            information in the database if you're not careful. (You might want to make
+            a backup copy of the spreadsheet you downloaded, so you can restore the
+            original participants table in case something goes wrong.)
+        </li>
+        <li>
+            Please do not change or reorder the columns in the table.
+            In particular, please do not touch the header row or the "ID" column, because the upload
+            script needs these to identify the different participants.
+            Do feel free to modify the contents of the individual cells
+            in the spreadsheet.
+        </li>
+    </ul>
+</p>
+
+{% endblock %}

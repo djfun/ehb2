@@ -1,4 +1,9 @@
+import io
+from collections import Set
+
+import xlsxwriter
 from flask import request
+from flask import send_file
 from flask.templating import render_template_string
 from wtforms import Form, validators
 from wtforms.fields.core import IntegerField, SelectField, StringField, BooleanField
@@ -97,3 +102,46 @@ class MailtoolForm(Form):
     dryrun = BooleanField("Dry-run")
     body = TextAreaField("Body", render_kw=_taf)
 
+
+
+
+@app.route("/offline-participants.html", methods=["GET",])
+@login_required
+def offline_participants():
+    return render_template("offline-participants.html")
+
+
+@app.route("/participants.xlsx")
+@login_required
+def participants_spreadsheet():
+    # prepare Excel file
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    bold = workbook.add_format({'bold': True})
+    df = workbook.add_format({'num_format': 'dd/mm/yy'})
+    money = workbook.add_format({'num_format': '€ 0'})
+    worksheet = workbook.add_worksheet()
+
+    fields = ["id", "firstname", "lastname", "sex", "street", "city", "zip", "_country", "final_part", "part1", "part2", \
+              "paypal_token", "last_paypal_status", "email", "exp_quartet", "exp_brigade", "exp_chorus", "exp_musical", "exp_reference", "application_time", "comments", "donation", "iq_username", "code"]
+    date_fields = set(["application_time"])
+    money_fields = set(["donation"])
+
+
+    for i, f in enumerate(fields):
+        worksheet.write(0, i, f, bold)
+
+    for i, prt in enumerate(session.query(Participant)):
+        row = i+1
+
+        for col, f in enumerate(fields):
+            if f in date_fields:
+                worksheet.write(row, col, getattr(prt, f), df)
+            elif f in money_fields:
+                worksheet.write(row, col, getattr(prt, f), money)
+            else:
+                worksheet.write(row, col, getattr(prt, f))
+
+    workbook.close()
+    output.seek(0)
+    return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
