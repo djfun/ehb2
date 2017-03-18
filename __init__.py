@@ -16,6 +16,8 @@ __author__ = 'koller'
 # set up Flask
 app = Flask(__name__, static_url_path='')
 app.secret_key = conf.get("server", "secret")
+app.config['UPLOAD_FOLDER'] = "/tmp"
+
 start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
 # set up database connection

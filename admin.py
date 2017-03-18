@@ -1,12 +1,20 @@
 import io
+import os
+import tempfile
 from collections import Set
 
+import datetime
+
+import pickle
 import xlsxwriter
 from flask import request
 from flask import send_file
 from flask.templating import render_template_string
+from openpyxl import load_workbook
+from sqlalchemy import cast
 from sqlalchemy import inspect
-from wtforms import Form, validators
+from werkzeug.utils import secure_filename
+from wtforms import Form, validators, FileField
 from wtforms.fields.core import IntegerField, SelectField, StringField, BooleanField
 from wtforms.fields.simple import TextAreaField, HiddenField
 
@@ -109,7 +117,34 @@ class MailtoolForm(Form):
 @app.route("/offline-participants.html", methods=["GET",])
 @login_required
 def offline_participants():
-    return render_template("offline-participants.html")
+    form = XlsUploadForm()
+    return render_template("offline-participants.html", form=form)
+
+@app.route("/offline-participants.html", methods=["POST",])
+@login_required
+def upload_offline_participants():
+    form = XlsUploadForm(request.form)
+
+    if form.validate():
+        remote_file = request.files[form.file.name]
+
+        if not remote_file.filename.lower().endswith(".xlsx"):
+            form.file.errors.append("Please specify an XLSX file.")
+            return render_template("offline-participants.html", form=form)
+
+        tmpname = tempfile.mkstemp(suffix=".xlsx")[1]
+        remote_file.save(tmpname)
+
+        update_table_from_spreadsheet(Participant, tmpname)
+
+        os.remove(tmpname)
+
+        return render_template("admin.html", message="Database updated.")
+
+
+    else:
+        return render_template("offline-participants.html", form=form)
+
 
 
 
@@ -119,7 +154,7 @@ def send_table_spreadsheet(table, date_fields, money_fields):
     workbook = xlsxwriter.Workbook(output, {'in_memory': True})
     bold = workbook.add_format({'bold': True})
     df = workbook.add_format({'num_format': 'dd/mm/yy'})
-    money = workbook.add_format({'num_format': '€ 0'})
+    # money = workbook.add_format({'num_format': '€ 0'})
     worksheet = workbook.add_worksheet()
 
     fields = [column.key for column in table.__table__.columns]
@@ -135,8 +170,6 @@ def send_table_spreadsheet(table, date_fields, money_fields):
         for col, f in enumerate(fields):
             if f in date_fields:
                 worksheet.write(row, col, getattr(prt, f), df)
-            elif f in money_fields:
-                worksheet.write(row, col, getattr(prt, f), money)
             else:
                 worksheet.write(row, col, getattr(prt, f))
 
@@ -145,8 +178,45 @@ def send_table_spreadsheet(table, date_fields, money_fields):
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
+def update_table_from_spreadsheet(table, xlsx_file):
+    # assumes that table has an id field, which is in the first column of the Excel table
+
+    wb = load_workbook(xlsx_file)
+    sheet = wb.active
+
+    fields = [column.key for column in table.__table__.columns]
+    row = 2
+
+    rows_in_db = {row.id : row for row in session.query(table)}
+
+    # make backup of table, just in case
+    pickle_filename = "backup_%s_%s.p" % (table.__table__.name, str(datetime.datetime.now()))
+    pickle_filename = pickle_filename.replace(" ", "_")
+    pickle.dump(rows_in_db, open(pickle_filename, "wb"))
+
+    while True:
+        id = sheet.cell(row=row, column=1).value
+        if not id:
+            # break at first row with empty ID
+            break
+
+        obj = rows_in_db[id]
+        for i, f in enumerate(fields):
+            column = i+1
+            value = sheet.cell(row=row, column=i+1).value
+            setattr(obj, f, value)
+
+        row += 1
+
+    session.commit()
+
+
+
 @app.route("/participants.xlsx")
 @login_required
 def participants_spreadsheet():
     return send_table_spreadsheet(Participant, ["application_time"], ["donation"])
 
+
+class XlsUploadForm(Form):
+    file = FileField("XLSX file") #, validators=[FileRequired()])

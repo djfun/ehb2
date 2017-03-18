@@ -1,5 +1,6 @@
 {% set title="Offline Participants" %}
 {% extends "main.html" %}
+{% import "macros.html" as m %}
 
 {% block content %}
 
@@ -19,7 +20,7 @@ the current list of all participants.</p>
             database will be overwritten without further sanity checks by the spreadsheet
             you upload. There is no backup. So it is absolutely possible to destroy
             information in the database if you're not careful. (You might want to make
-            a backup copy of the spreadsheet you downloaded, so you can restore the
+            a backup copy of the spreadsheet you downloaded before you edit it, so you can restore the
             original participants table in case something goes wrong.)
         </li>
         <li>
@@ -29,7 +30,22 @@ the current list of all participants.</p>
             Do feel free to modify the contents of the individual cells
             in the spreadsheet.
         </li>
+        <li>
+            Treatment of worksheets is very naive right now. To be safe, make
+            sure that the XLSX file you upload only contains a single worksheet.
+        </li>
+        <li>
+            If there is a more direct way of making the edits you want (e.g. through
+            the show-participants page), use that instead.
+        </li>
     </ul>
+
+    <form class="form-horizontal" action='offline-participants.html' method="post" enctype="multipart/form-data">
+        {% call m.controlgroup("file", "Upload XLSX file") %}
+          {{ form.file() }}
+          {{ m.sub("upload", "Upload", "btn btn-danger") }}
+        {% endcall %}
+    </form>
 </p>
 
 {% endblock %}
