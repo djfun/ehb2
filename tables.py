@@ -216,8 +216,18 @@ class Extra(Base):
     sat_night_numpeople = Column(SmallInteger)
     phone = Column(String(100))
     paypal_token = Column(String(30))
+    special_event_tickets = Column(SmallInteger, nullable=False)
+    t_shirt_spec = Column(SmallInteger, ForeignKey('t_shirt_specs.id'))
 
     participant = relationship("Participant", backref=backref("extras"))
+    ts_spec = relationship("TShirtSpec", backref=backref("extras"))
+
+class TShirtSpec(Base):
+    __tablename__ = 't_shirt_specs'
+
+    id = Column(SmallInteger, primary_key=True)
+    color = Column(String(100), nullable=False)
+
 
 class OverwrittenExtra(Base):
     __tablename__ = 'overwritten_extras'
@@ -250,6 +260,9 @@ class OverwrittenExtra(Base):
     sat_night_numpeople = Column(SmallInteger)
     phone = Column(String(100))
     paypal_token = Column(String(30))
+    special_event_tickets = Column(SmallInteger, nullable=False)
+    t_shirt_spec = Column(SmallInteger)
+
     timestamp = Column(DateTime)
 
     participant = relationship("Participant", backref=backref("overwritten_extras"))

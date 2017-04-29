@@ -34,8 +34,8 @@
         <td><a href="show-extra.html?id={{ prt.id }}">{{ prt.fullnameLF() }}</a></td>
         <td>{{ extras.arrival_date|fd }}</td>
         <td>{{ extras.departure_date|fd }}</td>
-        <td>EUR {{ pay_now }}</td>
-        <td>EUR {{ pay_hotel }}</td>
+        <td>EUR {{ pay_now|eur }}</td>
+        <td>EUR {{ pay_hotel|eur }}</td>
         <td>{{ extras | ppstatus }}</td>
     </tr>
     {% endfor %}

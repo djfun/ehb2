@@ -26,7 +26,7 @@
 
         <p>Your registration fee covers the two nights from " + conf.s_startdate + " to " + conf.s_enddate + " for yourself in a double room.
            You can choose to book a single room instead of a double room. This will incur
-            an extra cost of " + ("" ~ ((conf.roomcost_single-conf.roomcost_double)*conf.num_days)) + " EUR for
+            an extra cost of " + ("" ~ format_price((conf.roomcost_single-conf.roomcost_double)*conf.num_days)) + " for
             these two nights. You will settle all extra costs for hotel rooms directly
             with the hotel when you check in.</p>
 
@@ -47,8 +47,8 @@
         {{ m.header("section2", """<strong>Arrival and departure</strong><br/>
         <p>If you would like to arrive in Berlin before " + conf.s_startdate + " or depart after " + conf.s_enddate +
         ", we can extend your room reservation in the hotel where EHB
-        takes place. This will incur an extra cost of EUR " ~ conf.roomcost_double ~ " per person and night
-            in a double room, or of EUR " ~ conf.roomcost_single ~ " per night in a single room.
+        takes place. This will incur an extra cost of EUR " ~ format_price(conf.roomcost_double) ~ " per person and night
+            in a double room, or of EUR " ~ format_price(conf.roomcost_single) ~ " per night in a single room.
         </p>""") }}
 
         {{ m.wtf(form.participant_arrival) }}
@@ -64,8 +64,8 @@
 
         {{ m.header("section3", """<strong>Hotel Rooms for Guests</strong><br/>
         <p>You are welcome to bring guests to Berlin, and they are welcome to stay in the same hotel with us.
-            Your guests pay the same as you for staying in the hotel: " ~ conf.roomcost_double ~ " EUR per night
-        in a double room, and " ~ conf.roomcost_single ~ " EUR per night in a single room.</p>
+            Your guests pay the same as you for staying in the hotel: " ~ format_price(conf.roomcost_double) ~ " EUR per night
+        in a double room, and " ~ format_price(conf.roomcost_single) ~ " EUR per night in a single room.</p>
 
         <p>If you bring up to two guests, please enter their names and departure/arrival dates
         below. If you have more than two guests, or would like to let us know anything else
@@ -100,8 +100,8 @@
             Friday night dinner, " ~ conf.cost_sat_lunch ~ " EUR to share our Saturday lunch, and " ~ conf.cost_after_concert ~ " EUR if they'd like to
             help themselves to the after-show midnight snacks on Saturday night.</p>
 
-         <p>Also, if you would like to book tickets for the <a href='http://schalotte.de/index.php?option=com_seminar&task=3&cid=567&sem_midx=2&sem_jidx=0'>Saturday night show</a>
-            with Trocadero, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
+         <p>Also, if you would like to book tickets for the <a href='http://www.europeanharmonybrigade.org/show.htm'>Saturday night show</a>
+             with <a href='http://www.trocaderoquartet.com/'>Trocadero</a>, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
             people with disabilities can get discounted tickets for EUR " ~ conf.cost_ticket_discounted ~ " each.
             Obviously, EHB participants don't need tickets for themselves.</p>
         """) }}
@@ -117,22 +117,13 @@
 
         <hr/>
 
-        {{ m.header("section_sat_dinner", """<strong>Dinner on Saturday night</strong><br/>
+        {{ m.header("section_sat_dinner", """<strong>Special Event: Masterclass with Deke Sharon</strong><br/>
         <p>
-            On Saturday afternoon, all EHB participants will move to the <a href='https://www.google.de/maps/place/Cafe+Theater+Schalotte/@52.5166209,13.3009495,17z/data=!3m1!4b1!4m5!3m4!1s0x47a85126a9c55ab5:0x3bb659d7e7b9882f!8m2!3d52.5166177!4d13.3031435?hl=de'>Schalotte theater</a>,
-            the concert venue for the Saturday night show, for an on-stage rehearsal. There will be about an
-            hour between this rehearsal and the final warm-up to the show, which you can use to
-            grab some dinner. You can either go and find some sandwiches or fast food on your own;
-            or you can join us at one of four restaurants within walking distance at which we've
-            made reservations. All four are offering set menus to us, including a starter,
-            main course, and a soft drink, for EUR " ~ conf.cost_sat_dinner ~ " per person. If you (and perhaps your
-            guests) would like to have dinner in one of these restaurants, please pick a restaurant
-            and specify the number of people below.
+            STEFANIE WILL PROVIDE TEXT HERE
         </p>
         """) }}
 
-        {{ m.wtf(form.sat_dinner_restaurant) }}
-        {{ m.wtf(form.sat_dinner_numpeople) }}
+        {{ m.wtf(form.special_event_tickets) }}
 
 
 
@@ -143,12 +134,15 @@
         <p>As in earlier years, we are again offering commemorative polo shirts for " ~ conf.shortname ~ ".
             These will be a different color than in earlier years, so it's worth getting one
             even if you were attended a previous EHB. Women's shirts differ from men's in
-            that they are fitted, i.e. follow your body's curves a bit more. You can
-            find the <a href='https://docs.google.com/spreadsheets/d/17kBgA9BmEgWWcOTA6GOlG0eSOVsOQ2d4LXq94wmRi5Q/edit#gid=0'>exact measurements here</a>.</p>
+            that they are fitted, i.e. follow your body's curves a bit more.</p>
+
+            <p>Be sure to check the <a href='https://docs.google.com/spreadsheets/d/17kBgA9BmEgWWcOTA6GOlG0eSOVsOQ2d4LXq94wmRi5Q/edit#gid=0'>exact measurements</a>
+                and refer to the <a href='https://drive.google.com/open?id=0B0juVgVCf52ldlp2RXdPOE5vdDQ'>color table</a>.</p>
         </p>""") }}
 
         {{ m.wtf(form.tshirt_sex) }}
         {{ m.wtf(form.tshirt_size) }}
+        {{ m.wtf(form.tshirt_spec) }}
 
         <hr/>
 

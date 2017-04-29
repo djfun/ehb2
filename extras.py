@@ -27,8 +27,8 @@ pp2 = Paypal(2,
 # Extract information from config file
 event_name = conf.get("application", "name")
 event_shortname = conf.get("application", "shortname")
-roomcost_single = int(conf["extras: room costs"]["1"])
-roomcost_double = int(conf["extras: room costs"]["2"])
+roomcost_single = float(conf["extras: room costs"]["1"])
+roomcost_double = float(conf["extras: room costs"]["2"])
 extra_cost_for_single = number_of_days*(roomcost_single-roomcost_double)
 cost_fri_dinner = int(conf["extras"]["cost_fri_dinner"])
 cost_sat_lunch = int(conf["extras"]["cost_sat_lunch"])
@@ -36,6 +36,8 @@ cost_after_concert = int(conf["extras"]["cost_after_concert"])
 cost_sat_dinner = int(conf["extras"]["cost_sat_dinner"])
 cost_ticket_regular = int(conf["extras"]["cost_ticket_regular"])
 cost_ticket_discounted = int(conf["extras"]["cost_ticket_discounted"])
+cost_special_event = int(conf["extras"]["cost_special_event"])
+name_special_event = conf["extras"]["name_special_event"]
 
 
 
@@ -48,6 +50,7 @@ conf_for_template = {"roomcost_single": roomcost_single,
                      "cost_sat_dinner": cost_sat_dinner,
                      "cost_ticket_regular": cost_ticket_regular,
                      "cost_ticket_discounted": cost_ticket_discounted,
+                     "cost_special_event": cost_special_event,
                      "shortname": conf["application"]["shortname"],
                      "s_startdate": start_date.strftime("%B %d"),
                      "s_enddate": end_date.strftime("%B %d"),
@@ -120,17 +123,24 @@ def extras_cost(extras:Extra):
 
     # Sat night dinner
     cost_sat_night = 0
-    if extras.sat_night_numpeople:
-        items.append(("Dinner for %d people at %s before the Saturday night show" % (extras.sat_night_numpeople, restaurant_name(extras)), 0, extras.sat_night_numpeople*cost_sat_dinner))
-        cost_sat_night = extras.sat_night_numpeople*cost_sat_dinner
+    # no Sat night dinner now
+    #if extras.sat_night_numpeople:
+    #    items.append(("Dinner for %d people at %s before the Saturday night show" % (extras.sat_night_numpeople, restaurant_name(extras)), 0, extras.sat_night_numpeople*cost_sat_dinner))
+    #    cost_sat_night = extras.sat_night_numpeople*cost_sat_dinner
+
+    # special event
+    cost_special = 0
+    if extras.special_event_tickets:
+        cost_special = cost_special_event * extras.special_event_tickets
+        items.append(("%d ticket(s) for the special event (%s)" % (extras.special_event_tickets, name_special_event), 0, cost_special))
 
     # t-shirt
     cost_tshirt = 0
     if extras.t_shirt_size != NO_TSHIRT:
         cost_tshirt = t_shirt_costs[extras.t_shirt_size]
-        items.append(("%s t-shirt (%s)" % (event_shortname, s_tshirt_size(extras)), 0, cost_tshirt))
+        items.append(("%s t-shirt (%s, %s)" % (event_shortname, s_tshirt_size(extras), extras.ts_spec.color), 0, cost_tshirt))
 
-    pay_now = extra_costs_guests + cost_sat_night + cost_tshirt
+    pay_now = extra_costs_guests + cost_sat_night + cost_tshirt + cost_special
     pay_to_hotel = extra_room_cost_ehbdays + room_cost_other_days + guest1_roomcost + guest2_roomcost
 
     return (pay_now, pay_to_hotel, items)
@@ -215,7 +225,8 @@ def insert_or_overwrite(extras:Extra):
                               guest1_name=extras.guest1_name, guest1_arrival=extras.guest1_arrival, guest1_departure=extras.guest1_departure,
                               guest2_name=extras.guest2_name, guest2_arrival=extras.guest2_arrival, guest2_departure=extras.guest2_departure,
                               last_paypal_status=extras.last_paypal_status, sat_night_restaurant=extras.sat_night_restaurant, sat_night_numpeople=extras.sat_night_numpeople,
-                              phone=extras.phone, paypal_token=extras.paypal_token, timestamp=datetime.now())
+                              phone=extras.phone, paypal_token=extras.paypal_token, special_event_tickets=extras.special_event_tickets, t_shirt_spec=extras.t_shirt_spec,
+                              timestamp=datetime.now())
 
         session.add(oe)
         session.delete(previous_extras)

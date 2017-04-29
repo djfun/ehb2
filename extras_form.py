@@ -7,7 +7,7 @@ from wtforms.validators import ValidationError
 from config import conf, end_date, start_date, number_of_days
 from extras_roomtypes import NO_GUEST, roomtypes, NO_ROOMPARTNER
 from __init__ import *
-from tables import Participant, Extra
+from tables import Participant, Extra, TShirtSpec
 
 default_arrival_date = start_date
 default_departure_date = end_date
@@ -56,8 +56,7 @@ sel_t_shirt_sexes = dict_to_sel(conf["extras: t-shirt sexes"])
 t_shirt_sizes = conf["extras: t-shirt sizes"]
 t_shirt_costs = {key: int(t_shirt_sizes[key]) for key in t_shirt_sizes}
 sel_t_shirt_sizes = [(size, "No t-shirt" if size == NO_TSHIRT else "%s (EUR %d)" % (size, t_shirt_costs[size])) for size in t_shirt_sizes] # iterate over original ordered_dict to preserve order
-
-
+sel_t_shirt_specs = [(str(row.id), row.color) for row in session.query(TShirtSpec) if row.id]
 
 
 _taf = {"rows":"5", "cols":"80"}
@@ -171,11 +170,14 @@ class ExtrasForm(Form):
 
     guest = TextAreaField("Further guest info", default="Room for any other comments regarding your guests.", render_kw=_taf)
 
-    sat_dinner_restaurant = SelectField("Restaurant", choices=sel_restaurants, validators=[restaurant_consistency_check("sat_dinner_numpeople")])
-    sat_dinner_numpeople = IntegerField("Number of people", validators=[validators.NumberRange(min=0)], default=0)
+    # sat_dinner_restaurant = SelectField("Restaurant", choices=sel_restaurants, validators=[restaurant_consistency_check("sat_dinner_numpeople")])
+    # sat_dinner_numpeople = IntegerField("Number of people", validators=[validators.NumberRange(min=0)], default=0)
+
+    special_event_tickets = IntegerField("Tickets to special event", validators=[validators.NumberRange(min=0)], default=0)
 
     tshirt_sex = SelectField("Style", choices=sel_t_shirt_sexes)
     tshirt_size = SelectField("Size", choices=sel_t_shirt_sizes)
+    tshirt_spec = SelectField("Color", choices=sel_t_shirt_specs)
 
     phone = StringField("Your number (optional)")
 
@@ -209,11 +211,14 @@ def make_extras_from_form(prt, form):
 
                  guest = form.guest.data,
 
-                 sat_night_restaurant = form.sat_dinner_restaurant.data,
-                 sat_night_numpeople = form.sat_dinner_numpeople.data,
+                 special_event_tickets = form.special_event_tickets.data,
+
+                 # sat_night_restaurant = form.sat_dinner_restaurant.data,
+                 # sat_night_numpeople = form.sat_dinner_numpeople.data,
 
                  t_shirt_sex = form.tshirt_sex.data,
                  t_shirt_size = form.tshirt_size.data,
+                 t_shirt_spec = form.tshirt_spec.data,
 
                  phone = form.phone.data,
                  other = form.other.data
@@ -248,11 +253,14 @@ def make_form_from_extras(extras:Extra):
 
     ret.guest.data = extras.guest
 
-    ret.sat_dinner_restaurant.data = extras.sat_night_restaurant
-    ret.sat_dinner_numpeople.data = extras.sat_night_numpeople
+    # ret.sat_dinner_restaurant.data = extras.sat_night_restaurant
+    # ret.sat_dinner_numpeople.data = extras.sat_night_numpeople
 
     ret.tshirt_sex.data = extras.t_shirt_sex
     ret.tshirt_size.data = extras.t_shirt_size
+    ret.tshirt_spec.data = extras.t_shirt_spec
+
+    ret.special_event_tickets.data = extras.special_event_tickets
 
     ret.phone.data = extras.phone
     ret.other.data = extras.other

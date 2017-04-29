@@ -7,9 +7,10 @@ NO_ROOMPARTNER = "-1"
 NO_GUEST = "no_guest" # roomtype for "no guest"; this is used when validating the form
 
 
-roomcost_single = int(conf["extras: room costs"]["1"])
-roomcost_double = int(conf["extras: room costs"]["2"])
-extra_cost_for_single = number_of_days*(roomcost_single-roomcost_double)
+roomcost_single = float(conf["extras: room costs"]["1"])
+roomcost_double = float(conf["extras: room costs"]["2"])
+extra_cost_for_single_per_night = (roomcost_single-roomcost_double)
+extra_cost_for_single = number_of_days*extra_cost_for_single_per_night
 
 
 
@@ -22,13 +23,13 @@ class Roomtype:
         self.people_in_room = people_in_room
 
         if self.people_in_room == 1:
-            self.detailed_description = "%s (+ %d EUR)" % (self.description, extra_cost_for_single)
+            self.detailed_description = "%s (+ %.2f EUR / night)" % (self.description, extra_cost_for_single_per_night)
         else:
             self.detailed_description = self.description
 
     def cost_on_ehb_days(self):
         if self.people_in_room == 1:
-            return roomcost_single-roomcost_double
+            return extra_cost_for_single_per_night
         else:
             return 0
 

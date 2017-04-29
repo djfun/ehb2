@@ -141,4 +141,3 @@ def fd(eval_ctx, value, format='%Y-%m-%d'):
 @evalcontextfilter
 def nlbr(eval_ctx, value, format='%Y-%m-%d'):
     return value.replace("\n", "<br/>\n")
-
