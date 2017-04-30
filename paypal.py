@@ -110,8 +110,8 @@ class Paypal:
                     self.log(id, PP_ERROR, "Could not extract token, data: %s" % str(payment))
                     return self.errorPage(id, "Internal error. Please contact the organizers.")
         else:
-            self.log(id, PP_ERROR, "An error occurred while processing your payment. Please contact the organizers.")
-            return self.errorPage(id, payment.error)
+            self.log(id, PP_ERROR, str(payment.error))
+            return self.errorPage(id, "An error occurred while processing your payment. Please contact the organizers.")
 
     def find_by_token(self, token):
         return session.query(self.pst).filter(self.pst.paypal_token == token).first()

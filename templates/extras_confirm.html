@@ -6,12 +6,27 @@
 
 	<h1>{{ conf.shortname }} Extras for {{ prt.firstname }} {{ prt.lastname }}</h1>
 
-    <p>Please check that the following information is correct. Your extras booking is not complete until
-        you have paid the total amount under "Pay Now" via Paypal. In addition, please be prepared to pay
-        the amount under "Pay to Hotel" when you check in at the hotel.    </p>
+    <p>Please check that the following information is correct.
+    If you wrote any comments in free-text fields, these comments have been stored in our database.
+    We are not displaying them below.
+    </p>
 
-    <p>If you wrote any comments in free-text fields, these comments have been stored in our database.
-    We are not displaying them below.</p>
+    {% if pay_now > 0 %}
+    <p><strong>Important:</strong> Your extras booking is not complete until
+        you have paid the total amount under "Pay Now" via Paypal.</p>
+    {% else %}
+    <p><strong>Important:</strong> You did not book any extras, but we still need
+        you to confirm that the information below is correct. Please click on
+        "Confirm" below.
+    </p>
+    {% endif %}
+
+    {% if pay_to_hotel > 0 %}
+    <p><strong>Important:</strong>
+        Please be prepared to settle the amount under "Pay to Hotel" directly with the hotel
+        when you check in.
+    </p>
+    {% endif %}
 
     {% include "extras_table.html" %}
 
@@ -19,6 +34,12 @@
         <input type="hidden" name="code" value="{{ prt.code }}" />
         <input type="hidden" name="pay_now" value="{{ pay_now }}" />
 
-        <button id="submit" name="submit" type="submit" class="btn btn-primary">Pay via Paypal</button>
+        <button id="submit" name="submit" type="submit" class="btn btn-primary">
+            {% if pay_now > 0 %}
+            Pay via Paypal
+            {% else %}
+            Confirm
+            {% endif %}
+        </button>
     </form>
 {% endblock %}

@@ -2,17 +2,18 @@ Dear {{ prt.fullname() }},
 
 thank you for submitting your extras booking for {{ conf.shortname }}!
 
-We confirm that you have booked the following items, and that we have
+{% if pay_now == 0 %}We confirm that you have not booked any extras.
+{% else %}We confirm that you have booked the following items, and that we have
 received your payment for these (total of {{ pay_now|eur }}):
 
 {% for item, pay_to_hotel, pay_to_ehb in items %}{% if pay_to_ehb > 0 %}- {{ item }}: {{ pay_to_ehb|eur }}
-{% endif %}{% endfor %}
+{% endif %}{% endfor %}{% endif %}
 
-Furthermore, we will make sure your accommodation at the hotel is booked
-as follows. Please be prepared to settle this bill (for a total of {{ pay_to_hotel|eur }})
+We will make sure your accommodation at the hotel is booked as follows.
+Please be prepared to settle this bill (for a total of {{ pay_to_hotel|eur }})
 with the hotel directly when you check in.
 
-{% for item, pay_to_hotel, pay_to_ehb in items %}{% if pay_to_hotel > 0 %}- {{ item }}: {{ pay_to_hotel|eur }}
+{% for item, pay_to_hotel, pay_to_ehb in items %}{% if pay_to_ehb == 0 %}- {{ item }}: {{ pay_to_hotel|eur }}{# pay_to_hotel == 0 would skip unchanged double rooms, shared with specific participant #}
 {% endif %}{% endfor %}
 
 If you added further comments, we have received these as well and will

@@ -139,7 +139,7 @@ def extras_cost(extras:Extra):
     cost_tshirt = 0
     if extras.t_shirt_size != NO_TSHIRT:
         cost_tshirt = t_shirt_costs[extras.t_shirt_size]
-        items.append(("%s t-shirt (%s, %s)" % (event_shortname, s_tshirt_size(extras), extras.ts_spec.color), 0, cost_tshirt))
+        items.append(("%s t-shirt (%s)" % (event_shortname, s_tshirt_size(extras)), 0, cost_tshirt))
 
     pay_now = extra_costs_guests + cost_sat_night + cost_tshirt + cost_special
     pay_to_hotel = extra_room_cost_ehbdays + room_cost_other_days + guest1_roomcost + guest2_roomcost
@@ -254,6 +254,12 @@ def do_extras_payment():
     pay_now = float(request.form.get('pay_now'))
     prt = lc(code) # type: Participant
     extras = find_extras(prt.id) # type: Extra
+
+    if pay_now == 0.0: # no payment is due at this time
+        pp2.log(prt.id, PP_SUCCESS, "Payment to EHB was zero, set Paypal status to SUCCESS without payment")
+        pay_now, pay_to_hotel, items = extras_cost(extras)
+        msg = render_template("em_extras_confirmation.txt", prt=prt, conf=conf_for_template, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items)
+        ehbmail.send([prt.id], "Extras Confirmation", [msg], "extras: payment success")
 
     if extras.last_paypal_status == PP_SUCCESS:
         return show_page_for_extras(prt, extras)
