@@ -10,6 +10,17 @@
 {% include "extras_table.html" %}
 
 
+
+{% if extras.guest and (extras.guest != "Room for any other comments regarding your guests.") %}
+<p><strong>Comments regarding guests:</strong><br/>{{ extras.guest }}</p>
+{% endif %}
+
+{% if extras.other and (extras.other != "Tell us anything else we need to know here.") %}
+<p><strong>Other comments:</strong><br/>{{ extras.other }}</p>
+{% endif %}
+
+
+
 <div class="participant-management">
     <h1>Payment History</h1>
     <table width="100%">
@@ -38,9 +49,6 @@ status: {{ item.paypal_status.paypal_status_name }}
 
         {% endfor %}
     </table>
-
-
-
 
 
     <h1>Participant Management</h1>

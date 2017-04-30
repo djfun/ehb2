@@ -361,6 +361,7 @@ def show_extra():
 
     return render_template("show_extra.html", prt=prt,
                            items=items, pay_now=pay_now, pay_to_hotel=pay_to_hotel,
+                           extras=extras,
                            paypal_history=payment_steps, paypal_statuses=ps)
 
 @app.route("/change-extras.html", methods=["POST",])
