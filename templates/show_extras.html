@@ -19,6 +19,7 @@
     <a href="show-meals.html">Meals</a> /
     <a href="show-tickets.html">Tickets</a> /
     <a href="show-shirts.html">Shirts</a> /
+    <a href="show-special.html">Special Event</a> /
     <a href="show-checkin.html">Check-In</a>
 </p>
 
@@ -34,8 +35,8 @@
         <td><a href="show-extra.html?id={{ prt.id }}">{{ prt.fullnameLF() }}</a></td>
         <td>{{ extras.arrival_date|fd }}</td>
         <td>{{ extras.departure_date|fd }}</td>
-        <td>EUR {{ pay_now|eur }}</td>
-        <td>EUR {{ pay_hotel|eur }}</td>
+        <td>{{ pay_now|eur }}</td>
+        <td>{{ pay_hotel|eur }}</td>
         <td>{{ extras | ppstatus }}</td>
     </tr>
     {% endfor %}

@@ -18,11 +18,16 @@
 
 {% for email, prt in emails_with_participants %}
 <p>
-    <strong>To:</strong> {{ prt.fullname() }} &lt;{{ prt.email }}&gt; <br/>
+    {% if prt %}
+        <strong>To:</strong> {{ prt.fullname() }} &lt;{{ prt.email }}&gt; <br/>
+    {% else %}
+        <strong>To:</strong> (unknown recipient)<br/>
+    {% endif %}
+
     <strong>Subject:</strong> {{ email.subject }} <br/>
     <strong>Sent:</strong> {{ email.timestamp|ft }} <br/>
     {% if email.replyto %}
-      <strong>Reply-To:</strong> {{ email.replyto }} <br/>
+        <strong>Reply-To:</strong> {{ email.replyto }} <br/>
     {% endif %}
 
     <pre>{{ email.body }}</pre>

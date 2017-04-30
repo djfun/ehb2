@@ -72,7 +72,7 @@ def ticket_costs(extras:Extra):
     return extras.num_show_tickets_regular*cost_ticket_regular + extras.num_show_tickets_discount*cost_ticket_discounted
 
 def s_tshirt_size(extras):
-    return "%s, size %s" % (conf["extras: t-shirt sexes"][extras.t_shirt_sex], extras.t_shirt_size)
+    return "%s, %s, %s" % (conf["extras: t-shirt sexes"][extras.t_shirt_sex], extras.t_shirt_size, extras.ts_spec.color)
 
 def restaurant_name(extras):
     if extras.sat_night_restaurant == NO_RESTAURANT:
@@ -448,7 +448,7 @@ def show_tshirts():
 @app.route("/show-checkin.html")
 @login_required
 def show_checkin():
-    header = ["Nr", "Name", "T-Shirt", "Sat Dinner", "Tickets", "Meals", "Checked In"]
+    header = ["Nr", "Name", "T-Shirt", "Tickets", "Meals", "Special Event", "Checked In"]
     content = []
 
     for prt in session.query(Participant).all():
@@ -458,9 +458,10 @@ def show_checkin():
             content.append([
                 prt.fullnameLF(),
                 "--" if extras.t_shirt_size == NO_TSHIRT else s_tshirt_size(extras),
-                "--" if extras.sat_night_numpeople == 0 else "%s (x %d)" % (restaurant_name(extras), extras.sat_night_numpeople),
+                # "--" if extras.sat_night_numpeople == 0 else "%s (x %d)" % (restaurant_name(extras), extras.sat_night_numpeople),
                 "--" if ticket_costs(extras) == 0 else "%d / %d" % (extras.num_show_tickets_regular, extras.num_show_tickets_discount),
                 "--" if meal_costs(extras) == 0 else "%d / %d / %d" % (extras.num_dinner_friday, extras.num_lunch_saturday, extras.num_after_concert),
+                "--" if extras.special_event_tickets == 0 else str(extras.special_event_tickets),
                 ""
             ])
         else:
@@ -469,6 +470,23 @@ def show_checkin():
     sortIdSummarize(content, columns=set())
     return render_template("show_table.html", tables=[TableToShow(header, content, title="Check-In - %s" % event_shortname)])
 
+
+@app.route("/show-special.html")
+@login_required
+def show_special_event():
+    header = ["Nr", "Participant", "Tickets"]
+    content = []
+
+    for prt in session.query(Participant).all():
+        extras = find_extras(prt.id)  # type: Extra
+
+        if extras:
+            if extras.special_event_tickets > 0:
+                content.append([prt.fullnameLF(), extras.special_event_tickets])
+
+    summaryRow = sortIdSummarize(content)
+    return render_template("show_table.html", tables=[
+        TableToShow(header, content, title="Special Event: %s - %s" %  (name_special_event, event_shortname), summaryRow=summaryRow)])
 
 
 def sortIdSummarize(content, columns=None):
