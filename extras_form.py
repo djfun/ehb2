@@ -68,20 +68,24 @@ _taf = {"rows":"5", "cols":"80"}
 # checks that departure is after arrival
 def dates_check(arrival_field_name):
     def _check(form, departure_field):
-        if departure_field.data <= form[arrival_field_name].data:
-            raise ValidationError("Departure must be after arrival!")
+        if departure_field.data and form[arrival_field_name].data:
+            if departure_field.data <= form[arrival_field_name].data:
+                raise ValidationError("Departure must be after arrival!")
 
     return _check
 
 # checks that arrival is <= EHB start date
 def start_date_check(form, field):
-    if field.data > default_arrival_date:
-        raise ValidationError("Your arrival date is after EHB starts!")
+    if field.data:
+        if field.data > default_arrival_date:
+            raise ValidationError("Your arrival date is after EHB starts!")
 
 # checks that departure is >= EHB end date
 def end_date_check(form, field):
-    if field.data < default_departure_date:
-        raise ValidationError("Your departure date is before EHB ends!")
+    if field.data:
+        if field.data < default_departure_date:
+            raise ValidationError("Your departure date is before EHB ends!")
+
 
 # checks that guest name is given if and only if guest roomtype is not "no guest"
 def guest_consistency_check(guestname_field_name):
