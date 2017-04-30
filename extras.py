@@ -45,6 +45,7 @@ name_special_event = conf["extras"]["name_special_event"]
 # variables to be made available to the website template
 conf_for_template = {"roomcost_single": roomcost_single,
                      "roomcost_double": roomcost_double,
+                     "currency": conf["application"]["currency_symbol"],
                      "cost_fri_dinner": cost_fri_dinner,
                      "cost_sat_lunch": cost_sat_lunch,
                      "cost_after_concert": cost_after_concert,
