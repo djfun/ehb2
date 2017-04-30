@@ -229,7 +229,7 @@ def make_form_from_extras(extras:Extra):
     ret = ExtrasForm() # type: ExtrasForm
 
     ret.participant_roomtype.data = extras.roomtype
-    ret.participant_roompartner.data = extras.roompartner
+    ret.participant_roompartner.data = str(extras.roompartner)
 
     ret.participant_arrival.data = extras.arrival_date
     ret.participant_departure.data = extras.departure_date
@@ -258,7 +258,7 @@ def make_form_from_extras(extras:Extra):
 
     ret.tshirt_sex.data = extras.t_shirt_sex
     ret.tshirt_size.data = extras.t_shirt_size
-    ret.tshirt_spec.data = extras.t_shirt_spec
+    ret.tshirt_spec.data = str(extras.t_shirt_spec)
 
     ret.special_event_tickets.data = extras.special_event_tickets
 
