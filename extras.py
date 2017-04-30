@@ -3,6 +3,7 @@ from datetime import date, datetime
 
 from flask_login import login_required
 
+import ehbmail
 from __init__ import *
 from extras_form import ExtrasForm, make_extras_from_form, NO_TSHIRT, t_shirt_costs, make_form_from_extras, \
     NO_RESTAURANT, restaurant_names
@@ -271,6 +272,11 @@ def paymentCancelledExtras():
     return show_extras_form(id=extras.id, message="You have cancelled payment. Your extras booking is not valid until we have received your payment.")
 
 
+def send_email_confirmation(prt, extras):
+    pay_now, pay_to_hotel, items = extras_cost(extras)
+    msg = render_template("em_extras_confirmation.txt", prt=prt, conf=conf_for_template, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items)
+    ehbmail.send([prt.id], "Extras Confirmation", [msg], "extras: payment success")
+
 @app.route("/extras-payment-success.html", methods=["GET",])
 def paymentSuccessExtras():
     # Paypal redirects the user to this URL once the user has approved the payment.
@@ -279,6 +285,7 @@ def paymentSuccessExtras():
     try:
         payment, extras = pp2.execute_payment(request.args)
         prt = lp(extras.id)
+        send_email_confirmation(prt, extras)
         return show_page_for_extras(prt, extras)
 
     # note that in the exceptions, e.prt is actually an Extras item

@@ -1,0 +1,25 @@
+Dear {{ prt.fullname() }},
+
+thank you for submitting your extras booking for {{ conf.shortname }}!
+
+We confirm that you have booked the following items, and that we have
+received your payment for these (total of {{ pay_now|eur }}):
+
+{% for item, pay_to_hotel, pay_to_ehb in items %}{% if pay_to_ehb > 0 %}- {{ item }}: {{ pay_to_ehb|eur }}
+{% endif %}{% endfor %}
+
+Furthermore, we will make sure your accommodation at the hotel is booked
+as follows. Please be prepared to settle this bill (for a total of {{ pay_to_hotel|eur }})
+with the hotel directly when you check in.
+
+{% for item, pay_to_hotel, pay_to_ehb in items %}{% if pay_to_hotel > 0 %}- {{ item }}: {{ pay_to_hotel|eur }}
+{% endif %}{% endfor %}
+
+If you added further comments, we have received these as well and will
+take them into account.
+
+If you have any further questions, please feel free to get in touch.
+
+Regards,
+{{ conf.shortname }} Organizers.
+
