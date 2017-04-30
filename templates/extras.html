@@ -95,31 +95,38 @@
 
         <hr/>
 
-        {{ m.header("section_guest_extras", """<strong>Extras for Guests</strong><br/>
+        {{ m.header("section_guest_meals", """<strong>Meals for Guests</strong><br/>
         <p>Your guests can also share our meals at the hotel. Each guest pays " ~ conf.cost_fri_dinner ~ " EUR to share our
             Friday night dinner, " ~ conf.cost_sat_lunch ~ " EUR to share our Saturday lunch, and " ~ conf.cost_after_concert ~ " EUR if they'd like to
             help themselves to the after-show midnight snacks on Saturday night.</p>
 
-         <p>Also, if you would like to book tickets for the <a href='http://www.europeanharmonybrigade.org/show.htm'>Saturday night show</a>
-             with <a href='http://www.trocaderoquartet.com/'>Trocadero</a>, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
-            people with disabilities can get discounted tickets for EUR " ~ conf.cost_ticket_discounted ~ " each.
-            Obviously, EHB participants don't need tickets for themselves.</p>
+        <p>If you would like to let us know anything else regarding your guests, you can enter that below as well.</p>
         """) }}
 
         {{ m.wtf(form.num_dinner_friday) }}
         {{ m.wtf(form.num_lunch_saturday) }}
         {{ m.wtf(form.num_after_concert) }}
-        {{ m.wtf(form.num_show_tickets_regular) }}
-        {{ m.wtf(form.num_show_tickets_discount) }}
 
         {{ m.wtf(form.guest, fclass="ta") }}
+
+        <hr/>
+
+        {{ m.header("section_guest_showtickets", """<strong>Show Tickets for Guests</strong><br/>
+        <p>If you would like to book tickets for the <a href='http://www.europeanharmonybrigade.org/show.htm'  target='_blank'>Saturday night show</a>
+             with <a href='http://www.trocaderoquartet.com/' target='_blank'>Trocadero</a>, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
+            people with disabilities can get discounted tickets for EUR " ~ conf.cost_ticket_discounted ~ " each.
+            Obviously, EHB participants don't need tickets for themselves.</p>
+        """) }}
+
+        {{ m.wtf(form.num_show_tickets_regular) }}
+        {{ m.wtf(form.num_show_tickets_discount) }}
 
 
         <hr/>
 
         {{ m.header("section_sat_dinner", """<strong>Special Event: Masterclass with Deke Sharon</strong><br/>
         <p>
-            A cappella superstar <a href='http://www.dekesharon.com/'>Deke Sharon</a> will hold an a cappella
+            A cappella superstar <a href='http://www.dekesharon.com/' target='_blank'>Deke Sharon</a> will hold an a cappella
             masterclass at the EHB venue on Sunday, June 18, 10-12 am.
             The masterclass is an interactive seminar where Deke will demonstrate his coaching techniques
             with various a cappella groups and quartets.
@@ -142,8 +149,8 @@
             Women's shirts differ from men's in
             that they are fitted, i.e. follow your body's curves a bit more.</p>
 
-            <p>Be sure to check the <a href='https://docs.google.com/spreadsheets/d/17kBgA9BmEgWWcOTA6GOlG0eSOVsOQ2d4LXq94wmRi5Q/edit#gid=0'>exact measurements</a>
-                and refer to the <a href='https://drive.google.com/open?id=0B0juVgVCf52ldlp2RXdPOE5vdDQ'>color table</a>.</p>
+            <p>Be sure to check the <a href='https://docs.google.com/spreadsheets/d/17kBgA9BmEgWWcOTA6GOlG0eSOVsOQ2d4LXq94wmRi5Q/edit#gid=0' target='_blank'>exact measurements</a>
+                and refer to the <a href='https://drive.google.com/open?id=0B0juVgVCf52ldlp2RXdPOE5vdDQ' target='_blank'>color table</a>.</p>
         </p>""") }}
 
         {{ m.wtf(form.tshirt_sex) }}
