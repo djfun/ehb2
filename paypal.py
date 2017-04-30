@@ -118,6 +118,12 @@ class Paypal:
 
 
 
+    def did_pay_before(self, prt):
+        previous_successful_payments = session.query(PaypalHistory). \
+            filter(PaypalHistory.participant_id == prt.id). \
+            filter(PaypalHistory.payment_step == self.payment_step). \
+            filter(PaypalHistory._paypal_status == PP_SUCCESS).all()
+        return len(previous_successful_payments) > 0
 
     def execute_payment(self, args):
         # The URL is of the form: http://localhost:5001/payment-success.html?paymentId=PAY-7US79692XR919631JLB7SUGY&token=EC-8KP41677BL107680E&PayerID=UB6Z4EQPBR8H6
@@ -133,7 +139,7 @@ class Paypal:
         if not prt:
             raise ParticipantNotFoundException(token)
 
-        if prt.last_paypal_status == PP_SUCCESS:
+        if self.did_pay_before(prt): # prt.last_paypal_status == PP_SUCCESS:
             # user already paid
             self.log(prt.id, PP_SUCCESS, "(duplicate payment attempt)")
             raise DuplicatePaymentException(prt)
