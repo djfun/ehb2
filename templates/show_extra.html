@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<p><strong>Booking for:</strong> {{ prt.fullname() }} ({{ prt.email }})</p>
+<p><strong>Booking for:</strong> <a href="show-participant.html?id={{ prt.id }}">{{ prt.fullname() }}</a> ({{ prt.email }})</p>
 
 {% include "extras_table.html" %}
 

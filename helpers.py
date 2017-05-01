@@ -11,6 +11,9 @@ from tables import *
 log_file_name = conf["server"]["logfile"]
 logger = None # type: Logger
 
+def logger():
+    return logger
+
 # lookup participant by ID
 def lp(id):
     return session.query(Participant).filter(Participant.id==id).first()
@@ -151,12 +154,16 @@ def nlbr(eval_ctx, value, format='%Y-%m-%d'):
 
 
 http_types = set(["GET", "POST"])
+ignored_prefixes = ["Request[", "Response[", "PayPal-Request-Id:", " * "]
+
 # convert all newlines (\n) to HTML <br/>
 @app.template_filter()
 @evalcontextfilter
 def format_log_message(eval_ctx, message):
     parts = message.split()
     if len(parts) >= 3 and parts[1] in http_types:
+        return Markup("<font color='gray'>%s</font>" % message)
+    elif any(message.startswith(prefix) for prefix in ignored_prefixes):
         return Markup("<font color='gray'>%s</font>" % message)
     elif "started at" in message:
         return Markup("<strong>%s</strong>" % message)

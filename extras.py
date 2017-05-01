@@ -262,7 +262,7 @@ def do_extras_payment():
         try:
             send_email_confirmation(prt, extras)
         except Exception as e:
-            logger.error("DEP: Exception while sending zero email confirmation to %d %s: %s" % (prt.id, prt.fullname(), repr(e)))
+            logger().error("DEP: Exception while sending zero email confirmation to %d %s: %s" % (prt.id, prt.fullname(), repr(e)))
 
     if extras.last_paypal_status == PP_SUCCESS:
         return show_page_for_extras(prt, extras)
@@ -303,26 +303,26 @@ def paymentSuccessExtras():
     # note that in the exceptions, e.prt is actually an Extras item
 
     except ParticipantNotFoundException as e:
-        logger.error("PSE: Unable to resolve the Paypal token '%s' to a participant." % e.token)
+        logger().error("PSE: Unable to resolve the Paypal token '%s' to a participant." % e.token)
         return show_message("Unable to resolve the Paypal token '%s' to a participant. Please try paying for your extras again, or contact the organizers." % e.token)
     except PaymentNotFoundException as e:
         prt = lp(e.prt.id)
-        logger.error("PSE: Unable to resolve the Paypal payment ID '%s' to a payment. Please try paying for your extras again, or contact the organizers." % e.paymentId)
+        logger().error("PSE: Unable to resolve the Paypal payment ID '%s' to a payment. Please try paying for your extras again, or contact the organizers." % e.paymentId)
         return show_page_for_extras(prt, e.prt, message="Unable to resolve the Paypal payment ID '%s' to a payment. Please try paying for your extras again, or contact the organizers." % e.paymentId)
     except DuplicatePaymentException as e:
         prt = lp(e.prt.id) # type: Participant
-        logger.info("PSE: Duplicate payment attempt by %d %s" % (prt.id, prt.fullname()))
+        logger().info("PSE: Duplicate payment attempt by %d %s" % (prt.id, prt.fullname()))
         return show_page_for_extras(prt, e.prt)
     except PaymentFailedException as e:
         prt = lp(e.prt.id) # type: Participant
-        logger.warn("PSE: Payment failed for %d %s" % (prt.id, prt.fullname()))
+        logger().warn("PSE: Payment failed for %d %s" % (prt.id, prt.fullname()))
         return show_page_for_extras(prt, e.prt, message = "Something went wrong with your Paypal payment. Please contact the organizers.")
     except Exception as e:
         if prt and extras:
-            logger.error("PSE: Exception for %d %s: %s" % (prt.id, prt.fullname(), repr(e)))
+            logger().error("PSE: Exception for %d %s: %s" % (prt.id, prt.fullname(), repr(e)))
             return show_page_for_extras(prt, extras, message = None)
         else:
-            logger.error("PSE: Exception for unknown user: %s" % repr(e))
+            logger().error("PSE: Exception for unknown user: %s" % repr(e))
 
 
 

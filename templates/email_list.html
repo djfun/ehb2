@@ -25,7 +25,7 @@
     {% endif %}
 
     <strong>Subject:</strong> {{ email.subject }} <br/>
-    <strong>Sent:</strong> {{ email.timestamp|ft }} <br/>
+    <strong>Sent:</strong> {{ email.timestamp|ft(format='%Y-%m-%d %H:%M:%S') }} <br/>
     {% if email.replyto %}
         <strong>Reply-To:</strong> {{ email.replyto }} <br/>
     {% endif %}

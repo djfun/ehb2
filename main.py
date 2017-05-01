@@ -10,13 +10,13 @@ from tornado.ioloop import IOLoop
 from tornado.wsgi import WSGIContainer
 
 from __init__ import *
-from helpers import *
 from auth import *
 from show_participants import show_participants, show_participant, do_show_participants
 from apply import *
 from extras import *
 from extras_roomplanner import *
 from admin import *
+from helpers import logger
 
 @app.route("/")
 def index():
@@ -37,8 +37,6 @@ def send_static(path):
 #######################################################################################
 ## main
 #######################################################################################
-
-default_logger = None
 
 
 if __name__ == "__main__":
@@ -66,20 +64,20 @@ if __name__ == "__main__":
         # logging.getLogger("tornado.access").addHandler(access_handler)
 
         print("Starting Tornado webserver on port %d." % port)
-        logger = logging.getLogger("tornado.application")
-        logger.info("Tornado started at %s" % str(start_time))
+        helpers.logger = logging.getLogger("tornado.application")
+        helpers.logger.info("Tornado started at %s" % str(start_time))
 
         http_server = HTTPServer(WSGIContainer(app))
         http_server.listen(port)
         IOLoop.instance().start()
 
     else:
+        helpers.logger = logging.getLogger(__name__)
+        helpers.logger.info("Flask started at %s" % str(start_time))
+
         print("Starting builtin Flask webserver on port %d." % port)
         app.run(debug=True, host="0.0.0.0", port=port)
 
-
-        logger = logging.getLogger(__name__)
-        logger.info("Flask started at %s" % str(start_time))
 
 
 

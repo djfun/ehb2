@@ -20,7 +20,7 @@ def log_email(recipient, subject, body, replyto, sent_from, dryrun=False): # dry
     return em
 
 
-def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, charset="iso-8859-15"):
+def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, charset="iso-8859-15", delay=0):
     """
     Sends an email using the connection specified in ehb.conf.
 
@@ -31,6 +31,7 @@ def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, cha
     :param replyto: (optional) specify a reply-to address which differs from the sender in the config file
     :param dryrun: generate email, but do not send it
     :param charset: charset in which the email body will be encoded
+    :param delay: the delay (in milliseconds) between any two subsequent messages
     :return: the list of email messages that were generated, as tables.Email objects
     """
 
@@ -53,6 +54,8 @@ def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, cha
             log_email(0, subject, "ERROR: SMTP authentication failed in email sending", replyto, sent_from)
             dryrun = True
 
+    first_message = True
+
     for recipient, body in zip(recipients, bodies):
         prt = lp(recipient)  # type: Participant
 
@@ -71,6 +74,12 @@ def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, cha
             msg.add_header('reply-to', replyto)
 
         if not dryrun:
+            # sleep for the specified number of milliseconds before sending next email
+            if first_message:
+                first_message = False
+            else:
+                time.sleep(delay/1000.0)
+
             server.sendmail(sender, prt.email, msg.as_string())
 
         em = log_email(recipient, full_subject, body, replyto or None, sent_from, dryrun=dryrun)

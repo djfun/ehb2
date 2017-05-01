@@ -8,6 +8,7 @@ import datetime
 
 import pickle
 import xlsxwriter
+from flask import flash
 from flask import request
 from flask import send_file
 from flask.templating import render_template_string
@@ -25,6 +26,9 @@ from extras import extras_cost
 from tables import *
 from helpers import *
 from flask_login import login_required, current_user
+
+
+delay_between_messages = float(conf["email"]["delay_between_messages"])
 
 
 @app.route('/admin.html')
@@ -85,20 +89,27 @@ def do_mailtool():
         bodies = []
         participants = []
 
-        for recipient in recipients:
-            prt = lp(recipient)  # type: Participant
-            ee = prt.extras
+        try:
+            for recipient in recipients:
+                prt = lp(recipient)  # type: Participant
+                ee = prt.extras
 
-            if ee:
-                e = ee[0]
-                pay_now, pay_to_hotel, items = extras_cost(e)
-            else:
-                e, pay_now, pay_to_hotel, items = None, None, None, None
+                if ee:
+                    e = ee[0]
+                    pay_now, pay_to_hotel, items = extras_cost(e)
+                else:
+                    e, pay_now, pay_to_hotel, items = None, None, None, None
 
-            bodies.append(render_template_string(form.body.data, prt=prt, extras=e, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items))
-            participants.append(prt)
+                bodies.append(render_template_string(form.body.data, prt=prt, extras=e, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items))
+                participants.append(prt)
 
-        emails = ehbmail.send(recipients, form.subject.data, bodies, "Mail Tool (%s)" % current_user.id, replyto=form.replyto.data, dryrun=dryrun)
+            emails = ehbmail.send(recipients, form.subject.data, bodies, "Mail Tool (%s)" % current_user.id, replyto=form.replyto.data, dryrun=dryrun, delay=delay_between_messages)
+
+        except Exception as e:
+            logger().error("Mailtool: Exception while attempting to send emails: %s" % repr(e))
+            flash("An error occurred while rendering or sending your emails: %s. Please check the Mail Archive to see what emails were actually sent." % str(e))
+            prts = session.query(Participant).all()
+            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
 
         if dryrun:
             return render_template("confirm_emails.html", title="Mail Tool", emails_with_participants=zip(emails, participants), form=form, num_emails=len(emails))
