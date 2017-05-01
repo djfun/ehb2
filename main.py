@@ -1,5 +1,9 @@
 
 import os
+
+import sys
+
+import tornado
 from flask import send_from_directory
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -37,22 +41,30 @@ def send_static(path):
 
 if __name__ == "__main__":
     port = int(conf.get("server", "port"))
+    logging.basicConfig(level=logging.INFO, filename="ehb2.log", format='%(asctime)s %(message)s')
 
     if conf.getboolean("server", "use_tornado"):
         # use Tornado web server to host Flask app
 
+        # The above configuration of the logging system sends all messages
+        # to ehb2.log, including the entire Tornado access log. In theory,
+        # one should be able to send the access log to a separate file from
+        # everything else, but for some reason logging to application and
+        # general seem to be ignored in this case. So I'm going the
+        # basicConfig route for now.
+
+        # formatter = logging.Formatter(fmt='%(asctime)s %(message)s')
+        # ehb_handler = logging.FileHandler("./ehb2.log")
+        # ehb_handler.setFormatter(formatter)
+        # access_handler = logging.FileHandler("./tornado-access.log")
+        # access_handler.setFormatter(formatter)
+        #
+        # logging.getLogger("tornado.application").addHandler(ehb_handler)
+        # logging.getLogger("tornado.general").addHandler(ehb_handler)
+        # logging.getLogger("tornado.access").addHandler(access_handler)
+
         print("Starting Tornado webserver on port %d." % port)
-
-        all = logging.FileHandler('./tornado.log')
-        access = logging.FileHandler("./tornado-access.log")
-
-        logging.getLogger("tornado.access").addHandler(access)
-        logging.getLogger("tornado.access").setLevel(logging.DEBUG)
-
-        logging.getLogger("tornado.application").addHandler(all)
-        logging.getLogger("tornado.general").addHandler(all)
-        logging.getLogger("tornado.application").setLevel(logging.DEBUG)
-        logging.getLogger("tornado.general").setLevel(logging.DEBUG)
+        logging.getLogger("tornado.application").info("Tornado started at %s" % str(start_time))
 
         http_server = HTTPServer(WSGIContainer(app))
         http_server.listen(port)
@@ -61,6 +73,10 @@ if __name__ == "__main__":
     else:
         print("Starting builtin Flask webserver on port %d." % port)
         app.run(debug=True, host="0.0.0.0", port=port)
+
+
+        logger = logging.getLogger(__name__)
+        logger.info("Started at %s" % str(start_time))
 
 
 

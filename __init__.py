@@ -49,10 +49,7 @@ def utility_processor():
 
 # set up logging
 import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
-logger.info("Started at %s" % str(start_time))
 
 # find Git revision
 git_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
