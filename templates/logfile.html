@@ -10,7 +10,7 @@
     <table>
         {% for timestamp, message in items %}
         <tr>
-            <td>{{ timestamp }}</td>
+            <td>{{ timestamp }} &nbsp; &nbsp; &nbsp; </td>
             <td>{{ message|format_log_message }}</td>
         </tr>
         {% endfor %}

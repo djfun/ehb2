@@ -161,4 +161,4 @@ def format_log_message(eval_ctx, message):
     elif "started at" in message:
         return Markup("<strong>%s</strong>" % message)
     else:
-        return message
+        return Markup("<font color='red'>%s</font>" % message)
