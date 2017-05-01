@@ -76,7 +76,7 @@ if __name__ == "__main__":
         helpers.logger.info("Flask started at %s" % str(start_time))
 
         print("Starting builtin Flask webserver on port %d." % port)
-        app.run(debug=True, host="0.0.0.0", port=port)
+        app.run(debug=True, host="0.0.0.0", port=port, threaded=True)
 
 
 

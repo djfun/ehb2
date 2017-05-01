@@ -61,7 +61,7 @@ def show_logfile():
 def mailtool():
     form = MailtoolForm(request.form)
     prts = session.query(Participant).all()
-    return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
+    return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts, delay=delay_between_messages)
 
 @app.route("/mailtool.html", methods=["POST",])
 @login_required
@@ -74,12 +74,12 @@ def do_mailtool():
         if not form.recipients.data:
             # no recipients selected
             prts = session.query(Participant).all()
-            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
+            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts, delay=delay_between_messages)
 
         if submit_button_label == "revise":
             # "revise" button clicked on confirm page
             prts = session.query(Participant).all()
-            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
+            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts, delay=delay_between_messages)
 
         # dryrun = True: "Send" button clicked on confirm page
         # dryrun = False: "Preview" button clicked on first Mailtool page
@@ -109,7 +109,7 @@ def do_mailtool():
             logger().error("Mailtool: Exception while attempting to send emails: %s" % repr(e))
             flash("An error occurred while rendering or sending your emails: %s. Please check the Mail Archive to see what emails were actually sent." % str(e))
             prts = session.query(Participant).all()
-            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
+            return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts, delay=delay_between_messages)
 
         if dryrun:
             return render_template("confirm_emails.html", title="Mail Tool", emails_with_participants=zip(emails, participants), form=form, num_emails=len(emails))
@@ -121,7 +121,7 @@ def do_mailtool():
 
     else:
         prts = session.query(Participant).all()
-        return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts)
+        return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts, delay=delay_between_messages)
 
 
 @app.route("/mailarchive.html")

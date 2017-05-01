@@ -12,6 +12,25 @@
     {% endif %}
 {% endwith %}
 
+<p>
+    <strong>Important:</strong>
+    In order to avoid being classified as a spammer by the mail server,
+    we wait for some time after sending each email before sending the
+    next email. This delay can be configured in the config file
+    (email / delay_between_messages), and is currently set to
+    {{ delay }} milliseconds. Emailing all participants will
+    thus take roughly {{ (  delay * ((participants|length)-1) / 1000  ) | int }}
+    seconds.</p>
+
+    <p>
+    Due to the underlying web server
+    architecture we use, the entire server will block while you send
+    messages; all requests from other web browsers will be delayed
+    until all emails have been sent. Thus, consider doing your
+    bulk email sending at a time of low activity.
+</p>
+
+
 <form class="form-horizontal" action="mailtool.html" method="post">
     <h2>Recipients</h2>
     <p>Please select the recipients from the table below using the checkboxes.</p>
