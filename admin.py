@@ -2,7 +2,7 @@ import io
 import os
 import re
 import tempfile
-from collections import Set
+from collections import Set, deque
 
 import datetime
 
@@ -39,21 +39,28 @@ def adminpage():
 @app.route('/show-log.html')
 @login_required
 def show_logfile():
+    # read log file, possibly cropping it to the last N lines
     with open(log_file_name, 'r') as myfile:
-        items = []
-        for line in myfile.readlines():
-            # 2017-05-01 09:22:25,473	Tornado started at 2017-05-01 09:22:23
-            mat = re.match('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (.*)$', line)
-            if mat is not None:
-                timestamp = mat.group(1)
-                message = mat.group(2)
-            else:
-                timestamp = ""
-                message = line
+        if conf.has_option("server", "logfile_max_lines"):
+            all_lines = deque(myfile, maxlen=conf.getint("server", "logfile_max_lines"))
+        else:
+            all_lines = list(myfile)
 
-            items.append((timestamp, message))
+    # parse log entries
+    items = []
+    for line in all_lines:
+        # 2017-05-01 09:22:25,473	Tornado started at 2017-05-01 09:22:23
+        mat = re.match('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (.*)$', line)
+        if mat is not None:
+            timestamp = mat.group(1)
+            message = mat.group(2)
+        else:
+            timestamp = ""
+            message = line
 
-        return render_template("logfile.html", items=items)
+        items.append((timestamp, message))
+
+    return render_template("logfile.html", items=items)
 
 
 @app.route("/mailtool.html", methods=["GET",])
