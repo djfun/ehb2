@@ -23,6 +23,12 @@
 
 <div class="participant-management">
     <h1>Payment History</h1>
+    <p>Color codes:
+        <span style="background-color: pink">cancelled</span> /
+        <span style="background-color:lightgreen">paid</span> /
+        <span style="background-color:#d2f9d2">set to paid without Paypal transfer</span>
+    </p>
+
     <table width="100%">
         <tr><th align="left" width="20%">Time</th> <th align="left" width="20%">Paypal Status</th> <th align="left" width="60%">Details</th></tr>
         {% for item in paypal_history %}
@@ -52,7 +58,10 @@ status: {{ item.paypal_status.paypal_status_name }}
 
 
     <h1>Participant Management</h1>
-    <p>Please do not use these functions unless you know what you're doing.<br/></p>
+    <p>Please do not use these functions unless you know what you're doing.
+        Put your reason in parentheses, e.g. "(reset to paid by hand)", to
+        make the color show up right in the Payment History.
+        <br/></p>
     <form class="form-horizontal" action="change-extras.html?id={{ prt.id }}" method="post">
         {% call m.controlgroup("paypal-change-field", "Change PP status") %}
           {{ m.sel("sp-paypal-change-field", "1", paypal_statuses) }}

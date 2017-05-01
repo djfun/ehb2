@@ -87,8 +87,8 @@ def lpart(eval_ctx, value):
 @evalcontextfilter
 def paypal_status_color(eval_ctx, item:PaypalHistory):
     if item._paypal_status == PP_SUCCESS:
-        if item.data == "(duplicate payment attempt)":
-            return "lightgray"
+        if item.data.startswith("("):  # was manually edited or "(duplicate payment attempt)":
+            return "#d2f9d2" # much lighter lightgreen, from https://www.w3schools.com/colors/colors_picker.asp
         else:
             return "lightgreen"
     elif item._paypal_status == PP_CANCELLED or item._paypal_status == PP_ERROR:
