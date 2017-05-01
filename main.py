@@ -34,10 +34,12 @@ def send_static(path):
     return send_from_directory('static', path)
 
 
-
 #######################################################################################
 ## main
 #######################################################################################
+
+default_logger = None
+
 
 if __name__ == "__main__":
     port = int(conf.get("server", "port"))
@@ -64,7 +66,8 @@ if __name__ == "__main__":
         # logging.getLogger("tornado.access").addHandler(access_handler)
 
         print("Starting Tornado webserver on port %d." % port)
-        logging.getLogger("tornado.application").info("Tornado started at %s" % str(start_time))
+        logger = logging.getLogger("tornado.application")
+        logger.info("Tornado started at %s" % str(start_time))
 
         http_server = HTTPServer(WSGIContainer(app))
         http_server.listen(port)

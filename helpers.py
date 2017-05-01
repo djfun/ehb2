@@ -7,6 +7,9 @@ from config import conf
 from tables import *
 
 
+# global logger; value is set in main.py
+logger = None # type: Logger
+
 # lookup participant by ID
 def lp(id):
     return session.query(Participant).filter(Participant.id==id).first()
