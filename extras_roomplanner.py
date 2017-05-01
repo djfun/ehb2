@@ -251,8 +251,8 @@ def make_people_string():
             df_arrival, df_departure = [date.strftime(rp_df) for date in (arrival, departure)]
             rt = roomtypes[rt_id] # type: Roomtype
 
-            tooltip = rt.tooltip(e, prt_dict)
-            roompartner_code = rt.roompartner_code(e) # type: str
+            tooltip = rt.tooltip(ee, prt_dict)
+            roompartner_code = rt.roompartner_code(ee) # type: str
             guest_id = make_guest_key(ra)
 
             entries.append(
