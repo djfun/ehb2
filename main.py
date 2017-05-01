@@ -43,7 +43,7 @@ default_logger = None
 
 if __name__ == "__main__":
     port = int(conf.get("server", "port"))
-    logging.basicConfig(level=logging.INFO, filename="ehb2.log", format='%(asctime)s %(message)s')
+    logging.basicConfig(level=logging.INFO, filename=log_file_name, format='%(asctime)s %(message)s')
 
     if conf.getboolean("server", "use_tornado"):
         # use Tornado web server to host Flask app
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
 
         logger = logging.getLogger(__name__)
-        logger.info("Started at %s" % str(start_time))
+        logger.info("Flask started at %s" % str(start_time))
 
 
 

@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import tempfile
 from collections import Set
 
@@ -30,6 +31,26 @@ from flask_login import login_required, current_user
 @login_required
 def adminpage():
     return render_template("admin.html")
+
+@app.route('/show-log.html')
+@login_required
+def show_logfile():
+    with open(log_file_name, 'r') as myfile:
+        items = []
+        for line in myfile.readlines():
+            # 2017-05-01 09:22:25,473	Tornado started at 2017-05-01 09:22:23
+            mat = re.match('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (.*)$', line)
+            if mat is not None:
+                timestamp = mat.group(1)
+                message = mat.group(2)
+            else:
+                timestamp = ""
+                message = line
+
+            items.append((timestamp, message))
+
+        return render_template("logfile.html", items=items)
+
 
 @app.route("/mailtool.html", methods=["GET",])
 @login_required

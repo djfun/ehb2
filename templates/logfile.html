@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log file</title>
+</head>
+
+
+<body>
+    <table>
+        {% for timestamp, message in items %}
+        <tr>
+            <td>{{ timestamp }}</td>
+            <td>{{ message|format_log_message }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

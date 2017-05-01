@@ -8,6 +8,7 @@ from tables import *
 
 
 # global logger; value is set in main.py
+log_file_name = conf["server"]["logfile"]
 logger = None # type: Logger
 
 # lookup participant by ID
@@ -147,3 +148,17 @@ def fd(eval_ctx, value, format='%Y-%m-%d'):
 @evalcontextfilter
 def nlbr(eval_ctx, value, format='%Y-%m-%d'):
     return value.replace("\n", "<br/>\n")
+
+
+http_types = set(["GET", "POST"])
+# convert all newlines (\n) to HTML <br/>
+@app.template_filter()
+@evalcontextfilter
+def format_log_message(eval_ctx, message):
+    parts = message.split()
+    if len(parts) >= 3 and parts[1] in http_types:
+        return Markup("<font color='gray'>%s</font>" % message)
+    elif "started at" in message:
+        return Markup("<strong>%s</strong>" % message)
+    else:
+        return message

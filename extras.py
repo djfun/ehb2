@@ -320,7 +320,7 @@ def paymentSuccessExtras():
     except Exception as e:
         if prt and extras:
             logger.error("PSE: Exception for %d %s: %s" % (prt.id, prt.fullname(), repr(e)))
-            return show_page_for_extras(prt, extras, message = "An error occurred after processing your payment: %s" % str(e))
+            return show_page_for_extras(prt, extras, message = None)
         else:
             logger.error("PSE: Exception for unknown user: %s" % repr(e))
 
