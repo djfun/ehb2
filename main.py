@@ -41,7 +41,15 @@ def send_static(path):
 
 if __name__ == "__main__":
     port = int(conf.get("server", "port"))
-    logging.basicConfig(level=logging.INFO, filename=log_file_name, format='%(asctime)s %(message)s')
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(log_file_name, 'a', 'utf-8')
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    handler.setFormatter(formatter)
+    root_logger.addHandler(handler)
+
+    # logging.basicConfig(level=logging.INFO, filename=log_file_name, format='%(asctime)s %(message)s')
 
     if conf.getboolean("server", "use_tornado"):
         # use Tornado web server to host Flask app

@@ -8,10 +8,11 @@
 
 <body>
     <table>
-        {% for timestamp, message in items %}
+        {% for timestamp, level, message in items %}
         <tr>
-            <td>{{ timestamp }} &nbsp; &nbsp; &nbsp; </td>
-            <td>{{ message|format_log_message }}</td>
+            <td>{{ timestamp }}</td>
+            <td>{{ level }}</td>
+            <td>{{ message|format_log_message(level=level) }}</td>
         </tr>
         {% endfor %}
     </table>

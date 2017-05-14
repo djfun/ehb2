@@ -161,13 +161,20 @@ ignored_prefixes = ["Request[", "Response[", "PayPal-Request-Id:", " * "]
 # convert all newlines (\n) to HTML <br/>
 @app.template_filter()
 @evalcontextfilter
-def format_log_message(eval_ctx, message):
-    parts = message.split()
-    if len(parts) >= 3 and parts[1] in http_types:
-        return Markup("<font color='gray'>%s</font>" % message)
-    elif any(message.startswith(prefix) for prefix in ignored_prefixes):
-        return Markup("<font color='gray'>%s</font>" % message)
+def format_log_message(eval_ctx, message, level='INFO'):
+    if level == 'ERROR':
+        return Markup("<font color='red'>%s</font>" % message)
     elif "started at" in message:
         return Markup("<strong>%s</strong>" % message)
     else:
-        return Markup("<font color='red'>%s</font>" % message)
+        return Markup("<font color='gray'>%s</font>" % message)
+
+    # parts = message.split()
+    # if len(parts) >= 3 and parts[1] in http_types:
+    #     return Markup("<font color='gray'>%s</font>" % message)
+    # elif any(message.startswith(prefix) for prefix in ignored_prefixes):
+    #     return Markup("<font color='gray'>%s</font>" % message)
+    # elif "started at" in message:
+    #     return Markup("<strong>%s</strong>" % message)
+    # else:
+    #     return Markup("<font color='red'>%s</font>" % message)

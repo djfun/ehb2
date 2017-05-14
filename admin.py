@@ -49,16 +49,18 @@ def show_logfile():
     # parse log entries
     items = []
     for line in all_lines:
-        # 2017-05-01 09:22:25,473	Tornado started at 2017-05-01 09:22:23
-        mat = re.match('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (.*)$', line)
+        # 2017-05-01 09:22:25,473 INFO	Tornado started at 2017-05-01 09:22:23
+        mat = re.match('^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})\s+(\S+)\s+(.*)$', line)
         if mat is not None:
             timestamp = mat.group(1)
-            message = mat.group(2)
+            level = mat.group(2)
+            message = mat.group(3)
         else:
             timestamp = ""
+            level = "INFO"
             message = line
 
-        items.append((timestamp, message))
+        items.append((timestamp, level, message))
 
     return render_template("logfile.html", items=items)
 
