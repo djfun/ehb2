@@ -40,7 +40,7 @@ def adminpage():
 @login_required
 def show_logfile():
     # read log file, possibly cropping it to the last N lines
-    with open(log_file_name, 'r') as myfile:
+    with open(log_file_name, 'r', encoding="utf-8") as myfile:
         if conf.has_option("server", "logfile_max_lines"):
             all_lines = deque(myfile, maxlen=conf.getint("server", "logfile_max_lines"))
         else:
