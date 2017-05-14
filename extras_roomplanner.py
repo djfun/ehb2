@@ -217,47 +217,50 @@ def make_people_string():
     df_enddate   = end_date.strftime(rp_df)
 
     for ra in session.query(RoomAssignment).all(): # type: RoomAssignment
-        prt = prt_dict[ra.id] # type: Participant
+        if not ra.id in prt_dict:
+            logger().warning("Room planner: Ignoring unknown participant with ID %s" % ra.id)
+        else:
+            prt = prt_dict[ra.id] # type: Participant
 
-        if not ra.guest_position:
-            # Room assignment for a participant. This produces a string of the following form:
-            # "19": {"id": "19", "name": "Simone Knoop", "arrival": "09/06", "departure": "12/06","roomsize": 2, "tooltip":"shared with Marquis, Mira", "extras_submitted":true, "room":"4_1", "partner": "35", "gender": "F"}
+            if not ra.guest_position:
+                # Room assignment for a participant. This produces a string of the following form:
+                # "19": {"id": "19", "name": "Simone Knoop", "arrival": "09/06", "departure": "12/06","roomsize": 2, "tooltip":"shared with Marquis, Mira", "extras_submitted":true, "room":"4_1", "partner": "35", "gender": "F"}
 
-            ee = prt.extras
-            if ee:
-                # prt submitted extras
-                e = ee[0] # type: Extra
-                arrival = e.arrival_date.strftime(rp_df)
-                departure = e.departure_date.strftime(rp_df)
-                rt = roomtypes[e.roomtype] # type: Roomtype
-                tooltip = rt.tooltip(e, prt_dict)
-                roompartner_code = rt.roompartner_code(e) # type: str
+                ee = prt.extras
+                if ee:
+                    # prt submitted extras
+                    e = ee[0] # type: Extra
+                    arrival = e.arrival_date.strftime(rp_df)
+                    departure = e.departure_date.strftime(rp_df)
+                    rt = roomtypes[e.roomtype] # type: Roomtype
+                    tooltip = rt.tooltip(e, prt_dict)
+                    roompartner_code = rt.roompartner_code(e) # type: str
 
-                entries.append('"%d": {"id": "%d", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": true, "room": "%s", "partner": "%s", "gender": "%s"}' % \
-                               (prt.id,     prt.id,    prt.fullname(),     arrival,         departure,    rt.people_in_room,     tooltip,                               ra.room,    roompartner_code,   prt.sex))
+                    entries.append('"%d": {"id": "%d", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": true, "room": "%s", "partner": "%s", "gender": "%s"}' % \
+                                   (prt.id,     prt.id,    prt.fullname(),     arrival,         departure,    rt.people_in_room,     tooltip,                               ra.room,    roompartner_code,   prt.sex))
+
+                else:
+                    entries.append(
+                        '"%d": {"id": "%d", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": false, "room": "%s", "partner": "", "gender": "%s"}' % \
+                        (prt.id, prt.id,         prt.fullname(),    df_startdate,      df_enddate,            2,   "** no extras submitted **",                    ra.room,                         prt.sex))
+
 
             else:
+                # Room assignment for a guest. This produces a string of the following form:
+                # "124_g1": {"id": "124_g1", "name": "x", "arrival": "16/06", "departure": "18/06", "roomsize": 2, "tooltip": "(guest of Alexander Koller) share with participant", "extras_submitted": true, "room": "18_1", "partner": "3", "guest_of": "124"}
+
+                ee = prt.extras[0] # type: Extra
+                arrival, departure, rt_id = (ee.guest1_arrival, ee.guest1_departure, ee.guest1_roomtype) if ra.guest_position == 1 else (ee.guest2_arrival, ee.guest2_departure, ee.guest2_roomtype)
+                df_arrival, df_departure = [date.strftime(rp_df) for date in (arrival, departure)]
+                rt = roomtypes[rt_id] # type: Roomtype
+
+                tooltip = rt.tooltip(ee, prt_dict)
+                roompartner_code = rt.roompartner_code(ee) # type: str
+                guest_id = make_guest_key(ra)
+
                 entries.append(
-                    '"%d": {"id": "%d", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": false, "room": "%s", "partner": "", "gender": "%s"}' % \
-                    (prt.id, prt.id,         prt.fullname(),    df_startdate,      df_enddate,            2,   "** no extras submitted **",                    ra.room,                         prt.sex))
-
-
-        else:
-            # Room assignment for a guest. This produces a string of the following form:
-            # "124_g1": {"id": "124_g1", "name": "x", "arrival": "16/06", "departure": "18/06", "roomsize": 2, "tooltip": "(guest of Alexander Koller) share with participant", "extras_submitted": true, "room": "18_1", "partner": "3", "guest_of": "124"}
-
-            ee = prt.extras[0] # type: Extra
-            arrival, departure, rt_id = (ee.guest1_arrival, ee.guest1_departure, ee.guest1_roomtype) if ra.guest_position == 1 else (ee.guest2_arrival, ee.guest2_departure, ee.guest2_roomtype)
-            df_arrival, df_departure = [date.strftime(rp_df) for date in (arrival, departure)]
-            rt = roomtypes[rt_id] # type: Roomtype
-
-            tooltip = rt.tooltip(ee, prt_dict)
-            roompartner_code = rt.roompartner_code(ee) # type: str
-            guest_id = make_guest_key(ra)
-
-            entries.append(
-                '"%s": {"id": "%s", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": true, "room": "%s", "partner": "%s", "guest_of": "%d"}' % \
-                (guest_id, guest_id, ra.name, df_arrival, df_departure, rt.people_in_room, tooltip, ra.room, roompartner_code, prt.id))
+                    '"%s": {"id": "%s", "name": "%s", "arrival": "%s", "departure": "%s", "roomsize": %d, "tooltip": "%s", "extras_submitted": true, "room": "%s", "partner": "%s", "guest_of": "%d"}' % \
+                    (guest_id, guest_id, ra.name, df_arrival, df_departure, rt.people_in_room, tooltip, ra.room, roompartner_code, prt.id))
 
 
     return ",\n".join(entries)

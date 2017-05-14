@@ -1,3 +1,5 @@
+from logging import Logger
+
 import flask
 import jinja2
 from jinja2 import evalcontextfilter, Markup
@@ -11,7 +13,7 @@ from tables import *
 log_file_name = conf["server"]["logfile"]
 logger = None # type: Logger
 
-def logger():
+def logger() -> Logger:
     return logger
 
 # lookup participant by ID

@@ -67,6 +67,7 @@ def do_show_participants():
                                              deletion_time=datetime.datetime.now())
 
             session.query(Participant).filter_by(id=id).delete()
+            session.query(Extra).filter_by(id=id).delete()
             session.add(deleted_prt)
             session.commit()
             message = "Deleted user %s (%d)." % (parti.fullname(), id)
