@@ -99,10 +99,13 @@ def send_room_assignemnts_xslx():
     nr = 1
 
     for room in flattened_all_rooms:
+        room_is_empty = True
+
         for ra in room_to_ra[room]:
             prt = prt_dict[ra.id] # type: Participant
             worksheet.write(row, 0, nr)
             worksheet.write(row, 1, ra.name)
+            room_is_empty = False
 
             if not ra.guest_position:
                 # participant
@@ -131,7 +134,8 @@ def send_room_assignemnts_xslx():
             nr += 1
             row += 1
 
-        row += 1 # empty row after each room
+        if not room_is_empty:
+            row += 1 # empty row after each room
 
     workbook.close()
 
