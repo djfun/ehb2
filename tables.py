@@ -276,6 +276,9 @@ class RoomAssignment(Base):
     guest_position = Column(SmallInteger)
     room = Column(String(10))
 
+    def __repr__(self):
+        return "[%d %s, guestpos=%d, room=%s]" % (self.id, self.name, self.guest_position, self.room)
+
 
 class Email(Base):
     __tablename__ = 'emails'

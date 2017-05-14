@@ -29,7 +29,7 @@ def mkrm(row, col):
 ROOM_ROWS = 30
 ROOM_COLS = 5
 all_rooms = [[mkrm(row, col) for col in range(1,ROOM_COLS+1)] for row in range(1,ROOM_ROWS+1)]
-flattened_all_rooms = itertools.chain.from_iterable(all_rooms)
+flattened_all_rooms = list(itertools.chain.from_iterable(all_rooms))
 
 @app.route("/room-planner.html", methods=["GET",])
 @login_required
