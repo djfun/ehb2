@@ -70,6 +70,9 @@ def send_room_assignemnts_xslx():
     for ra in r_room_assignments:
         room_to_ra[ra.room].append(ra)
 
+    logger().info("[xslx] room_to_ra: %s" % str(room_to_ra))
+    logger().info("[xslx] flattened: %s" % str(flattened_all_rooms))
+
     # prepare Excel file
     output = io.BytesIO()
     workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -224,7 +227,7 @@ def make_people_string():
 
             if not ra.guest_position:
                 # Room assignment for a participant. This produces a string of the following form:
-                # "19": {"id": "19", "name": "Simone Knoop", "arrival": "09/06", "departure": "12/06","roomsize": 2, "tooltip":"shared with Marquis, Mira", "extras_submitted":true, "room":"4_1", "partner": "35", "gender": "F"}
+                # "19": {"id": "19", "name": "Participant Name 1", "arrival": "09/06", "departure": "12/06","roomsize": 2, "tooltip":"shared with Participant, Another", "extras_submitted":true, "room":"4_1", "partner": "35", "gender": "F"}
 
                 ee = prt.extras
                 if ee:
