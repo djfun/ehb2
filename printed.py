@@ -36,7 +36,7 @@ def compile_and_send_pdf(pdf_filename, contents, runs=1, dirpath=None):
 
     logger().info("Temp directory for %s is %s" % (pdf_filename, dirpath))
 
-    with open(texfile, "w") as f:
+    with open(texfile, "w", encoding="utf-8") as f:
         f.write(contents)
 
     old_cwd = os.getcwd()
@@ -44,6 +44,8 @@ def compile_and_send_pdf(pdf_filename, contents, runs=1, dirpath=None):
 
     for i in range(runs):
         os.system("pdflatex -interaction=nonstopmode file.tex > file.texlog")
+
+    os.chdir(old_cwd)
 
     if os.path.exists(pdffile) and not latex_has_errors(logfile):
         return send_file(pdffile, mimetype='application/pdf')
@@ -269,7 +271,7 @@ def generate_badges():
                 close(f, i, just_ended)
 
             local_tex_name = "%s.tex" % parts[fp]
-            f = open(os.path.join(dirpath, local_tex_name), "w")
+            f = open(os.path.join(dirpath, local_tex_name), "w", encoding="utf-8")
             prev_part = fp
             i = 0
 
