@@ -73,16 +73,16 @@ if __name__ == "__main__":
         # logging.getLogger("tornado.access").addHandler(access_handler)
 
         print("Starting Tornado webserver on port %d." % port)
-        helpers.logger = logging.getLogger("tornado.application")
-        helpers.logger.info("Tornado started at %s" % str(start_time))
+        helpers._logger = logging.getLogger("tornado.application")
+        helpers._logger.info("Tornado started at %s" % str(start_time))
 
         http_server = HTTPServer(WSGIContainer(app))
         http_server.listen(port)
         IOLoop.instance().start()
 
     else:
-        helpers.logger = logging.getLogger(__name__)
-        helpers.logger.info("Flask started at %s" % str(start_time))
+        helpers._logger = logging.getLogger(__name__)
+        helpers.logger().info("Flask started at %s" % str(start_time))
 
         print("Starting builtin Flask webserver on port %d." % port)
         app.run(debug=True, host="0.0.0.0", port=port, threaded=True)

@@ -11,10 +11,10 @@ from tables import *
 
 # global logger; value is set in main.py
 log_file_name = conf["server"]["logfile"]
-logger = None # type: Logger
+_logger = None # type: Logger
 
 def logger() -> Logger:
-    return logger
+    return _logger
 
 # lookup participant by ID
 def lp(id):
