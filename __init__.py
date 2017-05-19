@@ -31,6 +31,16 @@ DBSession = sessionmaker(bind=engine)
 session = flask_scoped_session(DBSession, app) # type: Session
 
 
+# set up Jinja rendering environment for Latex
+# http://flask.pocoo.org/snippets/55/
+texenv = app.create_jinja_environment()
+# texenv.block_start_string = '((*'
+# texenv.block_end_string = '*))'
+texenv.variable_start_string = '((('
+texenv.variable_end_string = ')))'
+# texenv.comment_start_string = '((='
+# texenv.comment_end_string = '=))'
+
 
 # format float as EUR value
 @app.template_filter()

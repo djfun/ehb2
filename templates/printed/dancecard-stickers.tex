@@ -1,0 +1,57 @@
+{% raw %}
+\documentclass{article}
+
+\newlength{\stickerwidth}
+\newlength{\stickerheight}
+\setlength{\stickerwidth}{48.3mm}
+\setlength{\stickerheight}{16.9mm}
+
+\newlength{\mytopmargin}
+\newlength{\myleftmargin}
+\setlength{\mytopmargin}{13mm}
+\setlength{\myleftmargin}{7mm} % shift 1mm left to fit on sticker
+
+\newcommand{\stickercolumns}{4}
+\newcommand{\stickerrows}{16}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage[margin=0mm,a4paper]{geometry}
+\usepackage{graphicx,color}
+
+\definecolor{Tenor}{RGB}{96, 157, 210} % 66,139,202
+\definecolor{Lead}{RGB}{92,184,92}
+\definecolor{Bari}{RGB}{240,173,78}
+\definecolor{Bass}{RGB}{235, 106, 102}
+
+
+\newcommand{\Label}[4]{\textsf{\textcolor{#4}{#1}}\\ \textsf{\footnotesize #2}\\ \textsf{\footnotesize #3}}
+
+\newcommand{\Labelpage}[4]{
+\begin{tikzpicture}[remember picture,overlay, x=1mm, y=1mm]
+%\draw[thick] (current page.south west) rectangle (current page.north east);
+
+\foreach \x in {1, ..., \stickercolumns}
+  \foreach \y in {1, ..., \stickerrows}
+    {
+      \node[inner xsep=0pt,text centered,anchor=center,text height=5mm, text width=\stickerwidth]
+         at ($(current page.north west) + (\myleftmargin - 0.5\stickerwidth + \stickerwidth*\x, -(\mytopmargin - 0.5\stickerheight + \stickerheight*\y)$)
+         {\Label{#1}{#2}{#3}{#4}};
+
+    }
+\end{tikzpicture} \clearpage
+}
+
+\begin{document}
+
+{% endraw %}
+{% for p in participants %}
+  \Labelpage{{ "{" }}{{ p["name"] }}{{ "}{" }}{{ p["city"] }}{{ "}{" }}{{ p["email"] }}{{ "}{" }}{{ p["part"] }}{{ "}" }}
+{% endfor %}
+{% raw %}
+
+\end{document}
+{% endraw %}

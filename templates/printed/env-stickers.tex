@@ -1,0 +1,51 @@
+{% raw %}
+\documentclass{article}
+
+\newlength{\stickerwidth}
+\newlength{\stickerheight}
+\setlength{\stickerwidth}{64.6mm}
+\setlength{\stickerheight}{33.8mm}
+
+\newlength{\mytopmargin}
+\newlength{\myleftmargin}
+\setlength{\mytopmargin}{13.3mm}
+\setlength{\myleftmargin}{8mm}
+
+\newcommand{\stickercolumns}{3}
+\newcommand{\stickerrows}{8}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage[margin=0mm,a4paper]{geometry}
+\usepackage{graphicx,color}
+
+
+\renewcommand{\familydefault}{\sfdefault}
+
+
+\newcommand{\Label}[2]{{\Huge \bf #1}\\[3ex]{\huge #2}}
+\newcommand{\Labelat}[4]{\node[inner xsep=0pt,text centered,anchor=center,text height=5mm, text width=\stickerwidth]
+         at ($(current page.north west) + (\myleftmargin - 0.5\stickerwidth + \stickerwidth*#1, -(\mytopmargin - 0.5\stickerheight + \stickerheight*#2)$)
+         {\Label{#3}{#4}};}
+
+
+\begin{document}
+
+%\draw[thick] (current page.south west) rectangle (current page.north east);
+{% endraw %}
+
+{% for page in pages %}
+  \begin{tikzpicture}[remember picture,overlay, x=1mm, y=1mm]
+  {% for x, y, lastname, firstname in page -%}
+     \Labelat{{ "{" }}{{ x }}{{ "}{" }}{{ y }}{{ "}{" }}{{ lastname }}{{ "}{" }}{{ firstname }}{{ "}" }}
+  {%- endfor %}
+  \end{tikzpicture}
+  \clearpage
+{% endfor %}
+
+{% raw %}
+\end{document}
+{% endraw %}

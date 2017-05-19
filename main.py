@@ -17,6 +17,7 @@ from extras import *
 from extras_roomplanner import *
 from admin import *
 from helpers import logger
+from printed import *
 
 @app.route("/")
 def index():

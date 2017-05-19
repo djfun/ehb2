@@ -1,0 +1,89 @@
+{% raw %}
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[left=5mm,right=5mm,top=1cm,bottom=1cm,a4paper]{geometry}
+\pagestyle{empty}
+
+\usepackage{graphicx,color}
+
+\setlength{\parindent}{0pt}
+\setlength{\unitlength}{1mm}
+
+\definecolor{Tenor}{RGB}{96, 157, 210}
+\definecolor{Lead}{RGB}{92,184,92}
+\definecolor{Bari}{RGB}{240,173,78}
+\definecolor{Bass}{RGB}{235, 106, 102}
+
+
+
+\newcommand{\dclabel}[2]{{\hfill\textsf{\textcolor{#2}{#1}}\hfill}}
+\newcommand{\dcbox}[2]{\framebox(48.3,16.9){\dclabel{#1}{#2}}\hspace{2mm}}
+
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\begin{document}
+
+{% endraw %}
+
+\begin{center}
+  {\LARGE \bf {{ shortname }} -- Quartet Tramp Dance Card}\\[3ex]
+  {\Large Your Name: \underline{\hspace{8cm}}}\\[3ex]
+  {\large Sing with as many others as you can and collect their stickers on this
+card.}\\[1.5ex]
+{\large Win the coveted quartet tramp award!}\\[1cm]
+\end{center}
+
+{\large \bf \textcolor{Tenor}{Tenor:}}\\[1ex]
+
+{% for entry in tenors -%}
+  {% if entry is sameas "" %} \\[2mm]
+  {% else -%}
+  \dcbox{{ "{" }}{{ entry }}{{ "}{Tenor}" }}
+  {%- endif %}
+{%- endfor %}
+
+
+
+\strut\\[4ex]
+{\large \bf \textcolor{Lead}{Lead:}}\\[1ex]
+
+{% for entry in leads -%}
+  {% if entry is sameas "" %} \\[2mm]
+  {% else -%}
+  \dcbox{{ "{" }}{{ entry }}{{ "}{Lead}" }}
+  {%- endif %}
+{%- endfor %}
+
+
+\clearpage
+
+\strut\\[1cm]
+{\large \bf \textcolor{Bari}{Baritone:}}\\[1ex]
+
+{% for entry in baris -%}
+  {% if entry is sameas "" %} \\[2mm]
+  {% else -%}
+  \dcbox{{ "{" }}{{ entry }}{{ "}{Bari}" }}
+  {%- endif %}
+{%- endfor %}
+
+
+\strut\\[1.5cm]
+{\large \bf \textcolor{Bass}{Bass:}}\\[1ex]
+
+{% for entry in basses -%}
+  {% if entry is sameas "" %} \\[2mm]
+  {% else -%}
+  \dcbox{{ "{" }}{{ entry }}{{ "}{Bass}" }}
+  {%- endif %}
+{%- endfor %}
+
+
+{% raw %}
+
+\end{document}
+{% endraw %}
+
