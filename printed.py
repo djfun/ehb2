@@ -5,7 +5,7 @@ from urllib.parse import quote
 
 import re
 import requests
-from astropy import logger
+from helpers import logger
 from flask import send_file
 from flask_login import login_required
 from __init__ import *

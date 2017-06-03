@@ -30,14 +30,14 @@
 
 \begin{center}
   {\LARGE \bf {{ shortname }} -- Quartet Tramp Dance Card}\\[3ex]
-  {\Large Your Name: \underline{\hspace{8cm}}}\\[3ex]
-  {\large Sing with as many others as you can and collect their stickers on this
-card.}\\[1.5ex]
-{\large Win the coveted quartet tramp award!}\\[1cm]
+  {\Large Your Name: \underline{\hspace{8cm}}}\\[1cm]
+  %\\[3ex]
+%  {\large Sing with as many others as you can and collect their stickers on this
+%card.}\\[1.5ex]
+%{\large Win the coveted quartet tramp award!}\\[1cm]
 \end{center}
 
 {\large \bf \textcolor{Tenor}{Tenor:}}\\[1ex]
-
 {% for entry in tenors -%}
   {% if entry is sameas "" %} \\[2mm]
   {% else -%}
@@ -49,7 +49,6 @@ card.}\\[1.5ex]
 
 \strut\\[4ex]
 {\large \bf \textcolor{Lead}{Lead:}}\\[1ex]
-
 {% for entry in leads -%}
   {% if entry is sameas "" %} \\[2mm]
   {% else -%}
