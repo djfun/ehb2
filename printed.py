@@ -12,7 +12,7 @@ from __init__ import *
 
 from helpers import *
 from flask import request, flash
-from config import conf, end_date, start_date, number_of_days
+from config import conf, end_date, start_date, number_of_days, read_songs
 
 import tempfile
 import shutil
@@ -216,20 +216,6 @@ start = r"""
 end = r"""
 \end{tikzpicture}
 """
-
-
-def read_songs():
-    items = dict(conf.items('songs'))
-    sorted_keys = sorted(items.keys(), key=int)
-
-    ret = []
-    for k in sorted_keys:
-        parts = re.split("\s*\|\s*", items[k])
-        key = parts[1].replace("->", "$\\rightarrow$").replace("#", "\\#")
-        start = parts[2].replace("...", "\\ldots")
-        ret.append((k, parts[0], key, start))
-
-    return ret
 
 
 @app.route("/badges.pdf")

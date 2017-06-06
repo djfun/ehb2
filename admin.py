@@ -7,6 +7,8 @@ from collections import Set, deque
 import datetime
 
 import pickle
+from numpy import random
+
 import xlsxwriter
 from flask import flash
 from flask import request
@@ -22,6 +24,7 @@ from wtforms.fields.simple import TextAreaField, HiddenField
 
 import ehbmail
 from __init__ import *
+from config import read_songs
 from extras import extras_cost
 from tables import *
 from helpers import *
@@ -261,3 +264,104 @@ def participants_spreadsheet():
 
 class XlsUploadForm(Form):
     file = FileField("XLSX file") #, validators=[FileRequired()])
+
+
+
+
+########### RANDOM QUARTETS #############
+
+@app.route("/randomquartets.xlsx")
+@login_required
+def generate_random_quartets():
+    tenors, leads, baris, basses = [session.query(Participant).filter(Participant.final_part == p).all() for p in (1,2,3,4)]
+
+    num_quartets = max(len(tenors), len(leads), len(baris), len(basses))
+    tenors, leads, baris, basses = [pad(people, num_quartets) for people in (tenors, leads, baris, basses)]
+
+    songs = [title for (k, title, key, start) in read_songs()]
+    songs = pad_songs(songs, num_quartets)
+
+    # generate spreadsheet
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    bold = workbook.add_format({'bold': True})
+    italic = workbook.add_format({'italic': True})
+    worksheet = workbook.add_worksheet()
+
+    worksheet.set_column(1, 4, 20)
+    worksheet.set_column(5, 6, 30)
+
+    worksheet.write(0, 0, "Nr", bold)
+    worksheet.write(0, 1, "Tenor", bold)
+    worksheet.write(0, 2, "Lead", bold)
+    worksheet.write(0, 3, "Bari", bold)
+    worksheet.write(0, 4, "Bass", bold)
+    worksheet.write(0, 5, "Song", bold)
+    worksheet.write(0, 6, "Quartet name", bold)
+    worksheet.write(0, 7, "Judge 1", bold)
+    worksheet.write(0, 8, "Judge 2", bold)
+    worksheet.write(0, 9, "Judge 3", bold)
+    worksheet.write(0, 10, "Judge 4", bold)
+    worksheet.write(0, 11, "Average", bold)
+
+    for row in range(1, num_quartets+1):
+        worksheet.write(row, 0, row)
+        worksheet.write(row, 1, tenors[row-1].fullname())
+        worksheet.write(row, 2, leads[row - 1].fullname())
+        worksheet.write(row, 3, baris[row - 1].fullname())
+        worksheet.write(row, 4, basses[row - 1].fullname())
+        worksheet.write(row, 5, songs[row - 1])
+        # formula = '=IFERROR(AVERAGEIF(H%d:K%d;">0"); "---")' % (row+1, row+1)
+        # formula = "=2+3"
+        formula = '=IFERROR(AVERAGE(H%d:K%d), 0)' % (row+1, row+1)
+        worksheet.write_formula(row, 11, formula)
+
+    workbook.close()
+    output.seek(0)
+    return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+
+def shuffle_until_first_is_not(L, forbidden_first_element):
+    random.shuffle(L)
+
+    while L[0] == forbidden_first_element:
+        random.shuffle(L)
+
+
+def pad_songs(songs, num_quartets):
+    ret = list()
+
+    # extend with as many copies of the complete song list as will fit
+    while len(ret) <= num_quartets - len(songs):
+        if ret:
+            shuffle_until_first_is_not(songs, ret[-1])
+        else:
+            random.shuffle(songs)
+
+        ret.extend(songs)
+
+    # extend up to len(songs)-1 many with individual songs from the list
+    extras = list(songs)
+    if ret:
+        shuffle_until_first_is_not(extras, ret[-1])
+    else:
+        random.shuffle(extras)
+
+    while len(ret) < num_quartets:
+        ret.append(extras.pop())
+
+    return ret
+
+
+def pad(people, size):
+    ret = list(people)
+    random.shuffle(ret)
+
+    extras = list(people)
+    shuffle_until_first_is_not(extras, ret[-1])
+
+    while len(ret) < size:
+        ret.append(extras.pop())
+
+    return ret
