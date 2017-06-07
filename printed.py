@@ -96,7 +96,12 @@ def generate_envelope_stickers():
     labels_per_row = 3
     rows_per_page = 8
 
-    for p in session.query(Participant).order_by(Participant.lastname):
+    participants = [(prt.firstname, prt.lastname) for prt in session.query(Participant)]
+    guests = [(gq.firstname, gq.lastname) for gq in session.query(GuestQuartet)]
+    everyone = participants + guests
+    everyone.sort(key=lambda x:x[1])
+
+    for p in everyone:
         if x > labels_per_row:
             x = 1
             y += 1
@@ -106,7 +111,7 @@ def generate_envelope_stickers():
                 current_page = []
                 pages.append(current_page)
 
-        current_page.append((x, y, p.lastname, p.firstname))
+        current_page.append((x, y, p[1], p[0]))
         x += 1
 
     tex = render_template("printed/env-stickers.tex", pages=pages)
@@ -177,6 +182,17 @@ def makebadge(i, p:Participant, dir):
     return "  \\badge{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}" % \
            (pos, p.firstname, p.lastname, p.city, p.country, parts[p.final_part], p.country, qr)
 
+def make_guest_badge(i, p:GuestQuartet, dir):
+    filename = os.path.join(dir, "%d.png" % p.id)
+    qr = download_qr(p.iq_username, filename)
+    if qr == None:
+        qr = ""
+
+    pos = "topbadge_bottom_left" if i%2 == 0 else "current page.south west"
+
+    return "  \\badge{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}" % \
+           (pos, p.firstname, p.lastname, p.city, p.country, parts[p.part], p.country, qr)
+
 
 class MutableBoolean:
     val = False
@@ -218,9 +234,7 @@ end = r"""
 """
 
 
-@app.route("/badges.pdf")
-@login_required
-def generate_badges():
+def generate_badges(pdf_filename, template_filename, table):
     dirpath = tempfile.mkdtemp()
     logger().info("Temp directory for badges is %s" % (dirpath))
 
@@ -239,11 +253,11 @@ def generate_badges():
 
     i = 0
     prev_part = -1
-    just_ended = MutableBoolean() # type: MutableBoolean
+    just_ended = MutableBoolean()  # type: MutableBoolean
     just_ended.val = False
     f = None
 
-    for p in session.query(Participant).order_by(Participant.final_part):
+    for p in session.query(table).order_by(table.final_part):
         # download flag if necessary
         flag_filename = os.path.join(flagdir, "%s.png" % p.country)
         if not os.path.exists(flag_filename):
@@ -276,9 +290,19 @@ def generate_badges():
     f.flush()
     close(f, i, just_ended)
 
-    template = texenv.get_template('printed/badges.tex')
+    template = texenv.get_template(template_filename)
     tex = template.render(event_name=conf.get("application", "name"), songs=songs)
+    return compile_and_send_pdf(pdf_filename, tex, runs=2, dirpath=dirpath)
 
-    # tex = render_template("printed/badges.tex", event_name=conf.get("application", "name"), songs=songs)
-    return compile_and_send_pdf("badges.pdf", tex, runs=2, dirpath=dirpath)
+
+@app.route("/badges.pdf")
+@login_required
+def generate_participant_badges():
+    return generate_badges("badges.pdf", "printed/badges.tex", Participant)
+
+
+@app.route("/guest-badges.pdf")
+@login_required
+def generate_guest_badges():
+    return generate_badges("guest-badges.pdf", "printed/guest-badges.tex", GuestQuartet)
 

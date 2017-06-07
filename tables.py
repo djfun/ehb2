@@ -33,6 +33,22 @@ class Geocoding(Base):
         return "%s (%f, %f)" % (self.city, self.lat, self.long)
 
 
+
+class GuestQuartet(Base):
+    __tablename__ = 'guest_quartet'
+
+    id = Column(Integer, primary_key=True)
+    firstname = Column(String(100))
+    lastname = Column(String(100))
+    city = Column(String(100))
+    country = Column("country", String(2), ForeignKey('countries.code'))
+    final_part = Column(SmallInteger, ForeignKey('parts.id'))
+    iq_username = Column(String(100))
+
+
+    def fullname(self):
+        return "%s %s" % (self.firstname, self.lastname)
+
 class Participant(Base):
     __tablename__ = 'participant'
 

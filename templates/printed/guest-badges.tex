@@ -1,0 +1,87 @@
+{% raw %}
+\documentclass[a4paper,11pt]{article}
+
+% flags from http://flagpedia.net/
+
+\pagestyle{empty}
+
+\usepackage[top=0cm, left=0cm, right=0cm, paperheight=216mm, paperwidth=303mm, bottom=0cm]{geometry}
+% landscape, a4paper
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage{times}
+\usepackage{graphicx,color}
+
+\usepackage{ifthen}
+
+\usepackage[utf8]{inputenc}
+
+\newcommand{\HH}[1]{{\fontsize{42}{36} \selectfont #1}}
+\newcommand{\LL}[1]{{\fontsize{30}{36} \selectfont #1}}
+
+\definecolor{Tenor}{RGB}{96, 157, 210} % 66,139,202
+\definecolor{Lead}{RGB}{92,184,92}
+\definecolor{Bari}{RGB}{240,173,78}
+\definecolor{Bass}{RGB}{235, 106, 102}
+% heller 224, 101, 97 % 217,83,79
+
+
+\newcommand{\s}[4]{#1.\ & #2 (#3) -- \textit{\textcolor{red}{#4 \ldots}}}
+
+\newcommand{\songs}{\begin{minipage}[t]{0.5\paperwidth}
+    \begin{tabular*}{\textwidth}{rl} %@{\extracolsep{\fill}}l
+{% endraw %}
+
+{% for nr, title, key, start in songs %}
+\s{((( nr )))}{((( title )))}{((( key )))}{((( start )))}\\[1.2ex]
+{% endfor %}
+
+{% raw %}
+    \end{tabular*}  \end{minipage}}
+
+\newcommand{\name}[4]{\begin{minipage}[t]{0.5\paperwidth}
+\centering
+{\HH{\textbf{#1}}}\\[5ex]
+{\LL{ \textbf{#2}}}\\[7ex]
+{\LARGE #3, #4}
+\end{minipage}}
+
+
+\newcommand{\badge}[8]{
+% songs:
+  \node at ($(#1) + (qp) + (0.5,0.2)$)  {\songs};
+%%% name:
+  \node at ($(#1) + (hpx) + (qp) - (0,0.5)$) {\name{#2}{#3}{#4}{#5}};
+%% EHB:
+{% endraw %}
+  \node at ($(#1) + (hpx) + (hpy) + (0.25\paperwidth,-0.9)$) {{\Large ((( event_name )))}};
+{% raw %}
+  \node at ($(#1) + (hpx) + (hpy) + (0.25\paperwidth,-1.6)$) {{\Large -- Guest --}};
+% logo:
+  \node at ($(#1) + (hpx) + (hpy) + (1.8,-1.2)$) {\includegraphics[width=2cm]{Logo}};
+% flag:
+  \node at ($(#1) + (1\paperwidth, 0.5\paperheight) + (-0.7,-1.2)$) [anchor=east]
+      {\includegraphics[width=1.5cm]{flags/#7}};
+%% part:
+  \node at ($(#1) + (hpx) + (1.8,1)$) [anchor=south] {{\Huge \textbf{#6}}};
+% qr code:
+  \ifthenelse{\equal{#8}{}}{}{
+    \node at ($(#1) + (1\paperwidth,0) + (-0.7,1)$)
+      [anchor=south east]
+      {\includegraphics[width=2cm, trim=20 20 20 20, clip]{#8}};
+  }
+}
+
+
+\begin{document}
+
+
+\input Tenor
+\input Lead
+\input Bari
+\input Bass
+
+\end{document}
+{% endraw %}
