@@ -3,7 +3,7 @@ version: '2'
 services:
   mysql:
     image: lowmem-mysql
-    container_name: mysql1
+    container_name: mysql
     mem_limit: 256m
     environment:
       MYSQL_ROOT_PASSWORD: "foobar"
@@ -17,8 +17,10 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: pma
+    depends_on:
+      - mysql
     environment:
-       PMA_HOST: "mysql1"
+       PMA_HOST: "mysql"
        MYSQL_ROOT_PASSWORD: "foobar"
     ports:
       - 8080:80
@@ -28,6 +30,8 @@ services:
   ehb2:
     image: ehb2
     container_name: ehb2
+    depends_on:
+      - mysql
     ports:
       - 5000:5000
     networks:

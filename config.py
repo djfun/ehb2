@@ -1,5 +1,9 @@
 import codecs
 
+import sys
+
+import os
+
 __author__ = 'koller'
 
 import configparser
@@ -8,7 +12,60 @@ import re
 
 conf = configparser.RawConfigParser()
 conf.optionxform = lambda option: option
-conf.read_file(codecs.open("ehb.conf", "r", "utf8"))
+conf.read_file(codecs.open("ehb-public.conf", "r", "utf8"))
+
+
+# add private values
+if os.path.isfile("ehb-private.conf"):
+    conf_private = configparser.RawConfigParser()
+    conf_private.optionxform = lambda option: option
+    conf_private.read_file(codecs.open("ehb-private.conf", "r", "utf8"))
+
+    for section in conf_private.sections():
+        if not section in conf.sections():
+            conf.add_section(section)
+
+        for key, value in conf_private.items(section):
+            conf.set(section, key, value)
+
+# add values from environment variables
+env_to_conf_entries = [
+    ("SERVER_SECRET", "server", "secret"),
+    ("SERVER_PORT", "server", "port"),
+    ("SERVER_BASEURL", "server", "base_url"),
+    ("SERVER_TORNADO", "server", "use_tornado"),
+    ("SERVER_LOGFILE", "server", "logfile"),
+    #
+    ("DB_URL", "database", "url"),
+    #
+    ("EMAIL_SERVER", "email", "server"),
+    ("EMAIL_SENDER", "email", "sender"),
+    ("EMAIL_NAME", "email", "name"),
+    ("EMAIL_PASSWORD", "email", "password"),
+    ("EMAIL_DELAY", "email", "delay_between_messages"),
+    #
+    ("PAYPAL_MODE", "paypal", "mode"),
+    ("PAYPAL_CLIENT_ID", "paypal", "client_id"),
+    ("PAYPAL_CLIENT_SECRET", "paypal", "client_secret")
+]
+
+for var, section, key in env_to_conf_entries:
+    if var in os.environ:
+        if not section in conf.sections():
+            conf.add_section(section)
+        conf.set(section, key, os.environ[var])
+
+userid = 1
+while ("EHB_USER_%d" % userid) in os.environ:
+    if not "users" in conf.sections():
+        conf.add_section("users")
+
+    x = os.environ["EHB_USER_%d" % userid]
+    username, longname, password = re.split(r"\s*,\s*", x)
+    conf.set("users", username, "%s, %s" % (longname, password))
+    userid += 1
+
+
 
 # start and end date of this event
 start_date = datetime.strptime(conf["application"]["start_date"], "%Y-%m-%d").date()

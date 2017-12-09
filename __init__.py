@@ -63,4 +63,7 @@ import logging
 
 
 # find Git revision
-git_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
+try:
+    git_revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
+except:
+    git_revision = "(no git revision)".encode("UTF-8")
