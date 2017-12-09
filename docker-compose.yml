@@ -1,0 +1,39 @@
+version: '2'
+ 
+services:
+  mysql:
+    image: lowmem-mysql
+    container_name: mysql1
+    mem_limit: 256m
+    environment:
+      MYSQL_ROOT_PASSWORD: "foobar"
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    restart: always
+    networks:
+      - ehb2_net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    environment:
+       PMA_HOST: "mysql1"
+       MYSQL_ROOT_PASSWORD: "foobar"
+    ports:
+      - 8080:80
+    networks:
+      - ehb2_net
+
+  ehb2:
+    image: ehb2
+    container_name: ehb2
+    ports:
+      - 5000:5000
+    networks:
+      - ehb2_net
+
+networks:
+  ehb2_net:
+    driver: bridge
+      
