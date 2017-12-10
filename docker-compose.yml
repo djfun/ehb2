@@ -2,7 +2,7 @@ version: '2'
  
 services:
   mysql:
-    image: lowmem-mysql
+    image: akoller/low-memory-mysql
     container_name: mysql
     mem_limit: 256m
     environment:

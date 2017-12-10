@@ -25,6 +25,46 @@ pip install XlsxWriter
 pip install openpyxl
 ```
 
+## Configuration files
+
+As of December 2017, the configuration for the EHB server is split
+over two files.
+
+* ehb-public.conf contains all the information which can safely be
+  shared with the public, such as the event name, room prices, song
+  list, and so on. This file is part of this public repository, and
+  will be a (read-only) part of the Docker image.
+* Sensitive information, such as the details of the database
+  connection, email passwords, and so on, should _not_ be kept in
+  ehb-public.conf. You can either write this information into a file
+  ehb-private.conf, which you do _not_ put under version control. If
+  this file exists, the EHB server will read the information from
+  there. Alternatively, you can set these options through environment
+  variables, which are documented below. This is the most convenient
+  choice for injecting them into a Docker container.
+
+### Private options
+
+Here is a list of private options, together with their corresponding
+environment variables.
+
+| Environment variable | Section  | Key                    |
+-----------------------|----------|-------------------------
+| SERVER_SECRET        | server   | secret                 |
+| SERVER_PORT          | server   | port                   |
+| SERVER_BASEURL       | server   | base_url               |
+| SERVER_TORNADO       | server   | use_tornado            |
+| SERVER_LOGFILE       | server   | logfile                |
+| DB_URL               | database | url                    |
+| EMAIL_SERVER         | email    | server                 |
+| EMAIL_SENDER         | email    | sender                 |
+| EMAIL_NAME           | email    | name                   |
+| EMAIL_PASSWORD       | email    | password               |
+| EMAIL_DELAY          | email    | delay_between_messages |
+| PAYPAL_MODE          | paypal   | mode                   |
+| PAYPAL_CLIENT_ID     | paypal   | client_id              |
+| PAYPAL_CLIENT_SECRET | paypal   | client_secret          |
+
 
 ## Credits
 
