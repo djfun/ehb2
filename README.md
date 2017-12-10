@@ -127,7 +127,6 @@ Reitanna,
 [Powerup/Success](http://www.freesound.org/people/GabrielAraujo/sounds/242501/)
 by GabrielAraujo, and
 [Postit Remove](https://www.freesound.org/people/Ignitor/sounds/182575/)
-by Ignitor, all from [Freesound](http://www.freesound.org), both
-distributed, under a Creative Commons licence.
+by Ignitor, all from [Freesound](http://www.freesound.org) under a Creative Commons licence.
 
 
