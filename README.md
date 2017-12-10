@@ -72,7 +72,7 @@ Furthermore, use environment variables of the following form to define
 the users who can login to the system:
 
 ```
-EHB_USER_1: "organizers, EHB Organizers, b4rb3rsh0p"
+EHB_USER_1: "organizers, EHB Organizers, orgapassword"
 ```
 
 ## Running as a Docker container
