@@ -84,7 +84,7 @@ unnecessary to install Python or any of the requisite libraries
 spelled out above; all these pieces are automatically part of the
 Docker image.
 
-During development, you can also use `docker build -t ehb2 .` in the main ehb2 directory to rebuild and test the Docker image before pushing to Github.
+During development, you can also use `docker build -t ehb2 .` in the main ehb2 directory to rebuild and test the Docker image before pushing to Github. When you do push to Github, the Docker image on Docker Hub will be automatically rebuilt.
 
 The EHB container needs to connect to a container providing a MySQL
 database over a (possibly Docker-internal) network. The simplest way
