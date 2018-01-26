@@ -111,13 +111,14 @@ services:
 	  ... and so on for the other variables ...
 ```
 
-You can then start the EHB server from within Docker with the
+You can start the EHB server from within Docker with the
 following command:
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose-private.yml up
 ```
 
+You can then access the EHB server on port 5000 on your local machine.
 
 
 
