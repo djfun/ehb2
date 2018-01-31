@@ -36,6 +36,8 @@ env_to_conf_entries = [
     ("SERVER_TORNADO", "server", "use_tornado"),
     ("SERVER_LOGFILE", "server", "logfile"),
     #
+    ("ACCEPT_APPLICATIONS", "application", "accept_applications"),
+    #
     ("DB_URL", "database", "url"),
     #
     ("EMAIL_SERVER", "email", "server"),
