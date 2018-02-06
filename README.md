@@ -28,6 +28,7 @@ If you want to generate printable materials, such as name badges, you
 will also need a reasonably recent and complete installation of
 [LaTeX](https://www.tug.org/texlive/).
 
+*These requirements will be automatically installed if you are using a Docker container (see below).*
 
 ## Configuration files
 
@@ -85,7 +86,7 @@ unnecessary to install Python or any of the requisite libraries
 spelled out above; all these pieces are automatically part of the
 Docker image.
 
-During development, you can also use `docker build -t ehb2 .` in the main ehb2 directory to rebuild and test the Docker image before pushing to Github. When you do push to Github, the Docker image on Docker Hub will be automatically rebuilt.
+During development, you can use `docker build -t akoller/ehb2 .` in the main ehb2 directory to rebuild and test the Docker image before pushing to Github. When you do push to Github, the Docker image on Docker Hub will be automatically rebuilt.
 
 The EHB container needs to connect to a container providing a MySQL
 database over a (possibly Docker-internal) network. The simplest way
@@ -103,7 +104,7 @@ part of this repository; it should look as follows:
 
 ```
 version: '2'
- 
+
 services:
   ehb2:
     environment:
@@ -132,5 +133,3 @@ Reitanna,
 by GabrielAraujo, and
 [Postit Remove](https://www.freesound.org/people/Ignitor/sounds/182575/)
 by Ignitor, all from [Freesound](http://www.freesound.org) under a Creative Commons licence.
-
-
