@@ -1,11 +1,12 @@
 # coding: utf-8
-from sqlalchemy import Column, DateTime, Float, Integer, SmallInteger, String, Table, text, ForeignKey, Unicode, Date
+from sqlalchemy import Column, DateTime, Float, Integer, SmallInteger, String, Table, text, ForeignKey, Unicode, Date, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql.sqltypes import Text, UnicodeText
 
 Base = declarative_base()
 metadata = Base.metadata
+
 
 class Country(Base):
     __tablename__ = 'countries'
@@ -33,7 +34,6 @@ class Geocoding(Base):
         return "%s (%f, %f)" % (self.city, self.lat, self.long)
 
 
-
 class GuestQuartet(Base):
     __tablename__ = 'guest_quartet'
 
@@ -45,9 +45,9 @@ class GuestQuartet(Base):
     final_part = Column(SmallInteger, ForeignKey('parts.id'))
     iq_username = Column(String(100))
 
-
     def fullname(self):
         return "%s %s" % (self.firstname, self.lastname)
+
 
 class Participant(Base):
     __tablename__ = 'participant'
@@ -63,8 +63,10 @@ class Participant(Base):
     final_part = Column(SmallInteger, ForeignKey('parts.id'))
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)
+    member = Column(Boolean)
     paypal_token = Column(String(30), index=True)
-    last_paypal_status = Column("last_paypal_status", SmallInteger, ForeignKey("paypal_statuses.id"))
+    last_paypal_status = Column("last_paypal_status", SmallInteger,
+                                ForeignKey("paypal_statuses.id"))
     email = Column(String(100), unique=True)
     exp_quartet = Column(String)
     exp_brigade = Column(String)
@@ -86,7 +88,8 @@ class Participant(Base):
         return "%s, %s" % (self.city, self.country)
 
     def makeMapLabel(self):
-        line1 = "%s %s (%s / %s)" % (self.firstname, self.lastname, self.shortsex(), self.shortpart())
+        line1 = "%s %s (%s / %s)" % (self.firstname, self.lastname,
+                                     self.shortsex(), self.shortpart())
         line2 = "<a href=\'mailto:%s\'>%s</a>" % (self.email, self.email)
         return '"%s<br/>%s"' % (line1, line2)
 
@@ -109,7 +112,6 @@ class Participant(Base):
         return "%s %s (%d)" % (self.firstname, self.lastname, self.id)
 
 
-
 class DeletedParticipant(Base):
     __tablename__ = 'deleted_participants'
 
@@ -124,8 +126,10 @@ class DeletedParticipant(Base):
     final_part = Column(SmallInteger, ForeignKey('parts.id'))
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)
+    member = Column(Boolean)
     paypal_token = Column(String(30), index=True)
-    last_paypal_status = Column("last_paypal_status", SmallInteger, ForeignKey("paypal_statuses.id"))
+    last_paypal_status = Column("last_paypal_status", SmallInteger,
+                                ForeignKey("paypal_statuses.id"))
     email = Column(String(100), unique=True)
     exp_quartet = Column(String)
     exp_brigade = Column(String)
@@ -168,7 +172,9 @@ class PaypalHistory(Base):
     paypal_status = relationship("PaypalStatus", backref=backref("history_items"))
 
 
-paypal_shortnames = ["", "uninit", "token", "callback", "approved", "paid", "cancelled", "error", "oops"]
+paypal_shortnames = ["", "uninit", "token", "callback",
+                     "approved", "paid", "cancelled", "error", "oops"]
+
 
 class PaypalStatus(Base):
     __tablename__ = 'paypal_statuses'
@@ -200,6 +206,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(100))
     password = Column(String(100))
+
 
 class Extra(Base):
     __tablename__ = 'extras'
@@ -237,6 +244,7 @@ class Extra(Base):
 
     participant = relationship("Participant", backref=backref("extras"))
     ts_spec = relationship("TShirtSpec", backref=backref("extras"))
+
 
 class TShirtSpec(Base):
     __tablename__ = 't_shirt_specs'
@@ -283,6 +291,7 @@ class OverwrittenExtra(Base):
 
     participant = relationship("Participant", backref=backref("overwritten_extras"))
 
+
 class RoomAssignment(Base):
     __tablename__ = 'room_assignments'
 
@@ -308,6 +317,7 @@ class Email(Base):
     sent_from = Column(String(500))
 
     participant = relationship("Participant", backref=backref("emails"))
+
 
 class OopsCode(Base):
     __tablename__ = "oops_code"

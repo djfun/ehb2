@@ -13,7 +13,7 @@ from tables import *
 from itertools import groupby
 from helpers import *
 from flask import request, flash
-from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField
+from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField, BooleanField
 from config import conf, currency_symbol
 
 pp1 = Paypal(1,
@@ -27,9 +27,9 @@ event_name = conf.get("application", "name")
 event_shortname = conf.get("application", "shortname")
 
 conf_data = {"name": event_name,
-              "shortname": event_shortname,
-              "s_application_fee": str(application_fee)
-              }
+             "shortname": event_shortname,
+             "s_application_fee": str(application_fee)
+             }
 
 
 #@app.route("/apply.html", methods=["GET",])
@@ -37,11 +37,13 @@ def apply(message=None):
     form = ApplicationForm(request.form)
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
+
 def make_code(id):
-    s = "%s #%d" % (event_shortname, id) # generate different hashes for each new EHB instance
+    s = "%s #%d" % (event_shortname, id)  # generate different hashes for each new EHB instance
     return hashlib.sha224(s.encode()).hexdigest()[:16]
 
-@app.route("/apply.html", methods=["POST",])
+
+@app.route("/apply.html", methods=["POST", ])
 def do_apply():
     form = ApplicationForm(request.form)
 
@@ -50,11 +52,11 @@ def do_apply():
                               sex=form.gender.data, street=form.street.data,
                               city=form.city.data, zip=form.zip.data,
                               country=form.country.data, part1=int(form.part1.data), part2=int(form.part2.data),
-                              email=form.email.data, exp_quartet=form.exp_quartet.data,
+                              email=form.email.data, member=form.member.data, exp_quartet=form.exp_quartet.data,
                               exp_brigade=form.exp_brigade.data, exp_chorus=form.exp_chorus.data,
                               exp_musical=form.exp_musical.data, exp_reference=form.exp_reference.data,
                               application_time=datetime.datetime.now(), comments=form.comments.data,
-                              registration_status=1, # TODO - what is this for?
+                              registration_status=1,  # TODO - what is this for?
                               donation=form.donation.data, iq_username=form.iq_username.data
                               )
 
@@ -67,7 +69,6 @@ def do_apply():
 
             pp1.log(new_prt.id, PP_UNINITIALIZED, "")
             return pp1.pay(new_prt.id, "%s Application Fee: %s %s" % (event_shortname, new_prt.firstname, new_prt.lastname), application_fee + new_prt.donation)
-
 
         except IntegrityError as e:
             # TODO - if participant exists AND HAS PAID, reject application for same email
@@ -83,14 +84,14 @@ def do_apply():
         return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 
-
 def applyWithPaypalError(id, message):
     prt = session.query(Participant).filter(Participant.id == id).first()
     form = application_form(prt)
     flash(message)
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
-@app.route("/payment-cancelled.html", methods=["GET",])
+
+@app.route("/payment-cancelled.html", methods=["GET", ])
 def paymentCancelled():
     print(request.args)
     print(request.form)
@@ -104,7 +105,7 @@ def paymentCancelled():
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 
-@app.route("/payment-success.html", methods=["GET",])
+@app.route("/payment-success.html", methods=["GET", ])
 def paymentSuccess():
     # Paypal redirects the user to this URL once the user has approved the payment.
     # Now we still need to execute the payment.
@@ -116,7 +117,8 @@ def paymentSuccess():
         amount = application_fee + prt.donation
 
         # send confirmation email
-        body = render_template("application_confirmation.txt", amount=int(amount), prt=prt, eventname=event_name, shortname=event_shortname, application_fee=int(application_fee), currency_symbol=currency_symbol)
+        body = render_template("application_confirmation.txt", amount=int(amount), prt=prt, eventname=event_name,
+                               shortname=event_shortname, application_fee=int(application_fee), currency_symbol=currency_symbol)
         print(body)
         ehbmail.send([prt.id], "Application confirmed", [body], "Application page")
 
@@ -137,33 +139,52 @@ def paymentSuccess():
         return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
 
 
+_taf = {"rows": "5", "cols": "80"}
 
-_taf = {"rows":"5", "cols":"80"}
 
 class ApplicationForm(Form):
-    email = StringField("Email", validators=[validators.InputRequired(), validators.Email()], render_kw={"placeholder": "Enter your email address"})
-    firstname = StringField("First Name", validators=[validators.InputRequired()], render_kw={"placeholder": "Enter your first name"})
-    lastname = StringField("Last Name", validators=[validators.InputRequired()], render_kw={"placeholder": "Enter your last name"})
+    email = StringField("Email", validators=[validators.InputRequired(), validators.Email()], render_kw={
+                        "placeholder": "Enter your email address"})
+    firstname = StringField("First Name", validators=[validators.InputRequired()], render_kw={
+                            "placeholder": "Enter your first name"})
+    lastname = StringField("Last Name", validators=[validators.InputRequired()], render_kw={
+                           "placeholder": "Enter your last name"})
     gender = SelectField("Gender", choices=[("M", "male"), ("F", "female")])
 
-    street = StringField("Street", validators=[validators.InputRequired()], render_kw={"placeholder": "Enter your street address"})
-    city = StringField("City", validators=[validators.InputRequired()], render_kw={"placeholder": "Enter the city you live in"})
-    zip = StringField("Zip / Post code", validators=[validators.InputRequired()], render_kw={"placeholder": "Enter the zip/post code of your city"})
+    street = StringField("Street", validators=[validators.InputRequired()], render_kw={
+                         "placeholder": "Enter your street address"})
+    city = StringField("City", validators=[validators.InputRequired()], render_kw={
+                       "placeholder": "Enter the city you live in"})
+    zip = StringField("Zip / Post code", validators=[validators.InputRequired()], render_kw={
+                      "placeholder": "Enter the zip/post code of your city"})
     country = SelectField("Country", choices=country_list)
 
-    donation = IntegerField("Donation (optional)", validators=[validators.NumberRange(min=0)], default=0)
+    donation = IntegerField("Donation (optional)", validators=[
+                            validators.NumberRange(min=0)], default=0)
 
-    part1 = SelectField("Preferred voice part", choices=[("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")])
-    part2 = SelectField("Alternative voice part", choices=[("0", "None"), ("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")])
+    part1 = SelectField("Preferred voice part", choices=[
+                        ("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")])
+    part2 = SelectField("Alternative voice part", choices=[
+                        ("0", "None"), ("1", "Tenor"), ("2", "Lead"), ("3", "Baritone"), ("4", "Bass")])
 
-    exp_quartet = TextAreaField("Quartetting experience", default="List your Barbershop QUARTET experience(s) here. If applicable, include representative contest scores.", render_kw=_taf)
-    exp_brigade= TextAreaField("Brigade experience", default="List any other Harmony Brigade or Extreme Quartetting events in which you have participated.", render_kw=_taf)
-    exp_chorus = TextAreaField("Barbershop chorus experience", default="List your Barbershop CHORUS experience(s) here.", render_kw=_taf)
-    exp_musical = TextAreaField("Performance experience", default="Describe any performance experience, musical education, and/or accomplishments.", render_kw=_taf)
-    exp_reference = TextAreaField("Musical reference", default="Please provide the name and e-mail address of someone we can contact who is familiar with your singing ability (e.g., your chorus director or section leader, coach, judge, etc.). Feel free to list multiple names.", render_kw=_taf)
+    member = BooleanField("I am a member of EHB.")
 
-    iq_username = StringField("IQ account", render_kw={"placeholder": "Enter your IQ account name (optional)"})
-    comments = TextAreaField("Comments", default="Room for anything else you would like to say.", render_kw=_taf)
+    exp_quartet = TextAreaField(
+        "Quartetting experience", default="List your Barbershop QUARTET experience(s) here. If applicable, include representative contest scores.", render_kw=_taf)
+    exp_brigade = TextAreaField(
+        "Brigade experience", default="List any other Harmony Brigade or Extreme Quartetting events in which you have participated.", render_kw=_taf)
+    exp_chorus = TextAreaField("Barbershop chorus experience",
+                               default="List your Barbershop CHORUS experience(s) here.", render_kw=_taf)
+    exp_musical = TextAreaField(
+        "Performance experience", default="Describe any performance experience, musical education, and/or accomplishments.", render_kw=_taf)
+    exp_reference = TextAreaField(
+        "Musical reference", default="Please provide the name and e-mail address of someone we can contact who is familiar with your singing ability (e.g., your chorus director or section leader, coach, judge, etc.). Feel free to list multiple names.", render_kw=_taf)
+
+    iq_username = StringField("IQ account", render_kw={
+                              "placeholder": "Enter your IQ account name (optional)"})
+
+    comments = TextAreaField(
+        "Comments", default="Room for anything else you would like to say.", render_kw=_taf)
 
 
 def application_form(prt):
@@ -179,6 +200,7 @@ def application_form(prt):
     ret.donation.data = prt.donation
     ret.part1.data = prt.part1
     ret.part2.data = prt.part2
+    ret.member.data = prt.member
     ret.exp_quartet.data = prt.exp_quartet
     ret.exp_brigade.data = prt.exp_brigade
     ret.exp_chorus.data = prt.exp_chorus
@@ -189,8 +211,6 @@ def application_form(prt):
     return ret
 
 
-
-
 ################################################
 #
 # for fixing the billing disaster of EHB 2017
@@ -198,7 +218,7 @@ def application_form(prt):
 ################################################
 
 
-@app.route("/execute-payment.html", methods=["GET",])
+@app.route("/execute-payment.html", methods=["GET", ])
 def executePaymentOops():
     oops_code = request.args.get("code")
     prt = lookup_oops(oops_code)
@@ -215,7 +235,8 @@ def executePaymentOops():
     else:
         return render_template("no_oops.html", prt=prt)
 
-@app.route("/execute-payment.html", methods=["POST",])
+
+@app.route("/execute-payment.html", methods=["POST", ])
 def doExecutePaymentOops():
     amount = float(request.form["amount"])
     id = int(request.form["id"])

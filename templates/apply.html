@@ -76,6 +76,10 @@
 
         <hr/>
 
+        {{ m.header("section4", """<strong>Are you a member of EHB?</strong><br/> If so, you don't have to answer any questions in this section.""") }}
+
+        {{ m.wtf(form.member) }}
+
         {{ m.header("section4", """<strong>Tell us a bit about your musical experience.</strong><br/> A Harmony Brigade is an event for experienced
         quartet singers or musicians. We will assume a certain level of experience in the selection process
         to ensure that all participants will have a great time singing with each other.""") }}
