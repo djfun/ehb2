@@ -1,8 +1,8 @@
 Dear {{ prt.fullname() }},
 
-thank you for applying to {{ eventname }}!
+Thank you for applying to {{ eventname }}!
 
-We will review all applications, and will be in touch by early February.
+We will review all applications, and will be in touch by early April.
 
 We confirm that we have received your Paypal payment of {{ currency_symbol }} {{ amount }}.
 {% if prt.donation > 0 %}This includes:
@@ -12,7 +12,5 @@ We confirm that we have received your Paypal payment of {{ currency_symbol }} {{
 - Donation for sponsoring participants who couldn't otherwise afford to come:
   {{ currency_symbol }} {{ prt.donation }}. (Thank you!){% endif %}
 
-Best regards,
-{{ shortname }} Organizers.
-
-
+With kind regards,
+{{ shortname }} Organizers
