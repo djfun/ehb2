@@ -11,25 +11,28 @@ from tables import *
 
 # global logger; value is set in main.py
 log_file_name = conf["server"]["logfile"]
-_logger = None # type: Logger
+_logger = None  # type: Logger
+
 
 def logger() -> Logger:
     return _logger
 
 # lookup participant by ID
+
+
 def lp(id):
-    return session.query(Participant).filter(Participant.id==id).first()
+    return session.query(Participant).filter(Participant.id == id).first()
 
 
 # lookup participant by code
 def lc(code):
-    return session.query(Participant).filter(Participant.code==code).first()
+    return session.query(Participant).filter(Participant.code == code).first()
 
 
 # returns mapping from participant ids to participants
 def id_to_participant_dict():
     all_prts = session.query(Participant).all()
-    return {prt.id : prt for prt in all_prts}
+    return {prt.id: prt for prt in all_prts}
 
 
 # show message on the message.html template
@@ -37,11 +40,9 @@ def show_message(message):
     return render_template("message.html", message=message)
 
 
-
-
 # lookup partcipant by oops code - DEPRECATED
 def lookup_oops(oops_code):
-    oops = session.query(OopsCode).filter(OopsCode.code==oops_code).first()
+    oops = session.query(OopsCode).filter(OopsCode.code == oops_code).first()
     return oops.participant
 
 
@@ -50,7 +51,7 @@ parts = ["--", "Tn", "Ld", "Br", "Bs"]
 lparts = ["None", "Tenor", "Lead", "Baritone", "Bass"]
 countries = {country.code: country for country in session.query(Country)}
 country_list = [(c.code, c.name_en) for id, c in sorted(countries.items(), key=lambda x:x[0])]
-paypal_statuses = { pp.id : pp for pp in session.query(PaypalStatus).all() }
+paypal_statuses = {pp.id: pp for pp in session.query(PaypalStatus).all()}
 
 PP_UNINITIALIZED = 1
 PP_TOKEN = 2
@@ -86,6 +87,7 @@ class TableToShow:
 def part(eval_ctx, value):
     return parts[value]
 
+
 @app.template_filter()
 @evalcontextfilter
 def lpart(eval_ctx, value):
@@ -94,10 +96,19 @@ def lpart(eval_ctx, value):
 
 @app.template_filter()
 @evalcontextfilter
-def paypal_status_color(eval_ctx, item:PaypalHistory):
+def mbr(eval_ctx, value):
+    if value == True:
+        return "Yes"
+    else:
+        return "No"
+
+
+@app.template_filter()
+@evalcontextfilter
+def paypal_status_color(eval_ctx, item: PaypalHistory):
     if item._paypal_status == PP_SUCCESS:
         if item.data.startswith("("):  # was manually edited or "(duplicate payment attempt)":
-            return "#d2f9d2" # much lighter lightgreen, from https://www.w3schools.com/colors/colors_picker.asp
+            return "#d2f9d2"  # much lighter lightgreen, from https://www.w3schools.com/colors/colors_picker.asp
         else:
             return "lightgreen"
     elif item._paypal_status == PP_CANCELLED or item._paypal_status == PP_ERROR:
@@ -115,6 +126,7 @@ def ppstatus(eval_ctx, item):
     else:
         return "(none)"
 
+
 @app.template_filter()
 @evalcontextfilter
 def tf(label, eval_ctx, name):
@@ -122,6 +134,7 @@ def tf(label, eval_ctx, name):
     # print(label)
     # print(name)
     return Markup("<input id='%s' name='%s' type='text' placeholder='%s' class='input-xlarge' />" % (name, name, label))
+
 
 @app.template_filter()
 @evalcontextfilter
@@ -135,6 +148,8 @@ def ehbrev(eval_ctx, value):
     return conf.get("application", "name")
 
 # format time
+
+
 @app.template_filter()
 @evalcontextfilter
 def ft(eval_ctx, value, format='%Y-%m-%d %H:%M'):
@@ -159,6 +174,8 @@ http_types = set(["GET", "POST"])
 ignored_prefixes = ["Request[", "Response[", "PayPal-Request-Id:", " * "]
 
 # convert all newlines (\n) to HTML <br/>
+
+
 @app.template_filter()
 @evalcontextfilter
 def format_log_message(eval_ctx, message, level='INFO'):
