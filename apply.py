@@ -139,7 +139,7 @@ def paymentSuccess():
         return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
 
 
-_taf = {"rows": "5", "cols": "80"}
+# _taf = {"rows": "5", "cols": "80"}
 
 
 class ApplicationForm(Form):
@@ -170,21 +170,21 @@ class ApplicationForm(Form):
     member = BooleanField("I am a member of EHB.")
 
     exp_quartet = TextAreaField(
-        "Quartetting experience", default="List your Barbershop QUARTET experience(s) here. If applicable, include representative contest scores.", render_kw=_taf)
+        "Quartetting experience", render_kw={"rows": "5", "cols": "80", "placeholder": "List your Barbershop QUARTET experience(s) here. If applicable, include representative contest scores."})
     exp_brigade = TextAreaField(
-        "Brigade experience", default="List any other Harmony Brigade or Extreme Quartetting events in which you have participated.", render_kw=_taf)
-    exp_chorus = TextAreaField("Barbershop chorus experience",
-                               default="List your Barbershop CHORUS experience(s) here.", render_kw=_taf)
+        "Brigade experience", render_kw={"rows": "5", "cols": "80", "placeholder": "List any other Harmony Brigade or Extreme Quartetting events in which you have participated."})
+    exp_chorus = TextAreaField("Barbershop chorus experience", render_kw={
+                               "rows": "5", "cols": "80", "placeholder": "List your Barbershop CHORUS experience(s) here."})
     exp_musical = TextAreaField(
-        "Performance experience", default="Describe any performance experience, musical education, and/or accomplishments.", render_kw=_taf)
-    exp_reference = TextAreaField(
-        "Musical reference", default="Please provide the name and e-mail address of someone we can contact who is familiar with your singing ability (e.g., your chorus director or section leader, coach, judge, etc.). Feel free to list multiple names.", render_kw=_taf)
+        "Performance experience", render_kw={"rows": "5", "cols": "80", "placeholder": "Describe any performance experience, musical education, and/or accomplishments."})
+    exp_reference = TextAreaField("Musical reference",  render_kw={
+                                  "rows": "5", "cols": "80", "placeholder": "Please provide the name and e-mail address of someone we can contact who is familiar with your singing ability (e.g., your chorus director or section leader, coach, judge, etc.). Feel free to list multiple names."})
 
     iq_username = StringField("IQ account", render_kw={
                               "placeholder": "Enter your IQ account name (optional)"})
 
-    comments = TextAreaField(
-        "Comments", default="Room for anything else you would like to say.", render_kw=_taf)
+    comments = TextAreaField("Comments", render_kw={
+                             "rows": "5", "cols": "80", "placeholder": "Room for anything else you would like to say."})
 
 
 def application_form(prt):
