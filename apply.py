@@ -24,6 +24,7 @@ pp1 = Paypal(1,
 
 application_fee = float(conf.get("paypal", "fee"))
 event_name = conf.get("application", "name")
+discount = float(conf.get("paypal", "possible_discount"))
 event_shortname = conf.get("application", "shortname")
 
 conf_data = {"name": event_name,
@@ -31,8 +32,9 @@ conf_data = {"name": event_name,
              "s_application_fee": str(application_fee)
              }
 
-
 #@app.route("/apply.html", methods=["GET",])
+
+
 def apply(message=None):
     form = ApplicationForm(request.form)
     return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
@@ -41,6 +43,13 @@ def apply(message=None):
 def make_code(id):
     s = "%s #%d" % (event_shortname, id)  # generate different hashes for each new EHB instance
     return hashlib.sha224(s.encode()).hexdigest()[:16]
+
+
+def apply_discount(discounted):
+    if discounted == True:
+        return discount
+    else:
+        return 0
 
 
 @app.route("/apply.html", methods=["POST", ])
@@ -57,7 +66,8 @@ def do_apply():
                               exp_musical=form.exp_musical.data, exp_reference=form.exp_reference.data,
                               application_time=datetime.datetime.now(), comments=form.comments.data,
                               registration_status=1,  # TODO - what is this for?
-                              donation=form.donation.data, iq_username=form.iq_username.data
+                              donation=form.donation.data, iq_username=form.iq_username.data,
+                              discounted=form.discount_code.data
                               )
 
         try:
@@ -68,7 +78,7 @@ def do_apply():
             session.commit()
 
             pp1.log(new_prt.id, PP_UNINITIALIZED, "")
-            return pp1.pay(new_prt.id, "%s Application Fee: %s %s" % (event_shortname, new_prt.firstname, new_prt.lastname), application_fee + new_prt.donation)
+            return pp1.pay(new_prt.id, "%s Application Fee: %s %s" % (event_shortname, new_prt.firstname, new_prt.lastname), application_fee + new_prt.donation - apply_discount(new_prt.discounted))
 
         except IntegrityError as e:
             # TODO - if participant exists AND HAS PAID, reject application for same email
@@ -114,11 +124,11 @@ def paymentSuccess():
         payment, prt = pp1.execute_payment(request.args)
 
         # amount = payment["transactions"][0]["amount"]["total"]  # get total amount from the Paypal return message
-        amount = application_fee + prt.donation
+        amount = application_fee + prt.donation - discount
 
         # send confirmation email
         body = render_template("application_confirmation.txt", amount=int(amount), prt=prt, eventname=event_name,
-                               shortname=event_shortname, application_fee=int(application_fee), currency_symbol=currency_symbol)
+                               shortname=event_shortname, application_fee=int(application_fee), discount=int(discount), currency_symbol=currency_symbol)
         print(body)
         ehbmail.send([prt.id], "Application confirmed", [body], "Application page")
 
@@ -137,9 +147,6 @@ def paymentSuccess():
     except PaymentFailedException as e:
         flash("Something went wrong with your Paypal payment. Please contact the organizers.")
         return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
-
-
-# _taf = {"rows": "5", "cols": "80"}
 
 
 class ApplicationForm(Form):
@@ -186,6 +193,8 @@ class ApplicationForm(Form):
     comments = TextAreaField("Comments", render_kw={
                              "rows": "5", "cols": "80", "placeholder": "Room for anything else you would like to say."})
 
+    discount_code = BooleanField("I have a discount.")
+
 
 def application_form(prt):
     ret = ApplicationForm()
@@ -208,6 +217,7 @@ def application_form(prt):
     ret.exp_reference.data = prt.exp_reference
     ret.iq_username.data = prt.iq_username
     ret.comments.data = prt.comments
+    ret.discounted.data = prt.discounted
     return ret
 
 
@@ -229,7 +239,7 @@ def executePaymentOops():
         if prt.donation > 0:
             items.append(PaymentItem("Donation", prt.donation))
 
-        total_amount = application_fee + prt.donation
+        total_amount = application_fee + prt.donation - discount
 
         return render_template("oops.html", prt=prt, payment_items=items, total_amount=total_amount)
     else:

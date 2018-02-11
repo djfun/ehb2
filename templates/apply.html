@@ -76,11 +76,11 @@
 
         <hr/>
 
-        {{ m.header("section4", """<strong>Are you a member of EHB?</strong><br/> If so, you don't have to answer any questions in this section.""") }}
+        {{ m.header("section4", """<strong>Are you a member of EHB?</strong><br/> If so, you don't have to answer any questions about your musical experience.""") }}
 
         {{ m.wtf(form.member) }}
 
-        {{ m.header("section4", """<strong>Tell us a bit about your musical experience.</strong><br/> A Harmony Brigade is an event for experienced
+        {{ m.header("section4", """<strong>For non-EHB members: Tell us a bit about your musical experience.</strong><br/> A Harmony Brigade is an event for experienced
         quartet singers or musicians. We will assume a certain level of experience in the selection process
         to ensure that all participants will have a great time singing with each other.""") }}
 
@@ -108,9 +108,13 @@
         Please review your data carefully before clicking the button; you will not have a chance to change it later. When you click on
         \"Submit\", we will redirect you to Paypal, where you will be asked to pay the registration fee of € " + conf_data["s_application_fee"] + ", plus your sponsorship
         donation if you made one. The recipient is
-        \"BinG Barbershop in Germany\".<br/>
-        &nbsp;<br/>
-        <strong>Your acknowledgment:</strong> I have read all the application information for " + conf_data["shortname"] + ". I will make sure that if I am invited
+        \"BinG Barbershop in Germany\".""") }}
+
+        {{ m.header("section6", """If you have a sponsorship discount, you can enter the discount code below.""") }}
+
+        {{ m.wtf(form.discount_code) }}
+
+        {{ m.header("section7", """<strong>Your acknowledgment:</strong> I have read all the application information for " + conf_data["shortname"] + ". I will make sure that if I am invited
         and attend the European Harmony Brigade, I will be completely prepared. I will know all my notes, words, and the interpretation
         of all the songs. <strong><i>I will be the reason all the people I sing with will be glad they attended.</i></strong> All of the
         information I've included is true.""") }}
