@@ -10,8 +10,10 @@ from tables import Participant, Email
 from __init__ import *
 
 
-def log_email(recipient, subject, body, replyto, sent_from, dryrun=False): # dryrun=True => don't actually log this email, just construct the object
-    em = Email(timestamp=datetime.now(), recipient=recipient, subject=subject, body=body, replyto=replyto, sent_from=sent_from)
+# dryrun=True => don't actually log this email, just construct the object
+def log_email(recipient, subject, body, replyto, sent_from, dryrun=False):
+    em = Email(timestamp=datetime.now(), recipient=recipient, subject=subject,
+               body=body, replyto=replyto, sent_from=sent_from)
 
     if not dryrun:
         session.add(em)
@@ -48,10 +50,11 @@ def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, cha
         server.starttls()
 
         try:
-            server.login(sender, password)
+            server.login(sender, password).decode("utf-8")
         except SMTPAuthenticationError:
             # if authentication fails, log failure and continue silently with dry-run
-            log_email(0, subject, "ERROR: SMTP authentication failed in email sending", replyto, sent_from)
+            log_email(0, subject, "ERROR: SMTP authentication failed in email sending",
+                      replyto, sent_from)
             dryrun = True
 
     first_message = True
@@ -78,16 +81,14 @@ def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, cha
             if first_message:
                 first_message = False
             else:
-                time.sleep(delay/1000.0)
+                time.sleep(delay / 1000.0)
 
             server.sendmail(sender, prt.email, msg.as_string())
 
         em = log_email(recipient, full_subject, body, replyto or None, sent_from, dryrun=dryrun)
         sent_emails.append(em)
 
-
     if not dryrun:
         server.quit()
 
     return sent_emails
-
