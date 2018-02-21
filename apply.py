@@ -7,14 +7,14 @@ from werkzeug.utils import redirect
 
 import ehbmail
 from __init__ import *
-from paypal import Paypal, find_payment, ParticipantNotFoundException, PaymentFailedException, PaymentNotFoundException, \
-    DuplicatePaymentException
+from paypal import Paypal, find_payment, ParticipantNotFoundException, PaymentFailedException, PaymentNotFoundException, DuplicatePaymentException
 from tables import *
 from itertools import groupby
 from helpers import *
 from flask import request, flash
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField, BooleanField
 from config import conf, currency_symbol
+from discount import *
 
 pp1 = Paypal(1,
              lambda url: redirect(url, code=302),
@@ -24,7 +24,6 @@ pp1 = Paypal(1,
 
 application_fee = float(conf.get("paypal", "fee"))
 event_name = conf.get("application", "name")
-discount = float(conf.get("paypal", "possible_discount"))
 event_shortname = conf.get("application", "shortname")
 
 conf_data = {"name": event_name,
@@ -32,7 +31,17 @@ conf_data = {"name": event_name,
              "s_application_fee": str(application_fee)
              }
 
-#@app.route("/apply.html", methods=["GET",])
+# @app.route("/apply.html", methods=["GET",])
+
+
+class CodeNotFoundException(Exception):
+    def __init__(self, code):
+        self.code = code
+
+
+class CodeInUseException(Exception):
+    def __init__(self, code):
+        self.code = code
 
 
 def apply(message=None):
@@ -45,11 +54,21 @@ def make_code(id):
     return hashlib.sha224(s.encode()).hexdigest()[:16]
 
 
-def apply_discount(discounted):
-    if discounted == True:
-        return discount
+def apply_discount(d_code, prt_code):  # lookup discount code amount, update participant id
+    c = session.query(DiscountCode).filter(DiscountCode.code == d_code).first()
+
+    if c.user_id is None:
+        try:
+            session.query(DiscountCode).filter(DiscountCode.code ==
+                                               d_code).update({'user_id': prt_code})
+            session.commit()
+            return c.amount
+
+        except AttributeError:
+            raise CodeNotFoundException(d_code)
+
     else:
-        return 0
+        raise CodeInUseException(d_code)
 
 
 @app.route("/apply.html", methods=["POST", ])
@@ -77,16 +96,32 @@ def do_apply():
             new_prt.code = make_code(new_prt.id)
             session.commit()
 
+            new_prt.final_fee = application_fee - apply_discount(new_prt.discounted, new_prt.code)
+            session.commit()
+
             pp1.log(new_prt.id, PP_UNINITIALIZED, "")
-            return pp1.pay(new_prt.id, "%s Application Fee: %s %s" % (event_shortname, new_prt.firstname, new_prt.lastname), application_fee + new_prt.donation - apply_discount(new_prt.discounted))
+            return pp1.pay(new_prt.id, "%s Application Fee: %s %s" % (event_shortname, new_prt.firstname, new_prt.lastname), new_prt.final_fee + new_prt.donation)
 
         except IntegrityError as e:
             # TODO - if participant exists AND HAS PAID, reject application for same email
-            logger.error("Duplicate email in application: %s" % form.email.data)
+            logger().error("Duplicate email in application: %s" % form.email.data)
             flash("A user with the email address '%s' already exists. Please sign up with a different email address, or contact the organizers for help." % form.email.data)
             return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
+
+        except CodeNotFoundException as e:
+            logger().error("Cannot find discount code : %s" % form.discount_code.data)
+            flash("The scholarship code you entered is not valid: '%s'. Please try again." %
+                  form.discount_code.data)
+            return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
+
+        except CodeInUseException as e:
+            logger().error("Discount code already in use : %s" % form.discount_code.data)
+            flash("The scholarship code you entered is already in use: '%s'." %
+                  form.discount_code.data)
+            return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
+
         except Exception as e:
-            logger.error("Exception in do_apply: %s" % str(e))
+            logger().error("Exception in do_apply: %s" % str(e))
             flash("A database error occurred. Please resubmit your application in a few minutes. If the problem persists, please contact the organizers.")
             return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
@@ -193,7 +228,8 @@ class ApplicationForm(Form):
     comments = TextAreaField("Comments", render_kw={
                              "rows": "5", "cols": "80", "placeholder": "Room for anything else you would like to say."})
 
-    discount_code = BooleanField("I have a discount.")
+    discount_code = StringField("Scholarship code", [validators.Length(min=8, max=8, message="Code must be %(min)d digits long.")], render_kw={
+        "placeholder": "Enter your discount code (optional)"})
 
 
 def application_form(prt):
@@ -217,7 +253,7 @@ def application_form(prt):
     ret.exp_reference.data = prt.exp_reference
     ret.iq_username.data = prt.iq_username
     ret.comments.data = prt.comments
-    ret.discounted.data = prt.discounted
+    ret.discount_code.data = prt.discounted
     return ret
 
 
