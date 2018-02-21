@@ -18,6 +18,8 @@ from extras_roomplanner import *
 from admin import *
 from helpers import logger
 from printed import *
+from discount import *
+
 
 @app.route("/")
 def index():
@@ -26,9 +28,11 @@ def index():
     else:
         return "The application site is not available right now - please check back later!"
 
+
 @app.route("/secret")
 def secret():
     return apply()
+
 
 @app.route('/static/<path:path>')
 def send_static(path):
@@ -36,7 +40,7 @@ def send_static(path):
 
 
 #######################################################################################
-## main
+# main
 #######################################################################################
 
 
@@ -86,9 +90,3 @@ if __name__ == "__main__":
 
         print("Starting builtin Flask webserver on port %d." % port)
         app.run(debug=True, host="0.0.0.0", port=port, threaded=True)
-
-
-
-
-
-

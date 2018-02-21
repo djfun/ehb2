@@ -1,0 +1,17 @@
+{% set contentwidth="span12" %}
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{# message: message to be printed at the start #}
+{# title: page title, if you want one #}
+
+<p>Please copy this code and send it to the applicant.</p>
+
+<p>
+    <strong>Discount Amount:</strong> {{ d_amount }} <br/>
+    <strong>Code:</strong> {{ d_code }}
+</p>
+
+{% endblock %}

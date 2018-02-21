@@ -1,0 +1,37 @@
+{% set contentwidth="span12" %}
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+{% if message %}
+<p class="message">
+    {{ message }}
+</p>
+{% endif %}
+
+<p>On this page, you can generate a discount code for participants receiving a scholarship, which can be used on the application page. You can enter the amount of discount below (1-{{ application_fee }}) and get an 8-digit code to send to applicants. The final application fee (application fee - discout) will be shown in the table of participants. Each discount code can only be used once.</p>
+
+<form class="form-horizontal" action="discount_codes.html" method="post">
+    <fieldset>
+
+    {{ m.header("section1", "<strong>Enter the discount:</strong>") }}
+    {{ m.wtf(form.discount) }}
+
+    <div class="control-group">
+        <label class="control-label" for="submit"></label>
+        <div class="controls">
+            <button id="submit" name="submit" type="submit" class="btn btn-primary">Generate code</button>
+        </div>
+    </div>
+
+    </fieldset>
+
+</form>
+{% endblock %}
+
+{% block navbar %}
+<nav id="nav-main" role="navigation">
+    <div class="menu-primary-navigation-container"><ul id="menu-primary-navigation" class="nav"><li class="menu-home current-menu-item active"><a href="/">Home</a></li>
+    </ul></div>
+</nav>
+{% endblock %}
