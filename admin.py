@@ -29,7 +29,7 @@ from extras import extras_cost
 from tables import *
 from helpers import *
 from flask_login import login_required, current_user
-
+from discount import *
 
 delay_between_messages = float(conf["email"]["delay_between_messages"])
 
@@ -38,6 +38,7 @@ delay_between_messages = float(conf["email"]["delay_between_messages"])
 @login_required
 def adminpage():
     return render_template("admin.html")
+
 
 @app.route('/show-log.html')
 @login_required
@@ -68,14 +69,15 @@ def show_logfile():
     return render_template("logfile.html", items=items)
 
 
-@app.route("/mailtool.html", methods=["GET",])
+@app.route("/mailtool.html", methods=["GET", ])
 @login_required
 def mailtool():
     form = MailtoolForm(request.form)
     prts = session.query(Participant).all()
     return render_template("mailtool.html", title="Mail Tool", form=form, participants=prts, delay=delay_between_messages)
 
-@app.route("/mailtool.html", methods=["POST",])
+
+@app.route("/mailtool.html", methods=["POST", ])
 @login_required
 def do_mailtool():
     form = MailtoolForm(request.form)
@@ -112,10 +114,12 @@ def do_mailtool():
                 else:
                     e, pay_now, pay_to_hotel, items = None, None, None, None
 
-                bodies.append(render_template_string(form.body.data, prt=prt, extras=e, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items))
+                bodies.append(render_template_string(form.body.data, prt=prt, extras=e,
+                                                     pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items))
                 participants.append(prt)
 
-            emails = ehbmail.send(recipients, form.subject.data, bodies, "Mail Tool (%s)" % current_user.id, replyto=form.replyto.data, dryrun=dryrun, delay=delay_between_messages)
+            emails = ehbmail.send(recipients, form.subject.data, bodies, "Mail Tool (%s)" %
+                                  current_user.id, replyto=form.replyto.data, dryrun=dryrun, delay=delay_between_messages)
 
         except Exception as e:
             logger().error("Mailtool: Exception while attempting to send emails: %s" % repr(e))
@@ -128,8 +132,6 @@ def do_mailtool():
 
         else:
             return render_template("admin.html", message="%d email(s) were sent." % (len(emails)))
-
-
 
     else:
         prts = session.query(Participant).all()
@@ -146,25 +148,26 @@ def mailarchive():
 
 
 prt_select = [(str(prt.id), prt.fullname()) for prt in session.query(Participant).all()]
-_taf = {"rows":"20", "cols":"80"}
+_taf = {"rows": "20", "cols": "80"}
+
 
 class MailtoolForm(Form):
     recipients = HiddenField()
-    subject = StringField("Subject", render_kw={"placeholder":"Enter the email subject"})
-    replyto = StringField("Reply-To", render_kw={"placeholder": "Enter an alternative reply-to address (optional)"})
+    subject = StringField("Subject", render_kw={"placeholder": "Enter the email subject"})
+    replyto = StringField(
+        "Reply-To", render_kw={"placeholder": "Enter an alternative reply-to address (optional)"})
     dryrun = BooleanField("Dry-run")
     body = TextAreaField("Body", render_kw=_taf)
 
 
-
-
-@app.route("/offline-participants.html", methods=["GET",])
+@app.route("/offline-participants.html", methods=["GET", ])
 @login_required
 def offline_participants():
     form = XlsUploadForm()
     return render_template("offline-participants.html", form=form)
 
-@app.route("/offline-participants.html", methods=["POST",])
+
+@app.route("/offline-participants.html", methods=["POST", ])
 @login_required
 def upload_offline_participants():
     form = XlsUploadForm(request.form)
@@ -185,11 +188,8 @@ def upload_offline_participants():
 
         return render_template("admin.html", message="Database updated.")
 
-
     else:
         return render_template("offline-participants.html", form=form)
-
-
 
 
 def send_table_spreadsheet(table, date_fields, money_fields):
@@ -231,7 +231,7 @@ def update_table_from_spreadsheet(table, xlsx_file):
     fields = [column.key for column in table.__table__.columns]
     row = 2
 
-    rows_in_db = {row.id : row for row in session.query(table)}
+    rows_in_db = {row.id: row for row in session.query(table)}
 
     # make backup of table, just in case
     pickle_filename = "backup_%s_%s.p" % (table.__table__.name, str(datetime.datetime.now()))
@@ -246,14 +246,13 @@ def update_table_from_spreadsheet(table, xlsx_file):
 
         obj = rows_in_db[id]
         for i, f in enumerate(fields):
-            column = i+1
-            value = sheet.cell(row=row, column=i+1).value
+            column = i + 1
+            value = sheet.cell(row=row, column=i + 1).value
             setattr(obj, f, value)
 
         row += 1
 
     session.commit()
-
 
 
 @app.route("/participants.xlsx")
@@ -263,9 +262,7 @@ def participants_spreadsheet():
 
 
 class XlsUploadForm(Form):
-    file = FileField("XLSX file") #, validators=[FileRequired()])
-
-
+    file = FileField("XLSX file")  # , validators=[FileRequired()])
 
 
 ########### RANDOM QUARTETS #############
@@ -273,10 +270,12 @@ class XlsUploadForm(Form):
 @app.route("/randomquartets.xlsx")
 @login_required
 def generate_random_quartets():
-    tenors, leads, baris, basses = [session.query(Participant).filter(Participant.final_part == p).all() for p in (1,2,3,4)]
+    tenors, leads, baris, basses = [session.query(Participant).filter(
+        Participant.final_part == p).all() for p in (1, 2, 3, 4)]
 
     num_quartets = max(len(tenors), len(leads), len(baris), len(basses))
-    tenors, leads, baris, basses = [pad(people, num_quartets) for people in (tenors, leads, baris, basses)]
+    tenors, leads, baris, basses = [pad(people, num_quartets)
+                                    for people in (tenors, leads, baris, basses)]
 
     songs = [title for (k, title, key, start) in read_songs()]
     songs = pad_songs(songs, num_quartets)
@@ -304,22 +303,21 @@ def generate_random_quartets():
     worksheet.write(0, 10, "Judge 4", bold)
     worksheet.write(0, 11, "Average", bold)
 
-    for row in range(1, num_quartets+1):
+    for row in range(1, num_quartets + 1):
         worksheet.write(row, 0, row)
-        worksheet.write(row, 1, tenors[row-1].fullname())
+        worksheet.write(row, 1, tenors[row - 1].fullname())
         worksheet.write(row, 2, leads[row - 1].fullname())
         worksheet.write(row, 3, baris[row - 1].fullname())
         worksheet.write(row, 4, basses[row - 1].fullname())
         worksheet.write(row, 5, songs[row - 1])
         # formula = '=IFERROR(AVERAGEIF(H%d:K%d;">0"); "---")' % (row+1, row+1)
         # formula = "=2+3"
-        formula = '=IFERROR(AVERAGE(H%d:K%d), 0)' % (row+1, row+1)
+        formula = '=IFERROR(AVERAGE(H%d:K%d), 0)' % (row + 1, row + 1)
         worksheet.write_formula(row, 11, formula)
 
     workbook.close()
     output.seek(0)
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
 
 
 def shuffle_until_first_is_not(L, forbidden_first_element):
@@ -365,3 +363,10 @@ def pad(people, size):
         ret.append(extras.pop())
 
     return ret
+
+
+@app.route("/discount_codes.html")
+@login_required
+def discountgenerator():
+    form = DiscountForm(request.form)
+    return render_template("discount_codes.html", title="Generate Discount Code", form=form)

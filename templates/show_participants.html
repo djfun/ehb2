@@ -11,7 +11,7 @@
 <table class="table table-striped pretty" id="datatable">
     <thead>
     <tr> <th>Name</th> <th>Sex</th> <th>Location</th> <th>Part 1</th> <th>Part 2</th>
-         <th>Paypal</th> <th>Donation</th> <th>Application time</th></tr>
+         <th>Paypal</th> <th>Final fee</th> <th>Donation</th> <th>Application time</th></tr>
     </thead>
 
     <tbody>
@@ -20,6 +20,7 @@
         <td>{{ participant.shortsex() }}</td> <td>{{ participant.city_with_country() }}</td>
         <td>{{ participant.part1|part }}</td> <td>{{ participant.part2|part }}</td>
         <td>{{ participant.paypal_status.shortname() }}</td>
+        <td>{{ participant.final_fee }}</td>
         <td>{{ participant.donation }}</td>
         <td>{{ participant.application_time|ft }}</td>
     </tr>
