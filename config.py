@@ -22,7 +22,7 @@ if os.path.isfile("ehb-private.conf"):
     conf_private.read_file(codecs.open("ehb-private.conf", "r", "utf8"))
 
     for section in conf_private.sections():
-        if not section in conf.sections():
+        if section not in conf.sections():
             conf.add_section(section)
 
         for key, value in conf_private.items(section):
@@ -53,13 +53,13 @@ env_to_conf_entries = [
 
 for var, section, key in env_to_conf_entries:
     if var in os.environ:
-        if not section in conf.sections():
+        if section not in conf.sections():
             conf.add_section(section)
         conf.set(section, key, os.environ[var])
 
 userid = 1
 while ("EHB_USER_%d" % userid) in os.environ:
-    if not "users" in conf.sections():
+    if "users" not in conf.sections():
         conf.add_section("users")
 
     x = os.environ["EHB_USER_%d" % userid]
@@ -68,11 +68,10 @@ while ("EHB_USER_%d" % userid) in os.environ:
     userid += 1
 
 
-
 # start and end date of this event
 start_date = datetime.strptime(conf["application"]["start_date"], "%Y-%m-%d").date()
 end_date = datetime.strptime(conf["application"]["end_date"], "%Y-%m-%d").date()
-number_of_days = (end_date-start_date).days  # number of days = number of nights
+number_of_days = (end_date - start_date).days  # number of days = number of nights
 
 currency_symbol = conf.get("application", "currency_symbol")
 
@@ -90,5 +89,3 @@ def read_songs():
         ret.append((k, parts[0], key, start))
 
     return ret
-
-

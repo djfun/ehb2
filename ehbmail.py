@@ -50,7 +50,7 @@ def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, cha
         server.starttls()
 
         try:
-            server.login(sender, password).decode("utf-8")
+            server.login(sender, password)
         except SMTPAuthenticationError:
             # if authentication fails, log failure and continue silently with dry-run
             log_email(0, subject, "ERROR: SMTP authentication failed in email sending",
