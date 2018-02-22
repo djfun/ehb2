@@ -7,7 +7,7 @@ We will review all applications, and will be in touch by early April.
 We confirm that we have received your Paypal payment of {{ currency_symbol }} {{ amount }}.
 {% if prt.donation > 0 %}This includes:
 
-- Application fee for {{ shortname }}: {{ currency_symbol }} {{ application_fee }}
+- Application fee for {{ shortname }}: {{ currency_symbol }} {{ final_fee }}
 
 - Donation for sponsoring participants who couldn't otherwise afford to come:
   {{ currency_symbol }} {{ prt.donation }}. (Thank you!){% endif %}

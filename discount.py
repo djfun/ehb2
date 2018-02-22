@@ -46,7 +46,7 @@ def do_discount():
             new_code.code = generate_discount(new_code.id)
             session.commit()
 
-            return render_template("display_code.html", title="New Discount Code Generated", d_amount=new_code.amount, d_code=new_code.code)
+            return render_template("display_code.html", message="New discount code generated!", d_amount=new_code.amount, d_code=new_code.code)
 
         except Exception as e:
             logger().error("Exception in do_discount: %s" % str(e))
@@ -56,5 +56,5 @@ def do_discount():
             return render_template("discount_codes.html", form=form)
 
     else:
-        return render_template("discount_codes.html", title="Success!",
+        return render_template("discount_codes.html", message="Please enter a number.",
                                form=form)

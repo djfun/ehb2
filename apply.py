@@ -55,20 +55,23 @@ def make_code(id):
 
 
 def apply_discount(d_code, prt_code):  # lookup discount code amount, update participant id
-    c = session.query(DiscountCode).filter(DiscountCode.code == d_code).first()
-
-    if c.user_id is None:
-        try:
-            session.query(DiscountCode).filter(DiscountCode.code ==
-                                               d_code).update({'user_id': prt_code})
-            session.commit()
-            return c.amount
-
-        except AttributeError:
-            raise CodeNotFoundException(d_code)
-
+    if d_code == "":
+        return 0
     else:
-        raise CodeInUseException(d_code)
+        c = session.query(DiscountCode).filter(DiscountCode.code == d_code).first()
+
+        if c.user_id is None:
+            try:
+                session.query(DiscountCode).filter(DiscountCode.code ==
+                                                   d_code).update({'user_id': prt_code})
+                session.commit()
+                return c.amount
+
+            except AttributeError:
+                raise CodeNotFoundException(d_code)
+
+        else:
+            raise CodeInUseException(d_code)
 
 
 @app.route("/apply.html", methods=["POST", ])
@@ -159,11 +162,11 @@ def paymentSuccess():
         payment, prt = pp1.execute_payment(request.args)
 
         # amount = payment["transactions"][0]["amount"]["total"]  # get total amount from the Paypal return message
-        amount = application_fee + prt.donation - discount
+        amount = prt.final_fee + prt.donation
 
         # send confirmation email
         body = render_template("application_confirmation.txt", amount=int(amount), prt=prt, eventname=event_name,
-                               shortname=event_shortname, application_fee=int(application_fee), discount=int(discount), currency_symbol=currency_symbol)
+                               shortname=event_shortname, final_fee=int(prt.final_fee), currency_symbol=currency_symbol)
         print(body)
         ehbmail.send([prt.id], "Application confirmed", [body], "Application page")
 
@@ -228,7 +231,7 @@ class ApplicationForm(Form):
     comments = TextAreaField("Comments", render_kw={
                              "rows": "5", "cols": "80", "placeholder": "Room for anything else you would like to say."})
 
-    discount_code = StringField("Scholarship code", [validators.Length(min=8, max=8, message="Code must be %(min)d digits long.")], render_kw={
+    discount_code = StringField("Scholarship code", [validators.Length(min=0, max=8, message="Code must be %(min)d digits long.")], render_kw={
         "placeholder": "Enter your discount code (optional)"})
 
 
