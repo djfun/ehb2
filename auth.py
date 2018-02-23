@@ -8,6 +8,7 @@ from __init__ import *
 import helpers
 from config import conf
 
+
 class User():
     def __init__(self, id, name, passwd):
         self.id = id
@@ -30,7 +31,6 @@ class User():
         """False, as anonymous users aren't supported."""
         return False
 
-
     def __str__(self):
         return "%s: %s (pw %s)" % (self.id, self.name, self.passwd)
 
@@ -49,13 +49,12 @@ login_manager.login_view = baseurl + "login"
 login_manager.login_message = None
 
 
-
-
 @login_manager.user_loader
 def load_user(user_id):
     return users[user_id]
 
-@app.route('/login', methods=['GET',])
+
+@app.route('/login', methods=['GET', ])
 def unauthorized():
     # flask-login gave us a "next" argument when it first called us;
     # after that, we hide it in a hidden field
@@ -63,7 +62,7 @@ def unauthorized():
     return render_template('login.html', form=form, baseurl=baseurl)
 
 
-@app.route('/login', methods=['POST',])
+@app.route('/login', methods=['POST', ])
 def do_unauthorized():
     form = LoginForm(request.form)
 
@@ -76,7 +75,7 @@ def do_unauthorized():
 
         if user:
             login_user(user)
-            return redirect(baseurl + form.next.data[1:]) # strip leading /
+            return redirect(form.next.data[1:])  # strip leading /
 
     return render_template('login.html', form=form, baseurl=baseurl)
 
@@ -86,6 +85,7 @@ def do_unauthorized():
 def logout():
     logout_user()
     return redirect(baseurl)
+
 
 class LoginForm(Form):
     name = StringField("User name", validators=[validators.InputRequired()])
