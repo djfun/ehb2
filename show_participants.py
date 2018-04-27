@@ -69,6 +69,8 @@ def do_show_participants():
                                              donation=prt.donation, iq_username=prt.iq_username,
                                              final_part=prt.final_part, paypal_token=prt.paypal_token,
                                              last_paypal_status=prt.last_paypal_status,
+                                             discounted=prt.discounted,
+                                             final_fee=prt.final_fee,
                                              code=prt.code,
                                              deletion_time=datetime.datetime.now())
 
