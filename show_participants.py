@@ -88,9 +88,10 @@ def do_show_participants():
 part_colors = ["428BCA", "5CB85C", "F0AD4E", "D9534F"]
 part_highlight_colors = ["5DA6E6", "78D077", "FCC671", "E16864"]
 
-country_colors = ["42847D", "615192", "D4C26A", "D4976A", "428BCA", "5CB85C", "F0AD4E", "D9534F"]
-country_highlight_colors = ["6A9E99", "887CAF", "FFF0AA",
-                            "FFCEAA", "5DA6E6", "78D077", "FCC671", "E16864"]
+country_colors = ["FFFC31", "5C415D", "F6F7EB", "E94F37",
+                  "393E41", "C5D86D", "1B998B", "F46036", "0B3954", "D7263D", "428BCA", "5CB85C", "F0AD4E", "D9534F"]
+country_highlight_colors = ["FFFDBF", "9F70A0", "FFFFFF",
+                            "E87B6A", "5C6368", "DAE6A2", "82C7BF", "F78B6C", "4D6F82", "DE4D60", "5DA6E6", "78D077", "FCC671", "E16864"]
 
 
 def participants_by(all_participants, fn):
