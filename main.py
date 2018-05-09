@@ -26,7 +26,8 @@ def index():
     if conf.getboolean("application", "accept_applications"):
         return apply()
     else:
-        return "The application site is not available right now - please check back later!"
+        return "Applications are closed. If you would still like to apply for EHB 2018, please get in touch with the organizers!"
+        # return "The application site is not available right now - please check back later!"
 
 
 @app.route("/secret")
