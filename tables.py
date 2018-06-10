@@ -92,7 +92,7 @@ class Participant(Base):
 
     def makeMapLabel(self):
         line1 = "%s %s (%s / %s)" % (self.firstname, self.lastname,
-                                     self.shortsex(), self.shortpart())
+                                     self.shortsex(), self.s_final_part)
         line2 = "<a href=\'mailto:%s\'>%s</a>" % (self.email, self.email)
         return '"%s<br/>%s"' % (line1, line2)
 

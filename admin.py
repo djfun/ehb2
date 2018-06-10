@@ -30,6 +30,7 @@ from tables import *
 from helpers import *
 from flask_login import login_required, current_user
 from discount import *
+from generate_map import *
 
 delay_between_messages = float(conf["email"]["delay_between_messages"])
 
@@ -370,3 +371,9 @@ def pad(people, size):
 def discountgenerator():
     form = DiscountForm(request.form)
     return render_template("discount_codes.html", title="Generate Discount Code", form=form)
+
+
+@app.route("/googlemap.html")
+@login_required
+def mappage():
+    return template.render(latlongs=ll, names=nn, parts=pp)
