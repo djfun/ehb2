@@ -2,19 +2,11 @@ from __future__ import print_function
 from jinja2.loaders import FileSystemLoader
 import sys
 
-from __init__ import Base, engine
+from __init__ import Base, engine, session
 from tables import Participant, Geocoding
 from sqlalchemy.orm import sessionmaker
 from random import random
 from jinja2 import Environment
-
-# set up database connection
-# engine = create_engine('mysql+pymysql://root@localhost/ehb2016')
-# engine = create_engine(config.db_url)
-
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
 
 # set up Jinja
 loader = FileSystemLoader("templates")
