@@ -5,8 +5,8 @@ from flask_login import login_required
 
 import ehbmail
 from __init__ import *
-from extras_form import ExtrasForm, make_extras_from_form, NO_TSHIRT, t_shirt_costs, make_form_from_extras, \
-    NO_RESTAURANT, restaurant_names
+from extras_form import ExtrasForm, make_extras_from_form, NO_TSHIRT, make_form_from_extras, \
+    NO_RESTAURANT
 from extras_roomtypes import Roomtype
 from extras_roomtypes import roomtypes, NO_ROOMPARTNER, NO_GUEST
 
@@ -160,7 +160,7 @@ def extras_cost(extras: Extra):
 
     pay_now = extra_costs_guests + cost_sat_night + cost_tshirt + cost_special + \
         extra_room_cost_ehbdays + room_cost_other_days + guest1_roomcost + guest2_roomcost
-    pay_to_hotel = 0
+    pay_to_hotel = 0  # for 2018 we pay the hotel in advance
 
     return (pay_now, pay_to_hotel, items)
 
