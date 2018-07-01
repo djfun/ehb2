@@ -158,8 +158,9 @@ def extras_cost(extras: Extra):
         cost_tshirt = t_shirt_costs[extras.t_shirt_size]
         items.append(("%s t-shirt (%s)" % (event_shortname, s_tshirt_size(extras)), 0, cost_tshirt))
 
-    pay_now = extra_costs_guests + cost_sat_night + cost_tshirt + cost_special
-    pay_to_hotel = extra_room_cost_ehbdays + room_cost_other_days + guest1_roomcost + guest2_roomcost
+    pay_now = extra_costs_guests + cost_sat_night + cost_tshirt + cost_special + \
+        extra_room_cost_ehbdays + room_cost_other_days + guest1_roomcost + guest2_roomcost
+    pay_to_hotel = 0
 
     return (pay_now, pay_to_hotel, items)
 
