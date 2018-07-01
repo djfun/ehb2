@@ -16,9 +16,9 @@
 <p>Welcome, {{ prt.firstname }} {{ prt.lastname }}!</p>
 
 <p>On this page, you can let us know whether you want a single room, who you would
-    like to share your room with, whether you are bringing guests, and so on.
+    like to share your room with, and whether you are bringing guests.
     When you click "Submit" below, you will pay for these extras by Paypal,
-    and they will be ready for you when you come to Berlin.</p>
+    and these extras will be ready for you when you come to Leipzig.</p>
 
 <form class="form-horizontal" action='extras.html' method="post">
     <fieldset>
@@ -27,15 +27,14 @@
         <p>Your registration fee covers the two nights from " + conf.s_startdate + " to " + conf.s_enddate + " for yourself in a double room.
            You can choose to book a single room instead of a double room. This will incur
             an extra cost of " + ("" ~ format_price((conf.roomcost_single-conf.roomcost_double)*conf.num_days)) + " for
-            these two nights. You will settle all extra costs for hotel rooms directly
-            with the hotel when you check in.</p>
+            these two nights.</p>
 
         <p>If you do choose a double room and you have a preference on who you'd
             like to share it with, please let us know here.
             This can be another participant; then pick them from the list below. It can also
             be a guest you're bringing with you; then pick \"share with a guest\" here and tell us
             about your guest below under \"Guests\". If you state no preference, we will pair you
-            up with some other participant of the same gender.</p>
+            up with a participant of the same gender.</p>
         ")  }}
 
         {{ m.wtf(form.participant_roomtype) }}
@@ -45,7 +44,7 @@
         <hr/>
 
         {{ m.header("section2", """<strong>Arrival and departure</strong><br/>
-        <p>If you would like to arrive in Berlin before " + conf.s_startdate + " or depart after " + conf.s_enddate +
+        <p>If you would like to arrive in Leipzig before " + conf.s_startdate + " or depart after " + conf.s_enddate +
         ", we can extend your room reservation in the hotel where EHB
         takes place. This will incur an extra cost of EUR " ~ format_price(conf.roomcost_double) ~ " per person and night
             in a double room, or of EUR " ~ format_price(conf.roomcost_single) ~ " per night in a single room.
@@ -63,7 +62,7 @@
         <hr/>
 
         {{ m.header("section3", """<strong>Hotel Rooms for Guests</strong><br/>
-        <p>You are welcome to bring guests to Berlin, and they are welcome to stay in the same hotel with us.
+        <p>You are welcome to bring guests to Leipzig, and they are welcome to stay in the same hotel with us.
             Your guests pay the same as you for staying in the hotel: " ~ format_price(conf.roomcost_double) ~ " EUR per night
         in a double room, and " ~ format_price(conf.roomcost_single) ~ " EUR per night in a single room.</p>
 
@@ -108,54 +107,6 @@
         {{ m.wtf(form.num_after_concert) }}
 
         {{ m.wtf(form.guest, fclass="ta") }}
-
-        <hr/>
-
-        {{ m.header("section_guest_showtickets", """<strong>Show Tickets for Guests</strong><br/>
-        <p>If you would like to book tickets for the <a href='http://www.europeanharmonybrigade.org/show.htm'  target='_blank'>Saturday night show</a>
-             with <a href='http://www.trocaderoquartet.com/' target='_blank'>Trocadero</a>, you can do this here. Regular tickets are EUR " ~ conf.cost_ticket_regular ~ " each; students, unemployed people and
-            people with disabilities can get discounted tickets for EUR " ~ conf.cost_ticket_discounted ~ " each.
-            Obviously, EHB participants don't need tickets for themselves.</p>
-        """) }}
-
-        {{ m.wtf(form.num_show_tickets_regular) }}
-        {{ m.wtf(form.num_show_tickets_discount) }}
-
-
-        <hr/>
-
-        {{ m.header("section_sat_dinner", """<strong>Special Event: Masterclass with Deke Sharon</strong><br/>
-        <p>
-            A cappella superstar <a href='http://www.dekesharon.com/' target='_blank'>Deke Sharon</a> will hold an a cappella
-            masterclass at the EHB venue on Sunday, June 18, 10-12 am.
-            The masterclass is an interactive seminar where Deke will demonstrate his coaching techniques
-            with various a cappella groups and quartets.
-            Deke charges a registration fee of " ~ conf.currency ~ "&nbsp;" ~ conf.cost_special_event ~ " for this class.
-            Don't miss the chance to part of this unique musical learning experience!
-        </p>
-        """) }}
-
-        {{ m.wtf(form.special_event_tickets) }}
-
-
-
-
-        <hr/>
-
-        {{ m.header("section3", """<strong>T-Shirt</strong><br/>
-        <p>As in earlier years, we are again offering commemorative polo shirts for " ~ conf.shortname ~ ". Choose your
-            favorite color for your shirt below. On light color shirts, the EHB logo will be printed black. On dark
-            color shirts, the logo will be white.
-            Women's shirts differ from men's in
-            that they are fitted, i.e. follow your body's curves a bit more.</p>
-
-            <p>Be sure to check the <a href='https://docs.google.com/spreadsheets/d/17kBgA9BmEgWWcOTA6GOlG0eSOVsOQ2d4LXq94wmRi5Q/edit#gid=0' target='_blank'>exact measurements</a>
-                and refer to the <a href='https://drive.google.com/open?id=0B0juVgVCf52ldlp2RXdPOE5vdDQ' target='_blank'>color table</a>.</p>
-        </p>""") }}
-
-        {{ m.wtf(form.tshirt_sex) }}
-        {{ m.wtf(form.tshirt_size) }}
-        {{ m.wtf(form.tshirt_spec) }}
 
         <hr/>
 

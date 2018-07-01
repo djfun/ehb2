@@ -1,5 +1,5 @@
 version: '2.1'
- 
+
 services:
   mysql:
     image: akoller/low-memory-mysql
@@ -29,22 +29,21 @@ services:
     networks:
       - ehb2_net
 
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   container_name: pma
-  #   depends_on:
-  #     mysql:
-  #       condition: service_healthy
-  #   environment:
-  #      PMA_HOST: "mysql"
-  #      MYSQL_ROOT_PASSWORD: "foobar"
-  #   ports:
-  #     - 8080:80
-  #   networks:
-  #     - ehb2_net
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+       PMA_HOST: "mysql"
+       MYSQL_ROOT_PASSWORD: "foobar"
+    ports:
+      - 8080:80
+    networks:
+      - ehb2_net
 
 
 networks:
   ehb2_net:
     driver: bridge
-      

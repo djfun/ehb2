@@ -24,13 +24,12 @@ pp2 = Paypal(2,
              "/extras-payment-cancelled.html")
 
 
-
 # Extract information from config file
 event_name = conf.get("application", "name")
 event_shortname = conf.get("application", "shortname")
 roomcost_single = float(conf["extras: room costs"]["1"])
 roomcost_double = float(conf["extras: room costs"]["2"])
-extra_cost_for_single = number_of_days*(roomcost_single-roomcost_double)
+extra_cost_for_single = number_of_days * (roomcost_single - roomcost_double)
 cost_fri_dinner = int(conf["extras"]["cost_fri_dinner"])
 cost_sat_lunch = int(conf["extras"]["cost_sat_lunch"])
 cost_after_concert = int(conf["extras"]["cost_after_concert"])
@@ -39,7 +38,6 @@ cost_ticket_regular = int(conf["extras"]["cost_ticket_regular"])
 cost_ticket_discounted = int(conf["extras"]["cost_ticket_discounted"])
 cost_special_event = int(conf["extras"]["cost_special_event"])
 name_special_event = conf["extras"]["name_special_event"]
-
 
 
 # variables to be made available to the website template
@@ -63,18 +61,22 @@ def find_extras(prt_id):
     x = session.query(Extra).filter(Extra.id == prt_id).first()
     return x if x else None
 
-def fd(d:date):
+
+def fd(d: date):
     return d.strftime("%d/%m/%Y")
 
 
-def meal_costs(extras:Extra):
-    return extras.num_dinner_friday*cost_fri_dinner + extras.num_lunch_saturday*cost_sat_lunch + extras.num_after_concert*cost_after_concert
+def meal_costs(extras: Extra):
+    return extras.num_dinner_friday * cost_fri_dinner + extras.num_lunch_saturday * cost_sat_lunch + extras.num_after_concert * cost_after_concert
 
-def ticket_costs(extras:Extra):
-    return extras.num_show_tickets_regular*cost_ticket_regular + extras.num_show_tickets_discount*cost_ticket_discounted
+
+def ticket_costs(extras: Extra):
+    return extras.num_show_tickets_regular * cost_ticket_regular + extras.num_show_tickets_discount * cost_ticket_discounted
+
 
 def s_tshirt_size(extras):
     return "%s, %s, %s" % (conf["extras: t-shirt sexes"][extras.t_shirt_sex], extras.t_shirt_size, extras.ts_spec.color)
+
 
 def restaurant_name(extras):
     if extras.sat_night_restaurant == NO_RESTAURANT:
@@ -83,50 +85,63 @@ def restaurant_name(extras):
         return restaurant_names[extras.sat_night_restaurant]
 
 # returns (pay_now, pay_to_hotel, items), where items is a list of entries (item description, pay_to_hotel, pay_to_ehb)
-def extras_cost(extras:Extra):
-    prt_roomtype = roomtypes[extras.roomtype] # type: Roomtype
+
+
+def extras_cost(extras: Extra):
+    prt_roomtype = roomtypes[extras.roomtype]  # type: Roomtype
     items = []
 
     # room costs for participant
     extra_room_cost_ehbdays = number_of_days * prt_roomtype.cost_on_ehb_days()
-    room_cost_other_days = ((extras.departure_date-extras.arrival_date).days - number_of_days) * prt_roomtype.cost_on_other_days()
-    items.append(("Your room (%s), %s to %s" % (prt_roomtype.description_with_roompartner(extras.roompartner), fd(extras.arrival_date), fd(extras.departure_date)), extra_room_cost_ehbdays+room_cost_other_days, 0))
+    room_cost_other_days = ((extras.departure_date - extras.arrival_date).days -
+                            number_of_days) * prt_roomtype.cost_on_other_days()
+    items.append(("Your room (%s), %s to %s" % (prt_roomtype.description_with_roompartner(extras.roompartner), fd(
+        extras.arrival_date), fd(extras.departure_date)), extra_room_cost_ehbdays + room_cost_other_days, 0))
 
     # room costs for guests
     guest1_roomcost = 0
     if extras.guest1_roomtype != NO_GUEST:
-        g1rt = roomtypes[extras.guest1_roomtype] # type: Roomtype
-        guest1_roomcost = (extras.guest1_departure-extras.guest1_arrival).days * g1rt.cost_on_other_days()
-        items.append(("Guest: %s (%s), %s to %s" % (extras.guest1_name, g1rt.description, fd(extras.guest1_arrival), fd(extras.guest1_departure)), guest1_roomcost, 0))
+        g1rt = roomtypes[extras.guest1_roomtype]  # type: Roomtype
+        guest1_roomcost = (extras.guest1_departure - extras.guest1_arrival).days * \
+            g1rt.cost_on_other_days()
+        items.append(("Guest: %s (%s), %s to %s" % (extras.guest1_name, g1rt.description, fd(
+            extras.guest1_arrival), fd(extras.guest1_departure)), guest1_roomcost, 0))
 
     guest2_roomcost = 0
     if extras.guest2_roomtype != NO_GUEST:
-        g2rt = roomtypes[extras.guest2_roomtype] # type: Roomtype
-        guest2_roomcost = (extras.guest2_departure-extras.guest2_arrival).days * g2rt.cost_on_other_days()
-        items.append(("Guest: %s (%s), %s to %s" % (extras.guest2_name, g2rt.description, fd(extras.guest2_arrival), fd(extras.guest2_departure)), guest2_roomcost, 0))
+        g2rt = roomtypes[extras.guest2_roomtype]  # type: Roomtype
+        guest2_roomcost = (extras.guest2_departure - extras.guest2_arrival).days * \
+            g2rt.cost_on_other_days()
+        items.append(("Guest: %s (%s), %s to %s" % (extras.guest2_name, g2rt.description, fd(
+            extras.guest2_arrival), fd(extras.guest2_departure)), guest2_roomcost, 0))
 
     # other costs for guests
     if extras.num_dinner_friday:
-        items.append(("%d extra dinner(s) on Friday night" % extras.num_dinner_friday, 0, extras.num_dinner_friday*cost_fri_dinner))
+        items.append(("%d extra dinner(s) on Friday night" %
+                      extras.num_dinner_friday, 0, extras.num_dinner_friday * cost_fri_dinner))
 
     if extras.num_lunch_saturday:
-        items.append(("%d extra lunch(es) on Saturday" % extras.num_lunch_saturday, 0, extras.num_lunch_saturday*cost_sat_lunch))
+        items.append(("%d extra lunch(es) on Saturday" % extras.num_lunch_saturday,
+                      0, extras.num_lunch_saturday * cost_sat_lunch))
 
     if extras.num_after_concert:
-        items.append(("%d extra after-concert snack(s) on Saturday" % extras.num_after_concert, 0, extras.num_after_concert*cost_after_concert))
+        items.append(("%d extra after-concert snack(s) on Saturday" %
+                      extras.num_after_concert, 0, extras.num_after_concert * cost_after_concert))
 
     if extras.num_show_tickets_regular:
-        items.append(("%d regular ticket(s) for the Saturday night show" % extras.num_show_tickets_regular, 0, extras.num_show_tickets_regular*cost_ticket_regular))
+        items.append(("%d regular ticket(s) for the Saturday night show" %
+                      extras.num_show_tickets_regular, 0, extras.num_show_tickets_regular * cost_ticket_regular))
 
     if extras.num_show_tickets_discount:
-        items.append(("%d discounted ticket(s) for the Saturday night show" % extras.num_show_tickets_discount, 0, extras.num_show_tickets_discount*cost_ticket_discounted))
+        items.append(("%d discounted ticket(s) for the Saturday night show" %
+                      extras.num_show_tickets_discount, 0, extras.num_show_tickets_discount * cost_ticket_discounted))
 
     extra_costs_guests = meal_costs(extras) + ticket_costs(extras)
 
     # Sat night dinner
     cost_sat_night = 0
     # no Sat night dinner now
-    #if extras.sat_night_numpeople:
+    # if extras.sat_night_numpeople:
     #    items.append(("Dinner for %d people at %s before the Saturday night show" % (extras.sat_night_numpeople, restaurant_name(extras)), 0, extras.sat_night_numpeople*cost_sat_dinner))
     #    cost_sat_night = extras.sat_night_numpeople*cost_sat_dinner
 
@@ -134,7 +149,8 @@ def extras_cost(extras:Extra):
     cost_special = 0
     if extras.special_event_tickets:
         cost_special = cost_special_event * extras.special_event_tickets
-        items.append(("%d ticket(s) for the special event (%s)" % (extras.special_event_tickets, name_special_event), 0, cost_special))
+        items.append(("%d ticket(s) for the special event (%s)" %
+                      (extras.special_event_tickets, name_special_event), 0, cost_special))
 
     # t-shirt
     cost_tshirt = 0
@@ -148,8 +164,7 @@ def extras_cost(extras:Extra):
     return (pay_now, pay_to_hotel, items)
 
 
-
-@app.route("/extras.html", methods=["GET",])
+@app.route("/extras.html", methods=["GET", ])
 def show_extras_form(id=None, message=None):
     if not conf.getboolean("application", "accept_extras"):
         return show_message("Booking of extras is not available at this time. Please check back later.")
@@ -185,7 +200,7 @@ def show_extras_form(id=None, message=None):
         return show_message("Unknown code. Please check that you clicked on the link in your email correctly (no characters missing from the link, etc.). If this problem persists, please contact the organizers.")
 
 
-@app.route("/extras.html", methods=["POST",])
+@app.route("/extras.html", methods=["POST", ])
 def do_extras():
     form = ExtrasForm(request.form)
     prt = lc(form.code.data)
@@ -215,7 +230,7 @@ def do_extras():
 # Insert new extras row into database. If an extras row for this participant
 # already existed, move it to the "overwritten_extras" table and then
 # overwrite it in "extras".
-def insert_or_overwrite(extras:Extra):
+def insert_or_overwrite(extras: Extra):
     previous_extras = session.query(Extra).filter(Extra.id == extras.id).first()
 
     if previous_extras:
@@ -237,32 +252,34 @@ def insert_or_overwrite(extras:Extra):
     session.commit()
 
 
-def is_extras_paid(extras:Extra):
+def is_extras_paid(extras: Extra):
     return extras.last_paypal_status == PP_SUCCESS
 
 
 # Call this when an extras entry already exists in the database.
 # This will show the select extras items, and either display a payment
 # confirmation (if the payment was successful) or a Paypal button.
-def show_page_for_extras(prt:Participant, extras:Extra, message=None):
+def show_page_for_extras(prt: Participant, extras: Extra, message=None):
     all_paid = extras.last_paypal_status == PP_SUCCESS
     pay_now, pay_to_hotel, items = extras_cost(extras)
     return render_template("extras_page.html", prt=prt, extras=extras, message=message, all_paid=all_paid, conf=conf_for_template, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items)
 
-@app.route("/extras_payment.html", methods=["POST",])
+
+@app.route("/extras_payment.html", methods=["POST", ])
 def do_extras_payment():
     code = request.form.get('code')
     pay_now = float(request.form.get('pay_now'))
-    prt = lc(code) # type: Participant
-    extras = find_extras(prt.id) # type: Extra
+    prt = lc(code)  # type: Participant
+    extras = find_extras(prt.id)  # type: Extra
 
-    if pay_now == 0.0: # no payment is due at this time
+    if pay_now == 0.0:  # no payment is due at this time
         pp2.log(prt.id, PP_SUCCESS, "Payment to EHB was zero, set Paypal status to SUCCESS without payment")
 
         try:
             send_email_confirmation(prt, extras)
         except Exception as e:
-            logger().error("DEP: Exception while sending zero email confirmation to %d %s: %s" % (prt.id, prt.fullname(), repr(e)))
+            logger().error("DEP: Exception while sending zero email confirmation to %d %s: %s" %
+                           (prt.id, prt.fullname(), repr(e)))
 
     if extras.last_paypal_status == PP_SUCCESS:
         return show_page_for_extras(prt, extras)
@@ -271,7 +288,7 @@ def do_extras_payment():
         return pp2.pay(prt.id, "%s Extras Payment: %s" % (event_shortname, prt.fullname()), pay_now)
 
 
-@app.route("/extras-payment-cancelled.html", methods=["GET",])
+@app.route("/extras-payment-cancelled.html", methods=["GET", ])
 def paymentCancelledExtras():
     token = request.args.get('token')
     extras = pp2.find_by_token(token)
@@ -283,15 +300,17 @@ def paymentCancelledExtras():
 
 def send_email_confirmation(prt, extras):
     pay_now, pay_to_hotel, items = extras_cost(extras)
-    msg = render_template("em_extras_confirmation.txt", prt=prt, conf=conf_for_template, pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items)
+    msg = render_template("em_extras_confirmation.txt", prt=prt, conf=conf_for_template,
+                          pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items)
     ehbmail.send([prt.id], "Extras Confirmation", [msg], "extras: payment success")
 
-@app.route("/extras-payment-success.html", methods=["GET",])
+
+@app.route("/extras-payment-success.html", methods=["GET", ])
 def paymentSuccessExtras():
     # Paypal redirects the user to this URL once the user has approved the payment.
     # Now we still need to execute the payment.
 
-    prt = None # type: Participant
+    prt = None  # type: Participant
     extras = None
 
     try:
@@ -310,20 +329,19 @@ def paymentSuccessExtras():
         logger().error("PSE: Unable to resolve the Paypal payment ID '%s' to a payment. Please try paying for your extras again, or contact the organizers." % e.paymentId)
         return show_page_for_extras(prt, e.prt, message="Unable to resolve the Paypal payment ID '%s' to a payment. Please try paying for your extras again, or contact the organizers." % e.paymentId)
     except DuplicatePaymentException as e:
-        prt = lp(e.prt.id) # type: Participant
+        prt = lp(e.prt.id)  # type: Participant
         logger().info("PSE: Duplicate payment attempt by %d %s" % (prt.id, prt.fullname()))
         return show_page_for_extras(prt, e.prt)
     except PaymentFailedException as e:
-        prt = lp(e.prt.id) # type: Participant
+        prt = lp(e.prt.id)  # type: Participant
         logger().warn("PSE: Payment failed for %d %s" % (prt.id, prt.fullname()))
-        return show_page_for_extras(prt, e.prt, message = "Something went wrong with your Paypal payment. Please contact the organizers.")
+        return show_page_for_extras(prt, e.prt, message="Something went wrong with your Paypal payment. Please contact the organizers.")
     except Exception as e:
         if prt and extras:
             logger().error("PSE: Exception for %d %s: %s" % (prt.id, prt.fullname(), repr(e)))
-            return show_page_for_extras(prt, extras, message = None)
+            return show_page_for_extras(prt, extras, message=None)
         else:
             logger().error("PSE: Exception for unknown user: %s" % repr(e))
-
 
 
 ##############################################################
@@ -332,7 +350,7 @@ def paymentSuccessExtras():
 #
 ##############################################################
 
-@app.route("/show-extras.html", methods=["GET",])
+@app.route("/show-extras.html", methods=["GET", ])
 @login_required
 def show_extras(message=None):
     if message:
@@ -355,7 +373,7 @@ def show_extras(message=None):
     return render_template("show_extras.html", prt_with_data=prt_with_data, missing_prts=missing_participants)
 
 
-@app.route("/show-extra.html", methods=["GET",])
+@app.route("/show-extra.html", methods=["GET", ])
 @login_required
 def show_extra():
     id = int(request.args.get('id'))
@@ -372,14 +390,15 @@ def show_extra():
 
     payment_steps = session.query(PaypalHistory).filter(PaypalHistory.participant_id == id).\
         filter(PaypalHistory.payment_step == 2).order_by(PaypalHistory.timestamp).all()
-    ps = [(id, p.shortname()) for (id,p) in sorted(paypal_statuses.items())]
+    ps = [(id, p.shortname()) for (id, p) in sorted(paypal_statuses.items())]
 
     return render_template("show_extra.html", prt=prt,
                            items=items, pay_now=pay_now, pay_to_hotel=pay_to_hotel,
                            extras=extras,
                            paypal_history=payment_steps, paypal_statuses=ps)
 
-@app.route("/change-extras.html", methods=["POST",])
+
+@app.route("/change-extras.html", methods=["POST", ])
 @login_required
 def change_extras():
     id = int(request.args.get('id'))
@@ -395,12 +414,11 @@ def change_extras():
 
         pp2.log(id, value, reason)
 
-        message="Changed PP status of %s (%d) to %d (%s; reason: %s)." % (prt.fullname(), prt.id, value, paypal_statuses[value].shortname(), reason)
+        message = "Changed PP status of %s (%d) to %d (%s; reason: %s)." % (
+            prt.fullname(), prt.id, value, paypal_statuses[value].shortname(), reason)
         return show_extras(message)
 
     return show_message("Undefined command")
-
-
 
 
 ##############################################################
@@ -416,15 +434,17 @@ def show_meals():
     content = []
 
     for prt in session.query(Participant).all():
-        extras = find_extras(prt.id) # type: Extra
+        extras = find_extras(prt.id)  # type: Extra
 
         if extras:
             costs = meal_costs(extras)
             if costs > 0:
-                content.append([prt.fullnameLF(), extras.num_dinner_friday, extras.num_lunch_saturday, extras.num_after_concert, costs])
+                content.append([prt.fullnameLF(), extras.num_dinner_friday,
+                                extras.num_lunch_saturday, extras.num_after_concert, costs])
 
     summaryRow = sortIdSummarize(content)
     return render_template("show_table.html", tables=[TableToShow(header, content, title="Prepaid Extra Meals - %s" % event_shortname, summaryRow=summaryRow)])
+
 
 @app.route("/show-tickets.html")
 @login_required
@@ -433,15 +453,17 @@ def show_tickets():
     content = []
 
     for prt in session.query(Participant).all():
-        extras = find_extras(prt.id) # type: Extra
+        extras = find_extras(prt.id)  # type: Extra
 
         if extras:
             costs = ticket_costs(extras)
             if costs > 0:
-                content.append([prt.fullnameLF(), extras.num_show_tickets_regular, extras.num_show_tickets_discount, costs])
+                content.append([prt.fullnameLF(), extras.num_show_tickets_regular,
+                                extras.num_show_tickets_discount, costs])
 
     summaryRow = sortIdSummarize(content)
     return render_template("show_table.html", tables=[TableToShow(header, content, title="Bezahlte Tickets - %s" % event_shortname, summaryRow=summaryRow)])
+
 
 @app.route("/show-shirts.html")
 @login_required
@@ -449,18 +471,20 @@ def show_tshirts():
     # Table with individual t-shirts
     header = ["Nr", "Name", "Size", "Cost (EUR)"]
     content = []
-    all_sizes = [] # list of all t-shirt sizes for all participants, with duplicates
+    all_sizes = []  # list of all t-shirt sizes for all participants, with duplicates
 
     for prt in session.query(Participant).all():
-        extras = find_extras(prt.id) # type: Extra
+        extras = find_extras(prt.id)  # type: Extra
 
         if extras:
             if extras.t_shirt_size != NO_TSHIRT:
-                content.append([prt.fullnameLF(), s_tshirt_size(extras), t_shirt_costs[extras.t_shirt_size]])
+                content.append([prt.fullnameLF(), s_tshirt_size(
+                    extras), t_shirt_costs[extras.t_shirt_size]])
                 all_sizes.append(s_tshirt_size(extras))
 
     summaryRow = sortIdSummarize(content, columns=set([2]))
-    table = TableToShow(header, content, title="T-Shirts - %s" % event_shortname, summaryRow=summaryRow)
+    table = TableToShow(header, content, title="T-Shirts - %s" %
+                        event_shortname, summaryRow=summaryRow)
 
     # Table with t-shirt quantities
     size_counter = Counter(all_sizes)
@@ -469,7 +493,8 @@ def show_tshirts():
 
     qt_header = ["Size", "Quantity"]
     qt_content = [[key, size_counter[key]] for key in keys]
-    qt_table = TableToShow(qt_header, qt_content, title="Order Summary", summaryRow=["Total", len(all_sizes)])
+    qt_table = TableToShow(qt_header, qt_content, title="Order Summary",
+                           summaryRow=["Total", len(all_sizes)])
 
     # render template
     return render_template("show_table.html", tables=[table, qt_table])
@@ -482,15 +507,17 @@ def show_checkin():
     content = []
 
     for prt in session.query(Participant).all():
-        extras = find_extras(prt.id) # type: Extra
+        extras = find_extras(prt.id)  # type: Extra
 
         if extras:
             content.append([
                 prt.fullnameLF(),
                 "--" if extras.t_shirt_size == NO_TSHIRT else s_tshirt_size(extras),
                 # "--" if extras.sat_night_numpeople == 0 else "%s (x %d)" % (restaurant_name(extras), extras.sat_night_numpeople),
-                "--" if ticket_costs(extras) == 0 else "%d / %d" % (extras.num_show_tickets_regular, extras.num_show_tickets_discount),
-                "--" if meal_costs(extras) == 0 else "%d / %d / %d" % (extras.num_dinner_friday, extras.num_lunch_saturday, extras.num_after_concert),
+                "--" if ticket_costs(extras) == 0 else "%d / %d" % (
+                    extras.num_show_tickets_regular, extras.num_show_tickets_discount),
+                "--" if meal_costs(extras) == 0 else "%d / %d / %d" % (extras.num_dinner_friday,
+                                                                       extras.num_lunch_saturday, extras.num_after_concert),
                 "--" if extras.special_event_tickets == 0 else str(extras.special_event_tickets),
                 ""
             ])
@@ -516,22 +543,23 @@ def show_special_event():
 
     summaryRow = sortIdSummarize(content)
     return render_template("show_table.html", tables=[
-        TableToShow(header, content, title="Special Event: %s - %s" %  (name_special_event, event_shortname), summaryRow=summaryRow)])
+        TableToShow(header, content, title="Special Event: %s - %s" % (name_special_event, event_shortname), summaryRow=summaryRow)])
 
 
 def sortIdSummarize(content, columns=None):
     if len(content) > 0:
-        content.sort(key=lambda x:x[0])          # sort by names
+        content.sort(key=lambda x: x[0])          # sort by names
 
-        summary_values = [0] * (len(content[0])-1) # make accumulators
+        summary_values = [0] * (len(content[0]) - 1)  # make accumulators
         if columns == None:
-            columns = set(range(1,len(content[0]))) # if no columns specified, summarize over all except the first one
+            # if no columns specified, summarize over all except the first one
+            columns = set(range(1, len(content[0])))
         nr = 1
 
         for row in content:
-            for i in range(1,len(row)):
+            for i in range(1, len(row)):
                 if i in columns:
-                    summary_values[i-1] += row[i]
+                    summary_values[i - 1] += row[i]
             row.insert(0, str(nr))
             nr += 1
 

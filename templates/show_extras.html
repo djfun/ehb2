@@ -17,26 +17,26 @@
 <p>
     <strong>Reports:</strong>
     <a href="show-meals.html">Meals</a> /
-    <a href="show-tickets.html">Tickets</a> /
+    <!-- <a href="show-tickets.html">Tickets</a> /
     <a href="show-shirts.html">Shirts</a> /
-    <a href="show-special.html">Special Event</a> /
+    <a href="show-special.html">Special Event</a> / -->
     <a href="show-checkin.html">Check-In</a>
 </p>
 
 
 <table class="table table-striped pretty" id="datatable">
     <thead>
-    <tr> <th>Name</th> <th>Arrival</th> <th>Departure</th> <th>Pay Now</th> <th>Pay Hotel</th> <th>Status</th></tr>
+    <tr> <th>Name</th> <th>Arrival</th> <th>Departure</th> <th>Pay Now</th> <th>Status</th></tr>
     </thead>
 
     <tbody>
-    {% for prt, extras, pay_now, pay_hotel in prt_with_data %}
+    {% for prt, extras, pay_now in prt_with_data %}
     <tr>
         <td><a href="show-extra.html?id={{ prt.id }}">{{ prt.fullnameLF() }}</a></td>
         <td>{{ extras.arrival_date|fd }}</td>
         <td>{{ extras.departure_date|fd }}</td>
         <td>{{ pay_now|eur }}</td>
-        <td>{{ pay_hotel|eur }}</td>
+        <!-- <td>{{ pay_hotel|eur }}</td> -->
         <td>{{ extras | ppstatus }}</td>
     </tr>
     {% endfor %}
