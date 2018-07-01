@@ -1,9 +1,8 @@
 __author__ = 'koller'
 
-from __init__ import Base, engine, session
+from __init__ import session
 from tables import Participant, Geocoding
 from geopy.geocoders import Nominatim
-from sqlalchemy.orm import sessionmaker
 
 # set up geolocation service
 geolocator = Nominatim()

@@ -2,9 +2,8 @@ from __future__ import print_function
 from jinja2.loaders import FileSystemLoader
 import sys
 
-from __init__ import Base, engine, session
+from __init__ import session
 from tables import Participant, Geocoding
-from sqlalchemy.orm import sessionmaker
 from random import random
 from jinja2 import Environment
 
@@ -35,6 +34,4 @@ ll = u", ".join(latlng)
 nn = u", ".join(names)
 pp = u", ".join(parts)
 
-
-# template is rendered with UTF-8, web page needs to reflect that
-# mapcontent = template.render(latlongs=ll, names=nn, parts=pp)
+# print(template.render(latlongs=ll, names=nn, parts=pp))
