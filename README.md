@@ -86,10 +86,6 @@ unnecessary to install Python or any of the requisite libraries
 spelled out above; all these pieces are automatically part of the
 Docker image.
 
-During development, you can use
-```docker build -t akoller/ehb2 .```
-in the main ehb2 directory to rebuild and test the Docker image before pushing to Github. When you do push to Github, the Docker image on Docker Hub will be automatically rebuilt.
-
 The EHB container needs to connect to a container providing a MySQL
 database over a (possibly Docker-internal) network. The simplest way
 to start both the MySQL container and the EHB server together is
@@ -123,6 +119,28 @@ docker-compose -f docker-compose.yml -f docker-compose-private.yml up
 ```
 
 You can then access the EHB server on port 5000 on your local machine.
+
+### Initializing the database
+
+The EHB system keeps its data in a MySQL database, which is stored in a subdirectory `mysql_data` below your main `ehb2` directory. This subdirectory is created automatically when you first start the Docker containers as described above, and initially contains a fresh MySQL data directory with no databases. The initial root password is as specified in `docker-compose.yml`.
+
+After starting the Docker containers, you should navigate to the web interface of the phpMyAdmin container at [http://localhost:8080](http://localhost:8080) and log in as root with the initial root password. You can modify the database configuration there, including a new root password (don't forget to also change it in `docker-compose.yml` if you do this). You can also create or import a database with EHB participant data through this web interface.
+
+Once you have created or imported a database, change the database URL in your `docker-compose-private.yml` and restart the Docker containers. After this point, you should be able to navigate to the [EHB2 admin page](http://localhost:5000/admin.html) and e.g. look at the current participants.
+
+### Rebuilding the Docker image for development
+
+If you make local changes to the EHB system (e.g. by editing the Python code) and restart the Docker containers, don't be surprised if your changes don't show up in your system. This is because the `docker-compose.yml` uses the Docker image [akoller/ehb2](https://hub.docker.com/r/akoller/ehb2/) from Docker Hub by default, which is built from the latest version on Github.
+
+If you want to test your local changes, you need to rebuild this Docker image locally by running the following command in the main ehb2 directory:
+
+```docker build -t akoller/ehb2 .```
+
+This will then use your own local code the next time you start the Docker containers.
+
+Once you push to Github, the Docker image on Docker Hub will be automatically rebuilt.
+
+
 
 
 

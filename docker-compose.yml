@@ -10,8 +10,8 @@ services:
       MYSQL_ROOT_HOST: "%"
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 10s
-      retries: 10
+      timeout: 3s
+      retries: 30
     volumes:
       - ./mysql_data:/var/lib/mysql
     restart: always

@@ -16,7 +16,7 @@ from auth import *
 def show_participants(message=None):
     participants = session.query(Participant).all()
     paid_participants = session.query(Participant).filter(
-        Participant.last_paypal_status == PP_SUCCESS)
+        Participant.last_paypal_status == PP_SUCCESS).all()
     total_donations = sum([p.donation for p in participants])
 
     return render_template("show_participants.html", title="Show participants", message=message,
