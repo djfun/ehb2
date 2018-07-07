@@ -191,6 +191,9 @@ class PaypalStatus(Base):
     def shortname(self):
         return paypal_shortnames[self.id]
 
+    def __repr__(self):
+        return "%d-%s" % (self.id, self.paypal_status_name)
+
 
 class RegistrationStatus(Base):
     __tablename__ = 'registration_statuses'

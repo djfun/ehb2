@@ -24,7 +24,7 @@ start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
 # set up database connection
 db_url = conf.get("database", "url")
-engine = create_engine(db_url)
+engine = create_engine(db_url, pool_recycle=3600)
 
 # flask-mysqlalchemy integration
 Base.metadata.bind = engine
