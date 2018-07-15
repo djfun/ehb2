@@ -232,6 +232,9 @@ def make_extras_from_form(prt, form):
                  num_lunch_saturday=form.num_lunch_saturday.data,
                  num_after_concert=form.num_after_concert.data,
 
+                 num_show_tickets_regular="0",
+                 num_show_tickets_discount="0",
+
                  # num_show_tickets_regular = form.num_show_tickets_regular.data,
                  # num_show_tickets_discount = form.num_show_tickets_discount.data,
 
@@ -242,6 +245,8 @@ def make_extras_from_form(prt, form):
                  # sat_night_restaurant = form.sat_dinner_restaurant.data,
                  # sat_night_numpeople = form.sat_dinner_numpeople.data,
 
+                 t_shirt_sex="0",
+                 t_shirt_size="0",
                  # t_shirt_sex = form.tshirt_sex.data,
                  # t_shirt_size = form.tshirt_size.data,
                  # t_shirt_spec = form.tshirt_spec.data,

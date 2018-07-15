@@ -1,18 +1,18 @@
 <table class="table table-striped" width="100%">
-        <thead><tr><th>Item</th> <th>Pay Now</th> <th>Pay to Hotel</th></tr></thead>
+        <thead><tr><th>Item</th> <th>Pay Now</th></tr></thead>
         <tbody>
-            {% for item, pay_to_hotel, pay_to_ehb in items %}
+            {% for item, pay_to_ehb in items %}
               <tr>
                   <td>{{ item }}</td>
                   <td>{% if pay_to_ehb > 0 %} {{ pay_to_ehb | eur }} {% endif %}</td>
-                  <td>{% if pay_to_hotel > 0 %} {{ pay_to_hotel | eur }} {% endif %}</td>
+                  <!-- <td>{% if pay_to_hotel > 0 %} {{ pay_to_hotel | eur }} {% endif %}</td> -->
               </tr>
             {% endfor %}
 
             <tr>
                 <td><strong>Total cost:</strong></td>
                 <td><strong>{{ pay_now | eur }}</strong></td>
-                <td><strong>{{ pay_to_hotel | eur }}</strong></td>
+                <!-- <td><strong>{{ pay_to_hotel | eur }}</strong></td> -->
             </tr>
         </tbody>
     </table>
