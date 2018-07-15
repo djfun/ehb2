@@ -83,9 +83,9 @@ class Participant(Base):
     iq_username = Column(String(100))
     code = Column(String(16))
 
-    s_final_part = relationship("Part", backref=backref("participants"))
-    ccountry = relationship("Country", backref=backref("participants"))
-    paypal_status = relationship("PaypalStatus", backref=backref("participants"))
+    s_final_part = relationship("Part", backref=backref("participants"), lazy="joined")
+    ccountry = relationship("Country", backref=backref("participants"), lazy="joined")
+    paypal_status = relationship("PaypalStatus", backref=backref("participants"), lazy="joined")
 
     def city_with_country(self):
         return "%s, %s" % (self.city, self.country)
@@ -175,7 +175,7 @@ class PaypalHistory(Base):
     data = Column(String)
     payment_step = Column(SmallInteger, nullable=False, server_default=text("'1'"))
 
-    paypal_status = relationship("PaypalStatus", backref=backref("history_items"))
+    paypal_status = relationship("PaypalStatus", backref=backref("history_items"), lazy="joined")
 
 
 paypal_shortnames = ["", "uninit", "token", "callback",
@@ -193,6 +193,12 @@ class PaypalStatus(Base):
 
     def __repr__(self):
         return "%d-%s" % (self.id, self.paypal_status_name)
+
+    def clone(self): # ugly hack around the lazy loading issue
+        ret = PaypalStatus()
+        ret.id = int(self.id)
+        ret.paypal_status_name = str(self.paypal_status_name)
+        return ret
 
 
 class RegistrationStatus(Base):
@@ -251,8 +257,8 @@ class Extra(Base):
     special_event_tickets = Column(SmallInteger, nullable=False)
     t_shirt_spec = Column(SmallInteger, ForeignKey('t_shirt_specs.id'))
 
-    participant = relationship("Participant", backref=backref("extras"))
-    ts_spec = relationship("TShirtSpec", backref=backref("extras"))
+    participant = relationship("Participant", backref=backref("extras"), lazy="joined")
+    ts_spec = relationship("TShirtSpec", backref=backref("extras"), lazy="joined")
 
 
 class TShirtSpec(Base):
@@ -298,7 +304,7 @@ class OverwrittenExtra(Base):
 
     timestamp = Column(DateTime)
 
-    participant = relationship("Participant", backref=backref("overwritten_extras"))
+    participant = relationship("Participant", backref=backref("overwritten_extras"), lazy="joined")
 
 
 class RoomAssignment(Base):
@@ -325,7 +331,7 @@ class Email(Base):
     replyto = Column(String(200))
     sent_from = Column(String(500))
 
-    participant = relationship("Participant", backref=backref("emails"))
+    participant = relationship("Participant", backref=backref("emails"), lazy="joined")
 
 
 class OopsCode(Base):
@@ -334,4 +340,4 @@ class OopsCode(Base):
     id = Column(Integer, ForeignKey('participant.id'), primary_key=True)
     code = Column(String(16))
 
-    participant = relationship("Participant", backref=backref("oops_code"))
+    participant = relationship("Participant", backref=backref("oops_code"), lazy="joined")

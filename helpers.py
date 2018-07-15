@@ -51,7 +51,7 @@ parts = ["--", "Tn", "Ld", "Br", "Bs"]
 lparts = ["None", "Tenor", "Lead", "Baritone", "Bass"]
 countries = {country.code: country for country in session.query(Country)}
 country_list = [(c.code, c.name_en) for id, c in sorted(countries.items(), key=lambda x:x[0])]
-paypal_statuses = {pp.id: pp for pp in session.query(PaypalStatus).all()}
+paypal_statuses = {int(pp.id): pp.clone() for pp in session.query(PaypalStatus).all()}
 
 PP_UNINITIALIZED = 1
 PP_TOKEN = 2
