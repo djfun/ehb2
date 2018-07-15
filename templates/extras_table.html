@@ -1,7 +1,7 @@
 <table class="table table-striped" width="100%">
         <thead><tr><th>Item</th> <th>Pay Now</th></tr></thead>
         <tbody>
-            {% for item, pay_to_ehb in items %}
+            {% for item, pay_to_hotel, pay_to_ehb in items %}
               <tr>
                   <td>{{ item }}</td>
                   <td>{% if pay_to_ehb > 0 %} {{ pay_to_ehb | eur }} {% endif %}</td>
