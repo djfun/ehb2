@@ -303,7 +303,7 @@ def send_email_confirmation(prt, extras):
     pay_now, pay_to_hotel, items = extras_cost(extras)
     msg = render_template("em_extras_confirmation.txt", prt=prt, conf=conf_for_template,
                           pay_now=pay_now, pay_to_hotel=pay_to_hotel, items=items)
-    ehbmail.send([prt.id], "Extras Confirmation", [msg], "extras: payment success")
+    ehbmail.send([prt.id], "Extras confirmation", [msg], "extras: payment success")
 
 
 @app.route("/extras-payment-success.html", methods=["GET", ])
