@@ -30,7 +30,7 @@
     </thead>
 
     <tbody>
-    {% for prt, extras, pay_now in prt_with_data %}
+    {% for prt, extras, pay_now, pay_hotel in prt_with_data %}
     <tr>
         <td><a href="show-extra.html?id={{ prt.id }}">{{ prt.fullnameLF() }}</a></td>
         <td>{{ extras.arrival_date|fd }}</td>
