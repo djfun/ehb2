@@ -96,7 +96,7 @@ def extras_cost(extras: Extra):
     room_cost_other_days = ((extras.departure_date - extras.arrival_date).days -
                             number_of_days) * prt_roomtype.cost_on_other_days()
     items.append(("Your room (%s), %s to %s" % (prt_roomtype.description_with_roompartner(extras.roompartner), fd(
-        extras.arrival_date), fd(extras.departure_date)), extra_room_cost_ehbdays + room_cost_other_days, 0))
+        extras.arrival_date), fd(extras.departure_date)), 0, extra_room_cost_ehbdays + room_cost_other_days))
 
     # room costs for guests
     guest1_roomcost = 0
@@ -105,7 +105,7 @@ def extras_cost(extras: Extra):
         guest1_roomcost = (extras.guest1_departure - extras.guest1_arrival).days * \
             g1rt.cost_on_other_days()
         items.append(("Guest: %s (%s), %s to %s" % (extras.guest1_name, g1rt.description, fd(
-            extras.guest1_arrival), fd(extras.guest1_departure)), guest1_roomcost, 0))
+            extras.guest1_arrival), fd(extras.guest1_departure)), 0, guest1_roomcost))
 
     guest2_roomcost = 0
     if extras.guest2_roomtype != NO_GUEST:
@@ -113,7 +113,7 @@ def extras_cost(extras: Extra):
         guest2_roomcost = (extras.guest2_departure - extras.guest2_arrival).days * \
             g2rt.cost_on_other_days()
         items.append(("Guest: %s (%s), %s to %s" % (extras.guest2_name, g2rt.description, fd(
-            extras.guest2_arrival), fd(extras.guest2_departure)), guest2_roomcost, 0))
+            extras.guest2_arrival), fd(extras.guest2_departure)), 0, guest2_roomcost))
 
     # other costs for guests
     if extras.num_dinner_friday:
