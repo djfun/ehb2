@@ -15,7 +15,8 @@ from auth import *
 @login_required
 def show_participants(message=None):
     participants = session.query(Participant).all()
-    paid_participants = session.query(Participant).filter(Participant.last_paypal_status == PP_SUCCESS).all()
+    paid_participants = session.query(Participant).filter(
+        Participant.last_paypal_status == PP_SUCCESS).all()
     total_donations = sum([p.donation for p in participants])
 
     return render_template("show_participants.html", title="Show participants", message=message,
@@ -87,13 +88,45 @@ def do_show_participants():
 part_colors = ["428BCA", "5CB85C", "F0AD4E", "D9534F"]
 part_highlight_colors = ["5DA6E6", "78D077", "FCC671", "E16864"]
 
-country_colors = ["FFFC31", "5C415D", "F6F7EB", "E94F37",
-                  "393E41", "C5D86D", "1B998B", "F46036", "0B3954", "D7263D",
-                  "428BCA", "5CB85C", "F0AD4E", "D9534F"]
-country_highlight_colors = ["FFFDBF", "9F70A0", "FFFFFF",
-                            "E87B6A", "5C6368", "DAE6A2", "82C7BF", "F78B6C",
-                            "4D6F82", "DE4D60", "5DA6E6", "78D077", "FCC671",
-                            "E16864"]
+country_colors = [
+    "262BC0",
+    "5226C0",
+    "8326C0",
+    "B326C0",
+    "C0269D",
+    "C0266C",
+    "C0263C",
+    "C04126",
+    "C07226",
+    "C0A226",
+    "AEC026",
+    "7EC026",
+    "4DC026",
+    "26C030",
+    "26C061",
+    "26C091",
+    "26BFC0",
+    "268EC0",
+    "265EC0"]
+country_highlight_colors = [
+    "7D7DDB",
+    "997DDB",
+    "B57DDB",
+    "D17DDB",
+    "DB7DC9",
+    "DB7DAD",
+    "DB7D91",
+    "DB857D",
+    "DBA17D",
+    "DBBD7D",
+    "DBD97D",
+    "C0DB7D",
+    "A4DB7D",
+    "88DB7D",
+    "7DDB8D",
+    "7DDBA9",
+    "7DDBC5",
+    "7DD4DB"]
 
 
 def participants_by(all_participants, fn):

@@ -1,0 +1,21 @@
+Dear {{ prt.fullname() }},
+
+I'd like to remind you personally that we have not received an Extras booking
+from you, although the deadline for submitting the Extras page was last Sunday.
+
+If we don't hear from you by tomorrow (Thursday) night, we are going to
+assume that you:
+
+- want a double/twin room from __________________, shared with any other participant
+- are not bringing any guests
+
+If any of these is not correct, please go to the following URL by TOMORROW NIGHT
+and complete your booking:
+
+http://apply.europeanharmonybrigade.org/extras.html?={{ prt.code }}
+
+Even if you do not want any extras, it still helps us if you submit the form
+with the default values, so we know that we have all the data.
+
+Cheers,
+Eileen
