@@ -179,6 +179,7 @@ def makebadge(i, p:Participant, dir):
 
     pos = "topbadge_bottom_left" if i%2 == 0 else "current page.south west"
 
+
     return "  \\badge{%s}{%s}{%s}{%s}{%s}{%s}{%s}{%s}" % \
            (pos, p.firstname, p.lastname, p.city, p.country, parts[p.final_part], p.country, qr)
 
@@ -261,7 +262,11 @@ def generate_badges(pdf_filename, template_filename, table):
         # download flag if necessary
         flag_filename = os.path.join(flagdir, "%s.png" % p.country)
         if not os.path.exists(flag_filename):
-            download_binary_file("http://flagpedia.net/data/flags/normal/%s.png" % p.country.lower(), flag_filename)
+            to_download = p.country.lower()
+            if to_download == "hk":
+                to_download = "cn"
+            
+            download_binary_file("http://flagpedia.net/data/flags/normal/%s.png" % to_download, flag_filename)
 
         fp = p.final_part
 
@@ -292,6 +297,7 @@ def generate_badges(pdf_filename, template_filename, table):
 
     template = texenv.get_template(template_filename)
     tex = template.render(event_name=conf.get("application", "name"), songs=songs)
+    
     return compile_and_send_pdf(pdf_filename, tex, runs=2, dirpath=dirpath)
 
 
