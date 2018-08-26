@@ -31,7 +31,7 @@ from helpers import *
 from flask_login import login_required, current_user
 from discount import *
 from add_geolocations import *
-from generate_map import *
+#from generate_map import *
 
 delay_between_messages = float(conf["email"]["delay_between_messages"])
 
