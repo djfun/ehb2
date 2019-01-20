@@ -5,7 +5,7 @@ from tables import Participant, Geocoding
 from geopy.geocoders import Nominatim
 
 # set up geolocation service
-geolocator = Nominatim()
+geolocator = Nominatim(user_agent="ehb")
 
 # unknown cities
 known = set([geo.city.lower() for geo in session.query(Geocoding)])
