@@ -1,0 +1,51 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <hr/> <p class="error"> {{ message }} </p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<div class="page-header"> <h1>Executing your payment</h1> </div>
+
+
+<div>
+<p>
+Hello, {{ prt.firstname }} {{ prt.lastname }}!
+</p>
+
+{% if total_amount > 0 %}
+    <p>On this page, you can complete your payment for {{ conf_data["shortname"] }}.
+    </p>
+
+    <p>Our records show that you still need to pay for the following items:</p>
+
+    <table class="table">
+        {% for item in payment_items %}
+          <tr><td>{{ item.name }}</td>  <td>€ {{ item.amount }}</td></tr>
+        {% endfor %}
+
+        <tr><td><strong>Total:</strong></td>  <td><strong>€ {{ total_amount }}</strong></td></tr>
+    </table>
+
+    <p>Please click on the "Execute Payment" button below to execute this payment. Thank you!</p>
+
+        <form class="form-horizontal" action="{{ url_for('doExecutePaymentOops') }}" method="post">
+            <input type="hidden" name="id" value="{{ prt.id }}">
+            <input type="hidden" name="amount" value="{{ total_amount }}">
+            <button id="submit" name="submit" type="submit" class="btn btn-primary">Execute Payment</button>
+        </form>
+
+{% else %}
+<p>You have completed all of your payments. Thank you!</p>
+{% endif %}
+</div>
+
+
+{% endblock %}

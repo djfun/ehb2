@@ -35,6 +35,7 @@ env_to_conf_entries = [
     ("SERVER_BASEURL", "server", "base_url"),
     ("SERVER_TORNADO", "server", "use_tornado"),
     ("SERVER_LOGFILE", "server", "logfile"),
+    ("SERVER_PASSWORD_SALT", "server", "password_salt"),
     #
     ("ACCEPT_APPLICATIONS", "application", "accept_applications"),
     #
