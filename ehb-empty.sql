@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Jan 22, 2019 at 10:22 PM
+-- Generation Time: Jan 23, 2019 at 10:25 PM
 -- Server version: 5.7.20
 -- PHP Version: 7.2.8
 
@@ -524,7 +524,8 @@ CREATE TABLE `participant` (
   `member` tinyint(1) NOT NULL,
   `discounted` varchar(8) DEFAULT NULL,
   `final_fee` int(11) DEFAULT NULL,
-  `confirmed` tinyint(1) NOT NULL DEFAULT '0'
+  `confirmed` tinyint(1) NOT NULL DEFAULT '0',
+  `gdpr` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
