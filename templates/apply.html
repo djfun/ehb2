@@ -114,7 +114,11 @@
 
         {{ m.wtf(form.discount_code) }}
 
-        {{ m.header("section7", """<strong>Your acknowledgment:</strong> I have read all the application information for " + conf_data["shortname"] + ". I will make sure that if I am invited
+        {{ m.header("section7", """I agree to the processing of my personal data as outlined in the <a href=\"/\">data processing agreement</a>. I can withdraw my consent to this processing at any time.
+        """) }}
+        {{ m.wtf(form.gdpr) }}
+
+        {{ m.header("section8", """<strong>Your acknowledgment:</strong> I have read all the application information for " + conf_data["shortname"] + ". I will make sure that if I am invited
         and attend the European Harmony Brigade, I will be completely prepared. I will know all my notes, words, and the interpretation
         of all the songs. <strong><i>I will be the reason all the people I sing with will be glad they attended.</i></strong> All of the
         information I've included is true.""") }}

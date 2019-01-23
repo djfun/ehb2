@@ -93,7 +93,7 @@ def do_apply():
                               application_time=datetime.datetime.now(), comments=form.comments.data,
                               registration_status=1,  # TODO - what is this for?
                               donation=form.donation.data, iq_username=form.iq_username.data,
-                              discounted=form.discount_code.data, confirmed=False
+                              discounted=form.discount_code.data, confirmed=False, gdpr=form.gdpr.data
                               )
 
         try:
@@ -305,6 +305,8 @@ class ApplicationForm(Form):
     discount_code = StringField("Scholarship code", [validators.Length(min=0, max=8, message="Code must be %(min)d digits long.")], render_kw={
         "placeholder": "Enter your discount code (optional)"})
 
+    gdpr = BooleanField("Data processing agreement", validators=[validators.DataRequired()])
+
 
 def application_form(prt):
     ret = ApplicationForm()
@@ -328,6 +330,7 @@ def application_form(prt):
     ret.iq_username.data = prt.iq_username
     ret.comments.data = prt.comments
     ret.discount_code.data = prt.discounted
+    ret.gdpr = prt.gdpr
     return ret
 
 

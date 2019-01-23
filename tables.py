@@ -80,6 +80,7 @@ class Participant(Base):
     discounted = Column(String(8))
     final_fee = Column(Integer)
     confirmed = Column(Boolean)
+    gdpr = Column(Boolean)
 
     iq_username = Column(String(100))
     code = Column(String(16))
