@@ -83,9 +83,9 @@ def do_apply():
     form = ApplicationForm(request.form)
 
     if form.validate():
-        new_prt = Participant(firstname=form.firstname.data, lastname=form.lastname.data,
-                              sex=form.gender.data, street=form.street.data,
-                              city=form.city.data, zip=form.zip.data,
+        new_prt = Participant(firstname=form.firstname.data.strip(), lastname=form.lastname.data.strip(),
+                              sex=form.gender.data, street=form.street.data.strip(),
+                              city=form.city.data.strip(), zip=form.zip.data.strip(),
                               country=form.country.data, part1=int(form.part1.data), part2=int(form.part2.data),
                               email=form.email.data, member=form.member.data, exp_quartet=form.exp_quartet.data,
                               exp_brigade=form.exp_brigade.data, exp_chorus=form.exp_chorus.data,
