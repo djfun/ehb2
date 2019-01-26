@@ -79,6 +79,7 @@ class Participant(Base):
     donation = Column(Integer)
     discounted = Column(String(8))
     final_fee = Column(Integer)
+    confirmed = Column(Boolean)
 
     iq_username = Column(String(100))
     code = Column(String(16))

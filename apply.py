@@ -12,9 +12,12 @@ from tables import *
 from itertools import groupby
 from helpers import *
 from flask import request, flash
+from flask import session as flask_session
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField, BooleanField
 from config import conf, currency_symbol
 from discount import *
+from confirmation_token import generate_confirmation_token, confirm_token
+import urllib.parse
 
 pp1 = Paypal(1,
              lambda url: redirect(url, code=302),
@@ -25,10 +28,11 @@ pp1 = Paypal(1,
 application_fee = float(conf.get("paypal", "fee"))
 event_name = conf.get("application", "name")
 event_shortname = conf.get("application", "shortname")
+base_url = conf.get("server", "base_url")
 
 conf_data = {"name": event_name,
              "shortname": event_shortname,
-             "s_application_fee": str(application_fee)
+             "s_application_fee": str(application_fee),
              }
 
 # @app.route("/apply.html", methods=["GET",])
@@ -89,7 +93,7 @@ def do_apply():
                               application_time=datetime.datetime.now(), comments=form.comments.data,
                               registration_status=1,  # TODO - what is this for?
                               donation=form.donation.data, iq_username=form.iq_username.data,
-                              discounted=form.discount_code.data
+                              discounted=form.discount_code.data, confirmed=False
                               )
 
         try:
@@ -102,8 +106,23 @@ def do_apply():
             new_prt.final_fee = application_fee - apply_discount(new_prt.discounted, new_prt.code)
             session.commit()
 
+            token = generate_confirmation_token(new_prt.email)
+            confirmation_url = urllib.parse.urljoin(base_url, "/confirm_email/")
+            confirmation_url = urllib.parse.urljoin(confirmation_url, token)
+
+            amount = new_prt.final_fee + new_prt.donation
+
             pp1.log(new_prt.id, PP_UNINITIALIZED, "")
-            return pp1.pay(new_prt.id, "%s Application Fee: %s %s" % (event_shortname, new_prt.firstname, new_prt.lastname), new_prt.final_fee + new_prt.donation)
+
+            # send email with confirmation token
+            body = render_template("application_confirm_email.txt", amount=int(amount), prt=new_prt, eventname=event_name,
+                               shortname=event_shortname, final_fee=int(new_prt.final_fee), currency_symbol=currency_symbol,
+                               confirmation_token=token, confirmation_url=confirmation_url)
+            print(body)
+            ehbmail.send([new_prt.id], "Application confirmed", [body], "Application page")
+
+            return render_template("confirmation_email_sent.html", title="Apply!", amount=int(amount), data=new_prt, name=event_name,
+                                shortname=event_shortname, currency_symbol=currency_symbol, application_fee=int(application_fee))
 
         except IntegrityError as e:
             # TODO - if participant exists AND HAS PAID, reject application for same email
@@ -132,11 +151,61 @@ def do_apply():
         return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
 
+def confirmation_render(prt):
+    if pp1.did_pay_before(prt):
+        fee = 0
+        items = []
+    else:
+        items = [PaymentItem("Application fee", application_fee)]
+        fee = prt.final_fee
+
+        if prt.donation > 0:
+            items.append(PaymentItem("Donation", prt.donation))
+
+    return render_template("confirm.html", prt=prt, payment_items=items, total_amount=fee, conf_data=conf_data)
+
+
+@app.route('/confirm_email/<confirmation_code>')
+def confirm_email(confirmation_code):
+    try:
+        email = confirm_token(confirmation_code)
+    except:
+        flash('The confirmation link is invalid.', 'danger')
+        return redirect("/")
+    prt = session.query(Participant).filter(Participant.email == email).first()
+    if prt.confirmed:
+        flash('Account already confirmed.', 'success')
+    else:
+        prt.confirmed = True
+        prt.confirmed_on = datetime.datetime.now()
+        session.add(prt)
+        session.commit()
+        flash('You have confirmed your account. Thanks!', 'success')
+
+    flask_session['sn_code'] = generate_confirmation_token(prt.email)
+    return redirect("confirm.html")
+
+
+@app.route("/confirm.html", methods=["GET", ])
+def confirmation_page():
+    code = flask_session.get('sn_code')
+    if code:
+        try:
+            email = confirm_token(code)
+            prt = session.query(Participant).filter(Participant.email == email).first()
+        except:
+            return redirect("/")
+        return confirmation_render(prt)
+    return redirect("/")
+
+
+
 def applyWithPaypalError(id, message):
     prt = session.query(Participant).filter(Participant.id == id).first()
     form = application_form(prt)
     flash(message)
-    return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
+    flask_session['sn_code'] = generate_confirmation_token(prt.email)
+    return redirect("confirm.html")
 
 
 @app.route("/payment-cancelled.html", methods=["GET", ])
@@ -148,9 +217,9 @@ def paymentCancelled():
 
     pp1.log(prt.id, PP_CANCELLED, "(payment cancelled on Paypal website)")
 
-    form = application_form(prt)
-    flash("You have cancelled payment. Your application has not been processed. Please resubmit this form and complete payment to apply for EHB.")
-    return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
+    flash("You have cancelled payment. Your application has not been processed. Please complete payment to apply for EHB.")
+    flask_session['sn_code'] = generate_confirmation_token(prt.email)
+    return redirect("confirm.html")
 
 
 @app.route("/payment-success.html", methods=["GET", ])
@@ -178,13 +247,15 @@ def paymentSuccess():
     except PaymentNotFoundException as e:
         # print("pm nfe " + e.paymentId)
         flash("Unable to resolve the Paypal payment ID '%s' to a payment. Please try resubmitting your application, or contact the organizers." % e.paymentId)
-        return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
+        flask_session['sn_code'] = generate_confirmation_token(prt.email)
+        return redirect("confirm.html")
     except DuplicatePaymentException as e:
         amount = application_fee + e.prt.donation
         return render_template("payment_confirmation.html", title="Apply!", amount=amount, data=e.prt, name=event_name, shortname=event_shortname, application_fee=("%.2f" % application_fee))
     except PaymentFailedException as e:
         flash("Something went wrong with your Paypal payment. Please contact the organizers.")
-        return render_template("apply.html", title="Apply!", form=application_form(e.prt), conf_data=conf_data)
+        flask_session['sn_code'] = generate_confirmation_token(prt.email)
+        return redirect("confirm.html")
 
 
 class ApplicationForm(Form):
