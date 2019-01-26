@@ -1,0 +1,77 @@
+<html>
+<head>
+         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+   integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+   crossorigin=""/>
+</head>
+<body>
+<div id="map-canvas" style="width:900px;height:600px;"></div>
+
+ <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+   integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+   crossorigin=""></script>
+
+<script>
+    var map;
+    var infowindow = null;
+
+    function initialize() {
+        map = L.map('map-canvas');
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        // map.setView([51.505, -0.09], 9);
+        console.log("init done");
+    }
+
+    initialize();
+
+    var markerColors = new Array("", "428BCA", "5CB85C", "F0AD4E", "D9534F");
+
+    var LatLngList = new Array ({{ latlongs }});
+    var nameList = new Array({{ names }});
+    var partList = [{{ parts }}];
+
+    var MyIcon = L.Icon.extend({
+        options: {
+            iconSize:     [22, 33],
+            popupAnchor:  [0, -20]
+        }
+    });
+
+    var markerTypes = [
+        null,
+        new MyIcon({iconUrl: 'static/img/marker1a.png'}),
+        new MyIcon({iconUrl: 'static/img/marker2a.png'}),
+        new MyIcon({iconUrl: 'static/img/marker3a.png'}),
+        new MyIcon({iconUrl: 'static/img/marker4a.png'})
+    ];
+
+
+    console.log(LatLngList.length);
+
+    //  Create a new viewpoint bound
+    if (LatLngList.length < 2) {
+        var bounds = L.latLngBounds([63.94, -12.48], [39.78, 32.34]);
+    } else {
+        var bounds = L.latLngBounds(LatLngList[0], LatLngList[1]);
+    }
+    
+
+    function addMarkers() {
+        //  Go through each...
+        for (var i = 0, LtLgLen = LatLngList.length; i < LtLgLen; i++) {
+            //  And increase the bounds to take this point
+            bounds.extend (LatLngList[i]);
+
+            // add marker
+            L.marker(LatLngList[i], {icon: markerTypes[partList[i]]}).addTo(map).bindPopup(nameList[i]);
+        }
+        //  Fit these bounds to the map
+        map.fitBounds (bounds);
+    }
+    addMarkers();
+</script>
+</body>
+</html>

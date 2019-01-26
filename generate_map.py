@@ -10,7 +10,7 @@ from jinja2 import Environment
 # set up Jinja
 loader = FileSystemLoader("templates")
 env = Environment(loader=loader)
-template = env.get_template("googlemap.html")
+template = env.get_template("osmmap.html")
 
 
 latlng = list()
@@ -21,7 +21,7 @@ parts = list()
 for p in session.query(Participant):
     loc = session.query(Geocoding).filter(Geocoding.city == p.city_with_country()).first()
     if loc:
-        latlng.append("new google.maps.LatLng(%f, %f)" % (float(loc.lat) +
+        latlng.append("[%f, %f]" % (float(loc.lat) +
                                                           (random() - 0.5) * 0.1, float(loc.long) + (random() - 0.5) * 0.1))
         names.append(p.makeMapLabel())
         parts.append(str(p.final_part))
