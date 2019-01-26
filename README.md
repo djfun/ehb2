@@ -59,6 +59,7 @@ environment variables.
 | SERVER_BASEURL       | server   | base_url               |
 | SERVER_TORNADO       | server   | use_tornado            |
 | SERVER_LOGFILE       | server   | logfile                |
+| SERVER_PASSWORD_SALT | server   | secret                 |
 | ACCEPT_APPLICATIONS  | application | accept_applications |
 | DB_URL               | database | url                    |
 | EMAIL_SERVER         | email    | server                 |
