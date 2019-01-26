@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% import "macros.html" as m %}
+
+{% block content %}
+
+	<p>You have successfully submitted your application to the {{ name }}.
+		Please note, that in order to complete this process you have to confirm
+    your email address by clicking the link in the email you should receive
+    from us. In this step you also have to make the payment of {{ currency_symbol }} {{ amount }} via Paypal.
+	</p>
+
+    <p><a href="http://www.europeanharmonybrigade.org/">Click here to return to the main EHB website.</a></p>
+
+	<hr/>
+
+    {% include "participant_details.html" %}
+
+{% endblock %}

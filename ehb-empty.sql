@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.7
+-- version 4.8.3
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Feb 21, 2018 at 10:57 AM
+-- Generation Time: Jan 22, 2019 at 10:22 PM
 -- Server version: 5.7.20
--- PHP Version: 7.1.9
+-- PHP Version: 7.2.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -523,7 +523,8 @@ CREATE TABLE `participant` (
   `code` varchar(16) DEFAULT NULL,
   `member` tinyint(1) NOT NULL,
   `discounted` varchar(8) DEFAULT NULL,
-  `final_fee` int(11) DEFAULT NULL
+  `final_fee` int(11) DEFAULT NULL,
+  `confirmed` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
