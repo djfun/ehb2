@@ -83,9 +83,9 @@ def do_apply():
     form = ApplicationForm(request.form)
 
     if form.validate():
-        new_prt = Participant(firstname=form.firstname.data, lastname=form.lastname.data,
-                              sex=form.gender.data, street=form.street.data,
-                              city=form.city.data, zip=form.zip.data,
+        new_prt = Participant(firstname=form.firstname.data.strip(), lastname=form.lastname.data.strip(),
+                              sex=form.gender.data, street=form.street.data.strip(),
+                              city=form.city.data.strip(), zip=form.zip.data.strip(),
                               country=form.country.data, part1=int(form.part1.data), part2=int(form.part2.data),
                               email=form.email.data, member=form.member.data, exp_quartet=form.exp_quartet.data,
                               exp_brigade=form.exp_brigade.data, exp_chorus=form.exp_chorus.data,
@@ -93,7 +93,7 @@ def do_apply():
                               application_time=datetime.datetime.now(), comments=form.comments.data,
                               registration_status=1,  # TODO - what is this for?
                               donation=form.donation.data, iq_username=form.iq_username.data,
-                              discounted=form.discount_code.data, confirmed=False
+                              discounted=form.discount_code.data, confirmed=False, gdpr=form.gdpr.data
                               )
 
         try:
@@ -305,6 +305,8 @@ class ApplicationForm(Form):
     discount_code = StringField("Scholarship code", [validators.Length(min=0, max=8, message="Code must be %(min)d digits long.")], render_kw={
         "placeholder": "Enter your discount code (optional)"})
 
+    gdpr = BooleanField("I agree", validators=[validators.DataRequired()])
+
 
 def application_form(prt):
     ret = ApplicationForm()
@@ -328,6 +330,7 @@ def application_form(prt):
     ret.iq_username.data = prt.iq_username
     ret.comments.data = prt.comments
     ret.discount_code.data = prt.discounted
+    ret.gdpr = prt.gdpr
     return ret
 
 
