@@ -23,8 +23,12 @@ from discount import *
 
 @app.route("/")
 def index():
-    return "Applications are closed. If you would still like to apply for EHB 2018, please get in touch with the organizers!"
-    # return "The application site is not available right now - please check back later!"
+    event_shortname = conf.get("application", "shortname")
+    if conf.getboolean("application", "accept_applications"):
+        return apply()
+    else:
+        return "Applications are closed. If you would still like to apply for %s, please get in touch with the organizers!" % event_shortname
+        # return "The application site is not available right now - please check back later!"
 
 
 @app.route("/secret")
