@@ -162,7 +162,7 @@ def confirmation_render(prt):
         if prt.donation > 0:
             items.append(PaymentItem("Donation", prt.donation))
 
-    return render_template("confirm.html", prt=prt, payment_items=items, total_amount=amount, conf_data=conf_data)
+    return render_template("confirm.html", title="Confirm email address", prt=prt, payment_items=items, total_amount=amount, conf_data=conf_data)
 
 
 @app.route('/confirm_email/<confirmation_code>')
