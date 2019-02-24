@@ -153,16 +153,16 @@ def do_apply():
 
 def confirmation_render(prt):
     if pp1.did_pay_before(prt):
-        fee = 0
+        amount = 0
         items = []
     else:
         items = [PaymentItem("Application fee", application_fee)]
-        fee = prt.final_fee
+        amount = prt.final_fee + prt.donation
 
         if prt.donation > 0:
             items.append(PaymentItem("Donation", prt.donation))
 
-    return render_template("confirm.html", prt=prt, payment_items=items, total_amount=fee, conf_data=conf_data)
+    return render_template("confirm.html", prt=prt, payment_items=items, total_amount=amount, conf_data=conf_data)
 
 
 @app.route('/confirm_email/<confirmation_code>')
