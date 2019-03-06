@@ -91,6 +91,7 @@ def do_apply():
                               exp_brigade=form.exp_brigade.data, exp_chorus=form.exp_chorus.data,
                               exp_musical=form.exp_musical.data, exp_reference=form.exp_reference.data,
                               application_time=datetime.datetime.now(), comments=form.comments.data,
+                              contribution_comment=form.contribution_comment.data,
                               registration_status=1,  # TODO - what is this for?
                               donation=form.donation.data, iq_username=form.iq_username.data,
                               discounted=form.discount_code.data, confirmed=False, gdpr=form.gdpr.data
@@ -299,6 +300,9 @@ class ApplicationForm(Form):
     iq_username = StringField("IQ account", render_kw={
                               "placeholder": "Enter your IQ account name (optional)"})
 
+    contribution_comment = TextAreaField("Your contribution", render_kw={
+        "rows": "5", "cols": "80", "placeholder": "Besides coming fully prepared on your music, what can you do to help make the %s rally a success?" % event_shortname})
+
     comments = TextAreaField("Comments", render_kw={
                              "rows": "5", "cols": "80", "placeholder": "Room for anything else you would like to say."})
 
@@ -328,6 +332,7 @@ def application_form(prt):
     ret.exp_musical.data = prt.exp_musical
     ret.exp_reference.data = prt.exp_reference
     ret.iq_username.data = prt.iq_username
+    ret.contribution_comment = prt.contribution_comment
     ret.comments.data = prt.comments
     ret.discount_code.data = prt.discounted
     ret.gdpr = prt.gdpr

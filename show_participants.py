@@ -65,6 +65,7 @@ def do_show_participants():
                                              exp_brigade=prt.exp_brigade, exp_chorus=prt.exp_chorus,
                                              exp_musical=prt.exp_musical, exp_reference=prt.exp_reference,
                                              application_time=prt.application_time, comments=prt.comments,
+                                             contribution_comment=prt.contribution_comment,
                                              registration_status=prt.registration_status,
                                              donation=prt.donation, iq_username=prt.iq_username,
                                              final_part=prt.final_part, paypal_token=prt.paypal_token,
