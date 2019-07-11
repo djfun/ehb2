@@ -96,15 +96,14 @@
 
         {{ m.header("section_guest_meals", """<strong>Meals for Guests</strong><br/>
         <p>Your guests can also share our meals at the hotel. Each guest pays " ~ conf.cost_fri_dinner ~ " EUR to share our
-            Friday night dinner, " ~ conf.cost_sat_lunch ~ " EUR to share our Saturday lunch, and " ~ conf.cost_after_concert ~ " EUR if they'd like to
-            help themselves to the after-show midnight snacks on Saturday night.</p>
+            Friday night dinner and " ~ conf.cost_sat_dinner ~ " EUR to share our Saturday dinner.
+        </p>
 
         <p>If you would like to let us know anything else regarding your guests, you can enter that below as well.</p>
         """) }}
 
         {{ m.wtf(form.num_dinner_friday) }}
         {{ m.wtf(form.num_lunch_saturday) }}
-        {{ m.wtf(form.num_after_concert) }}
 
         {{ m.wtf(form.guest, fclass="ta") }}
 
