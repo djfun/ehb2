@@ -184,10 +184,10 @@ class ExtrasForm(Form):
 
     num_dinner_friday = IntegerField("Extra Friday dinners", validators=[
                                      validators.NumberRange(min=0)], default=0)
-    num_lunch_saturday = IntegerField("Extra Saturday lunches", validators=[
+    num_lunch_saturday = IntegerField("Extra Saturday dinners", validators=[
                                       validators.NumberRange(min=0)], default=0)
-    num_after_concert = IntegerField("Extra after-show snacks",
-                                     validators=[validators.NumberRange(min=0)], default=0)
+    # num_after_concert = IntegerField("Extra after-show snacks",
+    #                                 validators=[validators.NumberRange(min=0)], default=0)
 
     # num_show_tickets_regular = IntegerField("Show tickets (regular)", validators=[validators.NumberRange(min=0)], default=0)
     # num_show_tickets_discount = IntegerField("Show tickets (discounted)", validators=[validators.NumberRange(min=0)], default=0)
@@ -230,7 +230,7 @@ def make_extras_from_form(prt, form):
 
                  num_dinner_friday=form.num_dinner_friday.data,
                  num_lunch_saturday=form.num_lunch_saturday.data,
-                 num_after_concert=form.num_after_concert.data,
+                 num_after_concert=0,
 
                  num_show_tickets_regular="0",
                  num_show_tickets_discount="0",
@@ -277,7 +277,7 @@ def make_form_from_extras(extras: Extra):
 
     ret.num_dinner_friday.data = extras.num_dinner_friday
     ret.num_lunch_saturday.data = extras.num_lunch_saturday
-    ret.num_after_concert.data = extras.num_after_concert
+    # ret.num_after_concert.data = extras.num_after_concert
 
     # ret.num_show_tickets_regular.data = extras.num_show_tickets_regular
     # ret.num_show_tickets_discount.data = extras.num_show_tickets_discount
