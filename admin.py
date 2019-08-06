@@ -7,7 +7,7 @@ from collections import Set, deque
 import datetime
 
 import pickle
-from numpy import random
+from numpy import random as nrand
 
 import xlsxwriter
 from flask import flash
@@ -323,10 +323,10 @@ def generate_random_quartets():
 
 
 def shuffle_until_first_is_not(L, forbidden_first_element):
-    random.shuffle(L)
+    nrand.shuffle(L)
 
     while L[0] == forbidden_first_element:
-        random.shuffle(L)
+        nrand.shuffle(L)
 
 
 def pad_songs(songs, num_quartets):
@@ -337,7 +337,7 @@ def pad_songs(songs, num_quartets):
         if ret:
             shuffle_until_first_is_not(songs, ret[-1])
         else:
-            random.shuffle(songs)
+            nrand.shuffle(songs)
 
         ret.extend(songs)
 
@@ -346,7 +346,7 @@ def pad_songs(songs, num_quartets):
     if ret:
         shuffle_until_first_is_not(extras, ret[-1])
     else:
-        random.shuffle(extras)
+        nrand.shuffle(extras)
 
     while len(ret) < num_quartets:
         ret.append(extras.pop())
@@ -356,7 +356,7 @@ def pad_songs(songs, num_quartets):
 
 def pad(people, size):
     ret = list(people)
-    random.shuffle(ret)
+    nrand.shuffle(ret)
 
     extras = list(people)
     shuffle_until_first_is_not(extras, ret[-1])
