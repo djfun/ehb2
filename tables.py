@@ -64,9 +64,6 @@ class Participant(Base):
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)
     member = Column(Boolean)
-    paypal_token = Column(String(30), index=True)
-    last_paypal_status = Column("last_paypal_status", SmallInteger,
-                                ForeignKey("paypal_statuses.id"))
     email = Column(String(100), unique=True)
     exp_quartet = Column(String)
     exp_brigade = Column(String)
@@ -88,7 +85,6 @@ class Participant(Base):
 
     s_final_part = relationship("Part", backref=backref("participants"), lazy="joined")
     ccountry = relationship("Country", backref=backref("participants"), lazy="joined")
-    paypal_status = relationship("PaypalStatus", backref=backref("participants"), lazy="joined")
 
     def city_with_country(self):
         return "%s, %s" % (self.city, self.country)
@@ -111,9 +107,6 @@ class Participant(Base):
     def fullnameLF(self):
         return "%s, %s" % (self.lastname, self.firstname)
 
-    def paypalStatus(self):
-        return "xx"
-
     def __repr__(self):
         return "%s %s (%d)" % (self.firstname, self.lastname, self.id)
 
@@ -133,9 +126,6 @@ class DeletedParticipant(Base):
     part1 = Column(SmallInteger)
     part2 = Column(SmallInteger)
     member = Column(Boolean)
-    paypal_token = Column(String(30), index=True)
-    last_paypal_status = Column("last_paypal_status", SmallInteger,
-                                ForeignKey("paypal_statuses.id"))
     email = Column(String(100), unique=True)
     exp_quartet = Column(String)
     exp_brigade = Column(String)
@@ -252,12 +242,10 @@ class Extra(Base):
     guest2_name = Column(String(200))
     guest2_arrival = Column(Date)
     guest2_departure = Column(Date)
-    guest2_roomtype = Column(String(100))
-    last_paypal_status = Column(SmallInteger)
+    guest2_roomtype = Column(String(100))  
     sat_night_restaurant = Column(String(100))
     sat_night_numpeople = Column(SmallInteger)
     phone = Column(String(100))
-    paypal_token = Column(String(30))
     special_event_tickets = Column(SmallInteger, nullable=False)
     t_shirt_spec = Column(SmallInteger, ForeignKey('t_shirt_specs.id'))
 
@@ -298,11 +286,9 @@ class OverwrittenExtra(Base):
     guest2_arrival = Column(Date)
     guest2_departure = Column(Date)
     guest2_roomtype = Column(String(100))
-    last_paypal_status = Column(SmallInteger)
     sat_night_restaurant = Column(String(100))
     sat_night_numpeople = Column(SmallInteger)
     phone = Column(String(100))
-    paypal_token = Column(String(30))
     special_event_tickets = Column(SmallInteger, nullable=False)
     t_shirt_spec = Column(SmallInteger)
 
@@ -345,3 +331,37 @@ class OopsCode(Base):
     code = Column(String(16))
 
     participant = relationship("Participant", backref=backref("oops_code"), lazy="joined")
+
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True)
+    timestamp = Column(DateTime)
+    amount = Column(Integer)
+    short_description = Column(String)
+    long_description = Column(String)
+    shortstatuses = ["", "unpaid", "paid", "error"]
+
+    def status(self):
+        return shortstatuses[self.id]
+
+    def __repr__(self):
+        return "[%d %s, amount=%d]" % (self.id, self.short_description, self.amount)
+
+    participant = relationship("Participant", backref=backref("orders"), lazy="joined")
+
+
+class ExternalPayment(Base):
+    __tablename__ = "external_payment"
+
+    id = Column(Integer, primary_key=True)
+    reference = Column(String(30))
+
+
+class PaypalPayment(Base):
+    __tablename__ = "paypal_payment"
+
+    id = Column(Integer, primary_key=True)
+    paypal_token = Column(String(30), index=True)
+    last_paypal_status = Column(SmallInteger)
