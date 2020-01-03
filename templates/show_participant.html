@@ -11,27 +11,32 @@
 <div class="participant-management">
     <h1>Payment History</h1>
     <table width="100%">
-        <tr><th align="left" width="20%">Time</th> <th align="left" width="20%">Paypal Status</th> <th align="left" width="60%">Details</th></tr>
-        {% for item in paypal_history %}
+        <tr><th align="left" width="15%">Time</th> <th align="left" width="10%">Description</th> <th align="left" width="10%">Amount</th> <th align="left" width="55%">Details</th> <th align="left" width="10%">Pretix URL</th></tr>
+        {% for item in orders %}
         <tr>
-            <td bgcolor={{ item|paypal_status_color }}>
+            <td bgcolor={{ item|order_status_color }}>
                 {{ item.timestamp|ft }}
             </td>
 
-            <td bgcolor={{ item|paypal_status_color }}>
-                {{ item.payment_step }}: {{ item.paypal_status.shortname() }}
+            <td bgcolor={{ item|order_status_color }}>
+                {{ item.short_description }}
             </td>
 
-            {% if item.paypal_status.paypal_status_name == "paypal_error" %}
-            <td bgcolor={{ item|paypal_status_color }}>{{ item.data|replace("\n", "<br/>\n")|safe }}</td>
-            {% else %}
-            <td bgcolor={{ item|paypal_status_color }}>
+            <td bgcolor={{ item|order_status_color }}>
+                {{ item.amount }}
+            </td>
+
+            <td bgcolor={{ item|order_status_color }}>
                 <div title="timestamp: {{ item.timestamp|ft }}
-status: {{ item.paypal_status.paypal_status_name }}
-{{ item.data }}"
+status: {{ item.status }}
+description:
+{{ item.long_description }}"
                      class="hover-anchor">(hover here)</div>
             </td>
-            {% endif %}
+
+            <td bgcolor={{ item|order_status_color }}>
+                <a href="{{ item.pretix_url }}">{{ item.pretix_ref }}</a>
+            </td>
         </tr>
 
         {% endfor %}
@@ -47,12 +52,6 @@ status: {{ item.paypal_status.paypal_status_name }}
         {% call m.controlgroup("delete-field", "Delete participants") %}
           {{ m.tf("delete-field", "confirm deletion") }}
           {{ m.sub("delete-button", "Delete!", "btn btn-danger") }}
-        {% endcall %}
-
-        {% call m.controlgroup("paypal-change-field", "Change PP status") %}
-          {{ m.sel("sp-paypal-change-field", "1", paypal_statuses) }}
-          {{ m.tf("pp-change-reason", "reason?") }}
-          {{ m.sub("pp-change-button", "Submit", "btn btn-primary") }}
         {% endcall %}
     </form>
 </div>

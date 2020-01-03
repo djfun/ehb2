@@ -47,9 +47,12 @@ env_to_conf_entries = [
     ("EMAIL_PASSWORD", "email", "password"),
     ("EMAIL_DELAY", "email", "delay_between_messages"),
     #
-    ("PAYPAL_MODE", "paypal", "mode"),
-    ("PAYPAL_CLIENT_ID", "paypal", "client_id"),
-    ("PAYPAL_CLIENT_SECRET", "paypal", "client_secret")
+    ("PRETIX_API", "pretix", "api"),
+    ("PRETIX_TOKEN", "pretix", "token"),
+    ("PRETIX_APPLICATION_ITEM", "pretix", "application_item"),
+    ("PRETIX_OTHER_ITEM", "pretix", "other_item"),
+    #
+    ("ORDER_CRON_TOKEN", "order", "cron_token")
 ]
 
 for var, section, key in env_to_conf_entries:

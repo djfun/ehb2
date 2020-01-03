@@ -28,19 +28,11 @@ Hello, {{ prt.firstname }} {{ prt.lastname }}!
 
     <table class="table">
         {% for item in payment_items %}
-          <tr><td>{{ item.name }}</td>  <td>€ {{ item.amount }}</td></tr>
+          <tr><td>{{ item.name }}</td>  <td>€ {{ item.amount }}</td><td><a href="{{ item.pretix_url }}">Pay</a></td></tr>
         {% endfor %}
 
-        <tr><td><strong>Total:</strong></td>  <td><strong>€ {{ total_amount }}</strong></td></tr>
+        <tr><td><strong>Total:</strong></td>  <td><strong>€ {{ total_amount }}</strong></td><td></td></tr>
     </table>
-
-    <p>Please click on the "Confirm Payment" button below to execute this payment.</p>
-
-        <form class="form-horizontal" action="{{ url_for('doExecutePaymentOops') }}" method="post">
-            <input type="hidden" name="id" value="{{ prt.id }}">
-            <input type="hidden" name="amount" value="{{ total_amount }}">
-            <button id="submit" name="submit" type="submit" class="btn btn-primary">Confirm Payment</button>
-        </form>
 
 {% else %}
 <p>You have completed all of your payments. Thank you!</p>

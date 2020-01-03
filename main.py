@@ -13,12 +13,13 @@ from __init__ import *
 from auth import *
 from show_participants import show_participants, show_participant, do_show_participants
 from apply import *
-from extras import *
-from extras_roomplanner import *
+#from extras import *
+#from extras_roomplanner import *
 from admin import *
 from helpers import logger
 from printed import *
 from discount import *
+from payment import *
 
 
 @app.route("/")
@@ -85,7 +86,6 @@ if __name__ == "__main__":
         http_server = HTTPServer(WSGIContainer(app))
         http_server.listen(port)
         IOLoop.instance().start()
-
     else:
         helpers._logger = logging.getLogger(__name__)
         helpers.logger().info("Flask started at %s" % str(start_time))

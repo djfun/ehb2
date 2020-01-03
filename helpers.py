@@ -49,20 +49,9 @@ def lookup_oops(oops_code):
 # some useful global variables
 parts = ["--", "Tn", "Ld", "Br", "Bs"]
 lparts = ["None", "Tenor", "Lead", "Baritone", "Bass"]
+reg_statuses = ["--", "applied", "paid"]
 countries = {country.code: country for country in session.query(Country)}
 country_list = [(c.code, c.name_en) for id, c in sorted(countries.items(), key=lambda x:x[0])]
-paypal_statuses = {int(pp.id): pp.clone() for pp in session.query(PaypalStatus).all()}
-
-PP_UNINITIALIZED = 1
-PP_TOKEN = 2
-PP_CALLBACK = 3
-#PP_DETAILS = 4
-PP_APPROVED = 4
-PP_SUCCESS = 5
-PP_CANCELLED = 6
-PP_ERROR = 7
-PP_OOPS = 8
-
 
 # base URL from ehb.conf, with or without trailing slash
 def base_url(with_slash=False):
@@ -96,35 +85,27 @@ def lpart(eval_ctx, value):
 
 @app.template_filter()
 @evalcontextfilter
+def order_status_color(eval_ctx, item):
+    if item.status == OrderStatus.paid:
+        return "lightgreen"
+    else:
+        return "white"
+
+
+@app.template_filter()
+@evalcontextfilter
+def reg_status(eval_ctx, value):
+    return reg_statuses[value]
+
+
+@app.template_filter()
+@evalcontextfilter
 def mbr(eval_ctx, value):
     if value == True:
         return "Yes"
     else:
         return "No"
 
-
-@app.template_filter()
-@evalcontextfilter
-def paypal_status_color(eval_ctx, item: PaypalHistory):
-    if item._paypal_status == PP_SUCCESS:
-        if item.data.startswith("("):  # was manually edited or "(duplicate payment attempt)":
-            return "#d2f9d2"  # much lighter lightgreen, from https://www.w3schools.com/colors/colors_picker.asp
-        else:
-            return "lightgreen"
-    elif item._paypal_status == PP_CANCELLED or item._paypal_status == PP_ERROR:
-        return "Pink"
-    else:
-        return "white"
-
-
-# show string for last_paypal_status (works for Extras, need to confirm for Participants)
-@app.template_filter()
-@evalcontextfilter
-def ppstatus(eval_ctx, item):
-    if item.last_paypal_status:
-        return paypal_statuses[item.last_paypal_status].shortname()
-    else:
-        return "(none)"
 
 
 @app.template_filter()

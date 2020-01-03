@@ -1,8 +1,9 @@
 # coding: utf-8
-from sqlalchemy import Column, DateTime, Float, Integer, SmallInteger, String, Table, text, ForeignKey, Unicode, Date, Boolean
+from sqlalchemy import Column, DateTime, Float, Integer, SmallInteger, String, Table, text, ForeignKey, Unicode, Date, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql.sqltypes import Text, UnicodeText
+import enum
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -159,42 +160,6 @@ class Part(Base):
         return self.name
 
 
-class PaypalHistory(Base):
-    __tablename__ = 'paypal_history'
-
-    id = Column(Integer, primary_key=True)
-    participant_id = Column(Integer)
-    timestamp = Column(DateTime)
-    _paypal_status = Column("paypal_status", Integer, ForeignKey("paypal_statuses.id"))
-    data = Column(String)
-    payment_step = Column(SmallInteger, nullable=False, server_default=text("'1'"))
-
-    paypal_status = relationship("PaypalStatus", backref=backref("history_items"), lazy="joined")
-
-
-paypal_shortnames = ["", "uninit", "token", "callback",
-                     "approved", "paid", "cancelled", "error", "oops"]
-
-
-class PaypalStatus(Base):
-    __tablename__ = 'paypal_statuses'
-
-    id = Column(Integer, primary_key=True)
-    paypal_status_name = Column(String(20))
-
-    def shortname(self):
-        return paypal_shortnames[self.id]
-
-    def __repr__(self):
-        return "%d-%s" % (self.id, self.paypal_status_name)
-
-    def clone(self): # ugly hack around the lazy loading issue
-        ret = PaypalStatus()
-        ret.id = int(self.id)
-        ret.paypal_status_name = str(self.paypal_status_name)
-        return ret
-
-
 class RegistrationStatus(Base):
     __tablename__ = 'registration_statuses'
 
@@ -332,6 +297,10 @@ class OopsCode(Base):
 
     participant = relationship("Participant", backref=backref("oops_code"), lazy="joined")
 
+class OrderStatus(enum.Enum):
+    unpaid = 1
+    paid = 2
+    cancelled = 3
 
 class Order(Base):
     __tablename__ = "orders"
@@ -339,29 +308,15 @@ class Order(Base):
     id = Column(Integer, primary_key=True)
     timestamp = Column(DateTime)
     amount = Column(Integer)
-    short_description = Column(String)
-    long_description = Column(String)
-    shortstatuses = ["", "unpaid", "paid", "error"]
-
-    def status(self):
-        return shortstatuses[self.id]
+    short_description = Column(String(100))
+    long_description = Column(String(100))
+    participant_id = Column(Integer, ForeignKey('participant.id'))
+    status = Column(Enum(OrderStatus))
+    pretix_ref = Column(String(100))
+    pretix_url = Column(String(100))
+    comment = Column(String, server_default=text("''"))
 
     def __repr__(self):
         return "[%d %s, amount=%d]" % (self.id, self.short_description, self.amount)
 
     participant = relationship("Participant", backref=backref("orders"), lazy="joined")
-
-
-class ExternalPayment(Base):
-    __tablename__ = "external_payment"
-
-    id = Column(Integer, primary_key=True)
-    reference = Column(String(30))
-
-
-class PaypalPayment(Base):
-    __tablename__ = "paypal_payment"
-
-    id = Column(Integer, primary_key=True)
-    paypal_token = Column(String(30), index=True)
-    last_paypal_status = Column(SmallInteger)

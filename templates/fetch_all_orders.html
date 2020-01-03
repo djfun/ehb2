@@ -1,0 +1,25 @@
+Fetched the following {{ count }} orders from pretix:
+
+UPDATED:
+{% for item in updated_items %}
+------------------------------------------------------------------------
+Status: {{ item.pretix_status }}
+Description: {{ item.long_desc }}
+Total: € {{ item.pretix_total }}
+Pretix Comment:
+{{ item.pretix_comment | safe }}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{{ item.comment | safe }}
+------------------------------------------------------------------------{% endfor %}
+
+NOT CHANGED:
+{% for item in items %}
+------------------------------------------------------------------------
+Status: {{ item.pretix_status }}
+Description: {{ item.long_desc }}
+Total: € {{ item.pretix_total }}
+Pretix Comment:
+{{ item.pretix_comment | safe }}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{{ item.comment | safe }}
+------------------------------------------------------------------------{% endfor %}

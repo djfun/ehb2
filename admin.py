@@ -25,7 +25,7 @@ from wtforms.fields.simple import TextAreaField, HiddenField
 import ehbmail
 from __init__ import *
 from config import read_songs
-from extras import extras_cost
+# from extras import extras_cost
 from tables import *
 from helpers import *
 from flask_login import login_required, current_user

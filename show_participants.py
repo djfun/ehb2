@@ -2,7 +2,6 @@ import datetime
 
 from flask_login import login_required
 
-import paypal
 from __init__ import *
 from tables import *
 from itertools import groupby
@@ -15,13 +14,17 @@ from auth import *
 @login_required
 def show_participants(message=None):
     participants = session.query(Participant).all()
-    paid_participants = session.query(Participant).filter(
-        Participant.last_paypal_status == PP_SUCCESS).all()
+    paid_participants = session.query(Participant).\
+        join(Participant.orders).\
+        filter(Order.short_description == "application").\
+        filter(Order.status == OrderStatus.paid).all()
     total_donations = sum([p.donation for p in participants])
+    part_data = make_part_data(paid_participants)
+    country_data = make_country_data(paid_participants)
 
     return render_template("show_participants.html", title="Show participants", message=message,
                            participants=participants, total_donations=total_donations,
-                           part_data=make_part_data(paid_participants), country_data=make_country_data(paid_participants))
+                           part_data=part_data, country_data=country_data)
 
 
 @app.route("/show-participant.html")
@@ -29,12 +32,9 @@ def show_participants(message=None):
 def show_participant():
     id = int(request.args.get('id'))
     participant = session.query(Participant).filter(Participant.id == id).first()
-    payment_steps = session.query(PaypalHistory).filter(PaypalHistory.participant_id == id).\
-        filter(PaypalHistory.payment_step == 1).order_by(PaypalHistory.timestamp).all()
-    ps = [(id, p.shortname()) for (id, p) in sorted(paypal_statuses.items())]
+    orders = session.query(Order).filter(Order.participant_id == id).all()
 
-    return render_template("show_participant.html", title="Participant details", data=participant, paypal_history=payment_steps,
-                           paypal_statuses=ps)
+    return render_template("show_participant.html", title="Participant details", data=participant, orders=orders)
 
 
 @app.route("/show-participants.html", methods=["POST", ])
@@ -43,16 +43,7 @@ def do_show_participants():
     id = int(request.args.get('id'))
     parti = lp(id)
 
-    if 'pp-change-button' in request.form:
-        reason = request.form['pp-change-reason']
-        value = int(request.form['sp-paypal-change-field'])
-
-        paypal.log(id, 1, value, reason)
-
-        message = "Changed PP status of %s (%d) to %d (%s; reason: %s)." % (
-            parti.fullname(), id, value, paypal_statuses[value].shortname(), reason)
-
-    elif 'delete-button' in request.form:
+    if 'delete-button' in request.form:
         if request.form['delete-field'] == 'delete!':
             prt = session.query(Participant).filter(
                 Participant.id == id).first()  # type: Participant
@@ -68,8 +59,7 @@ def do_show_participants():
                                              contribution_comment=prt.contribution_comment,
                                              registration_status=prt.registration_status,
                                              donation=prt.donation, iq_username=prt.iq_username,
-                                             final_part=prt.final_part, paypal_token=prt.paypal_token,
-                                             last_paypal_status=prt.last_paypal_status,
+                                             final_part=prt.final_part,
                                              discounted=prt.discounted,
                                              final_fee=prt.final_fee,
                                              code=prt.code,
@@ -86,8 +76,8 @@ def do_show_participants():
     return show_participants(message=message)
 
 
-part_colors = ["428BCA", "5CB85C", "F0AD4E", "D9534F"]
-part_highlight_colors = ["5DA6E6", "78D077", "FCC671", "E16864"]
+part_colors = ["000000", "428BCA", "5CB85C", "F0AD4E", "D9534F"]
+part_highlight_colors = ["000000", "5DA6E6", "78D077", "FCC671", "E16864"]
 
 country_colors = [
     "262BC0",
@@ -136,9 +126,9 @@ def participants_by(all_participants, fn):
 
 
 def make_part_data(all_participants):
-    p_by_part = participants_by(all_participants, lambda p: p.part1)
+    p_by_part = participants_by(all_participants, lambda p: p.final_part)
     return ["{ value: %d, color:'#%s', highlight:'#%s', label:'%s'}" %
-            (len(list(people)), part_colors[i], part_highlight_colors[i], lparts[part])
+            (len(list(people)), part_colors[part], part_highlight_colors[part], lparts[part])
             for (i, (part, people)) in enumerate(p_by_part)]
 
 

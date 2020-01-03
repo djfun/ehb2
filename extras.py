@@ -4,7 +4,9 @@ from datetime import date, datetime
 from flask_login import login_required
 
 import ehbmail
+from tables import *
 from __init__ import *
+
 from extras_form import ExtrasForm, make_extras_from_form, NO_TSHIRT, make_form_from_extras, \
     NO_RESTAURANT
 from extras_roomtypes import Roomtype

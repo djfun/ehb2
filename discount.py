@@ -9,7 +9,7 @@ from config import conf
 Base = declarative_base()
 metadata = Base.metadata
 event_shortname = conf.get("application", "shortname")
-application_fee = str(conf.get("paypal", "fee"))
+application_fee = str(conf.get("payment", "fee"))
 
 
 class DiscountCode(Base):  # user_id is participant code, default is NULL

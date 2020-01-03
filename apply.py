@@ -1,4 +1,4 @@
-import datetime
+from datetime import date, datetime
 import hashlib
 
 from sqlalchemy.exc import IntegrityError
@@ -15,10 +15,11 @@ from flask import session as flask_session
 from wtforms import Form, StringField, validators, SelectField, IntegerField, TextAreaField, BooleanField
 from config import conf, currency_symbol
 from discount import *
+from order import *
 from confirmation_token import generate_confirmation_token, confirm_token
 import urllib.parse
 
-application_fee = float(conf.get("paypal", "fee"))
+application_fee = float(conf.get("payment", "fee"))
 event_name = conf.get("application", "name")
 event_shortname = conf.get("application", "shortname")
 base_url = conf.get("server", "base_url")
@@ -80,10 +81,11 @@ def do_apply():
                               sex=form.gender.data, street=form.street.data.strip(),
                               city=form.city.data.strip(), zip=form.zip.data.strip(),
                               country=form.country.data, part1=int(form.part1.data), part2=int(form.part2.data),
+                              final_part=int(form.part1.data),
                               email=form.email.data, member=form.member.data, exp_quartet=form.exp_quartet.data,
                               exp_brigade=form.exp_brigade.data, exp_chorus=form.exp_chorus.data,
                               exp_musical=form.exp_musical.data, exp_reference=form.exp_reference.data,
-                              application_time=datetime.datetime.now(), comments=form.comments.data,
+                              application_time=datetime.now(), comments=form.comments.data,
                               contribution_comment=form.contribution_comment.data,
                               registration_status=1,  # (= new application)
                               donation=form.donation.data, iq_username=form.iq_username.data,
@@ -92,25 +94,21 @@ def do_apply():
 
         try:
             session.add(new_prt)
-            session.commit()
+            session.flush()
 
             new_prt.code = make_code(new_prt.id)
-            session.commit()
+            session.flush()
 
             new_prt.final_fee = application_fee - apply_discount(new_prt.discounted, new_prt.code)
-            session.commit()
+            session.flush()
 
             token = generate_confirmation_token(new_prt.email)
             confirmation_url = urllib.parse.urljoin(base_url, "/confirm_email/")
             confirmation_url = urllib.parse.urljoin(confirmation_url, token)
 
             amount = new_prt.final_fee + new_prt.donation
-            # TODO2020: Create new order
-            # * new_prt.id
-            # * amount
-            # * "application"
-            # * "Application %s %s" % new_prt.firstname, new_prt.lastname
-            # pp1.log(new_prt.id, PP_UNINITIALIZED, "")
+
+            create_order(new_prt, amount, "application", "Application %s %s" % (new_prt.firstname, new_prt.lastname))
 
             # send email with confirmation token
             body = render_template("application_confirm_email.txt", amount=int(amount), prt=new_prt, eventname=event_name,
@@ -119,30 +117,36 @@ def do_apply():
             print(body)
             ehbmail.send([new_prt.id], "Application confirmed", [body], "Application page")
 
+            session.commit()
+
             return render_template("confirmation_email_sent.html", title="Apply!", amount=int(amount), data=new_prt, name=event_name,
                                 shortname=event_shortname, currency_symbol=currency_symbol, application_fee=int(application_fee))
 
         except IntegrityError as e:
             # TODO - if participant exists AND HAS PAID, reject application for same email
             logger().error("Duplicate email in application: %s" % form.email.data)
+            session.rollback()
             flash("A user with the email address '%s' already exists. Please sign up with a different email address, or contact the organizers for help." % form.email.data)
             return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
         except CodeNotFoundException as e:
             logger().error("Cannot find discount code : %s" % form.discount_code.data)
+            session.rollback()
             flash("The scholarship code you entered is not valid: '%s'. Please try again." %
                   form.discount_code.data)
             return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
         except CodeInUseException as e:
             logger().error("Discount code already in use : %s" % form.discount_code.data)
+            session.rollback()
             flash("The scholarship code you entered is already in use: '%s'." %
                   form.discount_code.data)
             return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
         except Exception as e:
             logger().error("Exception in do_apply: %s" % str(e))
-            flash("A database error occurred. Please resubmit your application in a few minutes. If the problem persists, please contact the organizers.")
+            session.rollback()
+            flash("An error occurred. Please resubmit your application in a few minutes. If the problem persists, please contact the organizers.")
             return render_template("apply.html", title="Apply!", form=form, conf_data=conf_data)
 
     else:
