@@ -3,7 +3,7 @@ Dear {{ prt.fullname() }},
 Thank you for applying to {{ eventname }}!
 
 To complete your application, please confirm your email address and make your
-Paypal payment of {{ currency_symbol }} {{ amount }} by following this link:
+payment of {{ currency_symbol }} {{ amount }} by following this link:
 
 {{ confirmation_url }}
 
