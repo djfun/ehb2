@@ -15,8 +15,7 @@
     have read <a href="https://europeanharmonybrigade.org/welcome/">what a Harmony Brigade is</a> and
     <a href="https://www.europeanharmonybrigade.org/faq/">how we handle applications</a> before you apply.
     In particular, note that your application is complete only when you have
-    paid the registration fee of € {{ conf_data["s_application_fee"] }} in full via Paypal. If your application is not accepted, we will reimburse this fee to you via Paypal as quickly
-    as we can.</p>
+    paid the registration fee of € {{ conf_data["s_application_fee"] }} in full via bank transfer or credit card. If your application is not accepted, we will reimburse this fee to you as quickly as we can.</p>
 
 <p>The information you submit will be held in confidence. We may share
     it among the organizing team in order to review the applications, but
@@ -58,8 +57,7 @@
         We will be offering financial support to a small number of participants
         who couldn't otherwise afford to come to " + conf_data["shortname"] + " (see explanation at the
         top of the page). If you would like to make a donation to help
-        finance this sponsorship program, just enter the value below, and we will transfer it
-        via Paypal together with your registration fee.
+        finance this sponsorship program, just enter the value below, and we will transfer it together with your registration fee.
         """) }}
         {{ m.wtf(form.donation) }}
 
@@ -110,7 +108,7 @@
         {{ m.header("section5", """<strong>Important:</strong> By clicking on the \"Submit\" button below, you apply for participation in the
         " + conf_data["name"] + ".
         <strong>Please review your data carefully before clicking the button; you will not have a chance to change it later.</strong> When you click on
-        \"Submit\", you will receive an email with a link to get to Paypal, where you will be asked to pay the registration fee of € " + conf_data["s_application_fee"] + ", plus your sponsorship
+        \"Submit\", you will receive an email with a link to confirm your email address, where you will be asked to pay the registration fee of € " + conf_data["s_application_fee"] + ", plus your sponsorship
         donation if you made one. The recipient is
         \"BinG Barbershop in Germany\".""") }}
 
