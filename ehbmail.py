@@ -22,7 +22,7 @@ def log_email(recipient, subject, body, replyto, sent_from, dryrun=False):
     return em
 
 
-def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, charset="iso-8859-15", delay=0):
+def send(recipients, subject, bodies, sent_from, replyto=None, dryrun=False, charset="utf-8", delay=0):
     """
     Sends an email using the connection specified in ehb.conf.
 
